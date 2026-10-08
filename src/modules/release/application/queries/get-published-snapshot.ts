@@ -1,8 +1,4 @@
-import type {
-  InfrastructureAppError,
-  NotFoundAppError,
-  UnexpectedAppError,
-} from '@lib/errors';
+import type { InfrastructureAppError, NotFoundAppError, UnexpectedAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
@@ -20,12 +16,14 @@ import type { PublicReleaseDependencies } from '../release-dependencies';
  * live release pointer, never through draft pages, and fails closed for a
  * website that was never published. A malformed id is just "not
  * published": the public surface does not explain its own id format.
+ *
+ * @authorization public Serves the published site, which anyone may read; it resolves only the live release.
  */
 export class GetPublishedSnapshot {
   constructor(private readonly deps: PublicReleaseDependencies) {}
 
   execute(
-    rawWebsiteId: string
+    rawWebsiteId: string,
   ): AppResultAsync<
     PublishedSnapshotView,
     NotFoundAppError | InfrastructureAppError | UnexpectedAppError
@@ -37,9 +35,8 @@ export class GetPublishedSnapshot {
 
     return this.deps.releases
       .findPublished(websiteId.value)
-      .andThen(
-        (release): AppResultAsync<Release, NotFoundAppError> =>
-          release === null ? errAsync(releaseNotPublished()) : okAsync(release)
+      .andThen((release): AppResultAsync<Release, NotFoundAppError> =>
+        release === null ? errAsync(releaseNotPublished()) : okAsync(release),
       )
       .map(toPublishedSnapshotView);
   }

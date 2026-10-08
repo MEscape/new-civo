@@ -18,10 +18,7 @@ export function assertNever(value: never, message?: string): never {
  * failure, so never use it to validate external input; use a schema for
  * that (validation.md).
  */
-export function invariant(
-  condition: unknown,
-  message: string
-): asserts condition {
+export function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(`Invariant violation: ${message}`);
   }

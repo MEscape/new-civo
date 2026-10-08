@@ -28,6 +28,10 @@
       "model": "Website",
       "namespace": "public"
     },
+    "WebsiteMigration": {
+      "model": "WebsiteMigration",
+      "namespace": "public"
+    },
     "WebsiteRelease": {
       "model": "WebsiteRelease",
       "namespace": "public"
@@ -85,6 +89,19 @@
               {
                 "name": "ERROR",
                 "value": "ERROR"
+              }
+            ]
+          },
+          "MigrationStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "PROPOSED",
+                "value": "PROPOSED"
+              },
+              {
+                "name": "APPLIED",
+                "value": "APPLIED"
               }
             ]
           },
@@ -785,6 +802,21 @@
                   "namespace": "public"
                 }
               },
+              "migrations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "websiteId"
+                  ]
+                },
+                "to": {
+                  "model": "WebsiteMigration",
+                  "namespace": "public"
+                }
+              },
               "pages": {
                 "cardinality": "1:N",
                 "on": {
@@ -884,6 +916,156 @@
               "table": "Website"
             }
           },
+          "WebsiteMigration": {
+            "fields": {
+              "appliedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "appliedBy": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "plan": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "proposedBy": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "resolutions": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceReleaseId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MigrationStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "websiteId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "sourceRelease": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "sourceReleaseId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "WebsiteRelease",
+                  "namespace": "public"
+                }
+              },
+              "website": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "websiteId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Website",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "appliedAt": {
+                  "column": "appliedAt"
+                },
+                "appliedBy": {
+                  "column": "appliedBy"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "plan": {
+                  "column": "plan"
+                },
+                "proposedBy": {
+                  "column": "proposedBy"
+                },
+                "resolutions": {
+                  "column": "resolutions"
+                },
+                "sourceReleaseId": {
+                  "column": "sourceReleaseId"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "websiteId": {
+                  "column": "websiteId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "WebsiteMigration"
+            }
+          },
           "WebsiteRelease": {
             "fields": {
               "createdAt": {
@@ -962,6 +1144,21 @@
                 },
                 "to": {
                   "model": "Website",
+                  "namespace": "public"
+                }
+              },
+              "migrations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "sourceReleaseId"
+                  ]
+                },
+                "to": {
+                  "model": "WebsiteMigration",
                   "namespace": "public"
                 }
               },
@@ -1746,6 +1943,150 @@
                 }
               ]
             },
+            "WebsiteMigration": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('PROPOSED', 'APPLIED')",
+                  "name": "WebsiteMigration_status_check_953d0064",
+                  "prefix": "WebsiteMigration_status_check"
+                }
+              ],
+              "columns": {
+                "appliedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "appliedBy": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "plan": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": false
+                },
+                "proposedBy": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "resolutions": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": true
+                },
+                "sourceReleaseId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "PROPOSED"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MigrationStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "websiteId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "websiteId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "WebsiteMigration"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Website"
+                  }
+                },
+                {
+                  "onDelete": "cascade",
+                  "source": {
+                    "columns": [
+                      "sourceReleaseId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "WebsiteMigration"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "WebsiteRelease"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "sourceReleaseId"
+                  ],
+                  "name": "WebsiteMigration_sourceReleaseId_idx_7dff7977",
+                  "prefix": "WebsiteMigration_sourceReleaseId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "websiteId",
+                    "createdAt"
+                  ],
+                  "name": "WebsiteMigration_websiteId_createdAt_idx_5579a8b3",
+                  "prefix": "WebsiteMigration_websiteId_createdAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "websiteId"
+                  ],
+                  "name": "WebsiteMigration_websiteId_idx_aa7167ce",
+                  "prefix": "WebsiteMigration_websiteId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "WebsiteRelease": {
               "checks": [
                 {
@@ -1987,6 +2328,13 @@
                 "ERROR"
               ]
             },
+            "MigrationStatus": {
+              "kind": "valueSet",
+              "values": [
+                "PROPOSED",
+                "APPLIED"
+              ]
+            },
             "PageConfigStatus": {
               "kind": "valueSet",
               "values": [
@@ -2009,10 +2357,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f7fd28cc716d91eb63f784d86f0ad0e8dbc39c4f9134e82b4c1c5a4fdc9a5c1a"
+    "storageHash": "c7c52e3229880c553d3655940f128f9ac431dbc469c0a3e8aef493807391b6cc"
   },
   "execution": {
-    "executionHash": "74c7d985cfcbc5d63a1c12ce5a2c43510f289d84f022e23a0ae9a8f2d4a188df",
+    "executionHash": "c733ba88b92a6fd782da42b6819289902373315a84680a48d232212f62b67f56",
     "mutations": {
       "defaults": [
         {
@@ -2021,9 +2369,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "DataSource",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "Dataset"
           }
         },
         {
@@ -2032,9 +2380,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "Dataset",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "DataSource"
           }
         },
         {
@@ -2043,9 +2391,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "Membership",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "Membership"
           }
         },
         {
@@ -2054,9 +2402,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "Page",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "Page"
           }
         },
         {
@@ -2065,9 +2413,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "PageConfig",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "PageConfig"
           }
         },
         {
@@ -2076,9 +2424,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "Website",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "Website"
           }
         },
         {
@@ -2087,9 +2435,9 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "WebsiteRelease",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "WebsiteMigration"
           }
         },
         {
@@ -2098,9 +2446,20 @@
             "kind": "generator"
           },
           "ref": {
-            "entry": "WebsiteTheme",
-            "field": "id",
-            "namespace": "public"
+            "column": "id",
+            "namespace": "public",
+            "table": "WebsiteRelease"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "WebsiteTheme"
           }
         }
       ]

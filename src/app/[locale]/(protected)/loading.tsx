@@ -5,5 +5,5 @@
  * The file still marks the Suspense boundary that `cacheComponents` needs.
  */
 export default function Loading(): null {
-    return null;
+  return null;
 }

@@ -3,12 +3,8 @@
 import { useId, useState, useTransition } from 'react';
 import type { ChangeEvent } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
-
 
 import { builderRoutes } from '@modules/builder/client';
 
@@ -16,6 +12,9 @@ import { FieldMessage } from '@components/shared/field-message';
 import { TextField } from '@components/shared/text-field';
 import { Button } from '@components/ui/button';
 
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 import { slugify } from '@lib/utils';
@@ -27,7 +26,6 @@ import {
 import { createWebsiteAction } from '../actions/create-website-action';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
 import { newWebsiteSchema } from '../schemas/new-website-schema';
-
 
 import { TemplatePicker } from './template-picker';
 
@@ -43,6 +41,9 @@ const CODE_FIELDS: Readonly<Record<string, FieldPath<NewWebsite>>> = {
 
 export function CreateWebsiteForm() {
   const t = useTranslations('website');
+  /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+  const errorText = (code: string | undefined) =>
+    code === undefined ? undefined : t(messageKeyForCode(code), MESSAGE_PARAMS);
 
   const router = useRouter();
   const id = useId();
@@ -60,7 +61,9 @@ export function CreateWebsiteForm() {
 
   /** Follow the name until the user has typed their own slug. */
   function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
-    if (form.getFieldState('slug').isDirty) {return;}
+    if (form.getFieldState('slug').isDirty) {
+      return;
+    }
     form.setValue('slug', slugify(event.target.value), {
       shouldValidate: form.formState.isSubmitted,
     });
@@ -82,9 +85,7 @@ export function CreateWebsiteForm() {
         router.push(builderRoutes.pages(result.data.id));
         return;
       }
-      setFormErrorCode(
-        applyActionError(result.error, form.setError, CODE_FIELDS)
-      );
+      setFormErrorCode(applyActionError(result.error, form.setError, CODE_FIELDS));
     });
   }
 
@@ -100,7 +101,7 @@ export function CreateWebsiteForm() {
         label={t('createForm.name')}
         placeholder={t('createForm.namePlaceholder')}
         autoComplete="organization"
-        error={errors.name?.message ? t(messageKeyForCode(errors.name.message), MESSAGE_PARAMS) : undefined}
+        error={errorText(errors.name?.message)}
         {...form.register('name', { onChange: handleNameChange })}
       />
 
@@ -109,7 +110,7 @@ export function CreateWebsiteForm() {
         label={t('createForm.slug')}
         placeholder={t('createForm.slugPlaceholder')}
         autoComplete="off"
-        error={errors.slug?.message ? t(messageKeyForCode(errors.slug.message), MESSAGE_PARAMS) : undefined}
+        error={errorText(errors.slug?.message)}
         {...form.register('slug', { onBlur: handleSlugBlur })}
       />
 

@@ -47,35 +47,26 @@ export const WEBSITE_VALIDATION_CODES = {
   spacingUnsupported: 'website.validation.spacing_unsupported',
 } as const;
 
-export type WebsiteErrorCode =
-  (typeof WEBSITE_ERROR_CODES)[keyof typeof WEBSITE_ERROR_CODES];
+export type WebsiteErrorCode = (typeof WEBSITE_ERROR_CODES)[keyof typeof WEBSITE_ERROR_CODES];
 export type WebsiteValidationCode =
   (typeof WEBSITE_VALIDATION_CODES)[keyof typeof WEBSITE_VALIDATION_CODES];
 export type WebsiteCode = WebsiteErrorCode | WebsiteValidationCode;
 
 /** Also covers a foreign tenant's website: see `WEBSITE_ERROR_CODES`. */
 export function websiteNotFound(): NotFoundAppError {
-  return notFoundError(
-    WEBSITE_ERROR_CODES.notFound,
-    'The website was not found.'
-  );
+  return notFoundError(WEBSITE_ERROR_CODES.notFound, 'The website was not found.');
 }
 
 /** Slugs are globally unique because they become public URL segments. */
 export function websiteSlugTaken(): ConflictAppError {
-  return conflictError(
-    WEBSITE_ERROR_CODES.slugTaken,
-    'A website with this slug already exists.'
-  );
+  return conflictError(WEBSITE_ERROR_CODES.slugTaken, 'A website with this slug already exists.');
 }
 
-export function websiteValidationFailed(
-  fieldErrors: Record<string, string[]>
-): ValidationAppError {
+export function websiteValidationFailed(fieldErrors: Record<string, string[]>): ValidationAppError {
   return validationError(
     WEBSITE_ERROR_CODES.validationFailed,
     'The website input is invalid.',
-    fieldErrors
+    fieldErrors,
   );
 }
 
@@ -87,19 +78,17 @@ export function createWebsiteErrorBag(): FieldErrorBag {
 /** A validation failure on a single field. */
 export function fieldValidationFailed(
   field: string,
-  code: WebsiteValidationCode
+  code: WebsiteValidationCode,
 ): ValidationAppError {
   return websiteValidationFailed({ [field]: [code] });
 }
 
 /** The builder was unreachable or failed while creating the home page. */
-export function homePageProvisioningFailed(
-  cause: unknown
-): InfrastructureAppError {
+export function homePageProvisioningFailed(cause: unknown): InfrastructureAppError {
   return infrastructureError(
     WEBSITE_ERROR_CODES.homePageProvisioningFailed,
     'The home page could not be provisioned.',
-    cause
+    cause,
   );
 }
 
@@ -111,6 +100,6 @@ export function homePageBlueprintRejected(cause: unknown): UnexpectedAppError {
   return unexpectedError(
     WEBSITE_ERROR_CODES.homePageBlueprintRejected,
     'The builder rejected the home page blueprint.',
-    cause
+    cause,
   );
 }

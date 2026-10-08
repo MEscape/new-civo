@@ -47,8 +47,12 @@ const SINGLE_LOCATION_ZOOM = 14;
 const MAX_FIT_ZOOM = 16;
 const CLUSTER_RADIUS = 50;
 const CLUSTER_MAX_ZOOM = 14;
-const FATAL_STATUSES: ReadonlySet<number> = new Set([401, 403]);
-const WORLD_CENTER: [number, number] = [0, 20];
+const HTTP_UNAUTHORIZED = 401;
+const HTTP_FORBIDDEN = 403;
+/** A token Mapbox rejects will not start working by retrying. */
+const FATAL_STATUSES: ReadonlySet<number> = new Set([HTTP_UNAUTHORIZED, HTTP_FORBIDDEN]);
+const WORLD_CENTER_LATITUDE = 20;
+const WORLD_CENTER: [number, number] = [0, WORLD_CENTER_LATITUDE];
 const WORLD_ZOOM = 1;
 
 type GeoJsonFeature = Feature<Geometry, Record<string, string | number | boolean>>;
@@ -168,7 +172,7 @@ class MapboxRenderer implements MapRenderer {
       });
       this.groups.set(
         layer.style.layerId,
-        buildLayerGroups(layer.style.layerId, sourceId, layer.style, palette),
+        buildLayerGroups({ layerId: layer.style.layerId, sourceId, style: layer.style, palette }),
       );
     }
     // Areas first, then lines, then points: a district never hides the sensors inside it.

@@ -1,11 +1,6 @@
-import { logger } from '@lib/logger';
+import { createAuditLog } from '@lib/logger';
 
-import type {
-    SecurityAuditLog,
-    SecurityEvent,
-} from '../../domain/ports/security-audit-log.port';
-
-const auditLogger = logger.withContext({ module: 'auth.audit' });
+import type { SecurityAuditLog, SecurityEvent } from '../../domain/ports/security-audit-log.port';
 
 /**
  * Failures and denials are `warn` so alerting can key on them; ordinary
@@ -13,23 +8,17 @@ const auditLogger = logger.withContext({ module: 'auth.audit' });
  * compile until it is given a level.
  */
 const LEVEL_BY_EVENT = {
-    'authorization.denied': 'warn',
-    'authentication.sign_in_failed': 'warn',
-    'authentication.rate_limited': 'warn',
-    'authentication.session_created': 'info',
-    'authentication.session_revoked': 'info',
-    'authentication.account_created': 'info',
-    'authentication.password_reset_completed': 'info',
+  'authorization.denied': 'warn',
+  'authentication.sign_in_failed': 'warn',
+  'authentication.rate_limited': 'warn',
+  'authentication.session_created': 'info',
+  'authentication.session_revoked': 'info',
+  'authentication.account_created': 'info',
+  'authentication.password_reset_completed': 'info',
 } as const satisfies Record<SecurityEvent['type'], 'info' | 'warn'>;
 
-/** Writes each event as one structured log line. Never throws. */
-export class LoggerSecurityAuditLog implements SecurityAuditLog {
-    record(event: SecurityEvent): void {
-        const { type, ...details } = event;
-        try {
-            auditLogger[LEVEL_BY_EVENT[type]](type, details);
-        } catch {
-            // Auditing must never fail the request it describes (see the port).
-        }
-    }
-}
+/** One structured log line per event under `auth.audit`; never throws. */
+export const loggerSecurityAuditLog: SecurityAuditLog = createAuditLog(
+  'auth.audit',
+  LEVEL_BY_EVENT,
+);

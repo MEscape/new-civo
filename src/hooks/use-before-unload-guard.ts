@@ -9,7 +9,9 @@ import { useEffect } from 'react';
  */
 export function useBeforeUnloadGuard(isActive: boolean): void {
   useEffect(() => {
-    if (!isActive) {return undefined;}
+    if (!isActive) {
+      return undefined;
+    }
 
     function handleBeforeUnload(event: BeforeUnloadEvent): void {
       event.preventDefault();

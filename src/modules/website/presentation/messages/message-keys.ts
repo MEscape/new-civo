@@ -24,31 +24,30 @@ type ValidKeys = NestedKeyOf<MessageCatalog['website']>;
  * until it has a message.
  */
 export const MESSAGE_KEY_BY_CODE = {
-  [ERRORS.notFound]: fieldPath( 'errors', 'notFound'),
-  [ERRORS.slugTaken]: fieldPath( 'errors', 'slugTaken'),
-  [ERRORS.validationFailed]: fieldPath( 'errors', 'validation'),
-  [ERRORS.persistenceFailed]: fieldPath( 'errors', 'infrastructure'),
-  [ERRORS.homePageProvisioningFailed]: fieldPath( 'errors', 'infrastructure'),
-  [ERRORS.homePageBlueprintRejected]: fieldPath( 'errors', 'infrastructure'),
-  [VALIDATION.idInvalid]: fieldPath( 'validation', 'idInvalid'),
-  [VALIDATION.nameTooShort]: fieldPath( 'validation', 'nameTooShort'),
-  [VALIDATION.nameTooLong]: fieldPath( 'validation', 'nameTooLong'),
-  [VALIDATION.slugRequired]: fieldPath( 'validation', 'slugRequired'),
-  [VALIDATION.slugTooLong]: fieldPath( 'validation', 'slugTooLong'),
-  [VALIDATION.slugInvalid]: fieldPath( 'validation', 'slugInvalid'),
-  [VALIDATION.descriptionTooLong]: fieldPath( 'validation', 'descriptionTooLong'),
-  [VALIDATION.templateUnknown]: fieldPath( 'validation', 'templateUnknown'),
-  [VALIDATION.colorInvalid]: fieldPath( 'validation', 'colorInvalid'),
-  [VALIDATION.fontUnsupported]: fieldPath( 'validation', 'fontUnsupported'),
-  [VALIDATION.radiusUnsupported]: fieldPath( 'validation', 'radiusUnsupported'),
-  [VALIDATION.spacingUnsupported]: fieldPath( 'validation', 'spacingUnsupported'),
+  [ERRORS.notFound]: fieldPath('errors', 'notFound'),
+  [ERRORS.slugTaken]: fieldPath('errors', 'slugTaken'),
+  [ERRORS.validationFailed]: fieldPath('errors', 'validation'),
+  [ERRORS.persistenceFailed]: fieldPath('errors', 'infrastructure'),
+  [ERRORS.homePageProvisioningFailed]: fieldPath('errors', 'infrastructure'),
+  [ERRORS.homePageBlueprintRejected]: fieldPath('errors', 'infrastructure'),
+  [VALIDATION.idInvalid]: fieldPath('validation', 'idInvalid'),
+  [VALIDATION.nameTooShort]: fieldPath('validation', 'nameTooShort'),
+  [VALIDATION.nameTooLong]: fieldPath('validation', 'nameTooLong'),
+  [VALIDATION.slugRequired]: fieldPath('validation', 'slugRequired'),
+  [VALIDATION.slugTooLong]: fieldPath('validation', 'slugTooLong'),
+  [VALIDATION.slugInvalid]: fieldPath('validation', 'slugInvalid'),
+  [VALIDATION.descriptionTooLong]: fieldPath('validation', 'descriptionTooLong'),
+  [VALIDATION.templateUnknown]: fieldPath('validation', 'templateUnknown'),
+  [VALIDATION.colorInvalid]: fieldPath('validation', 'colorInvalid'),
+  [VALIDATION.fontUnsupported]: fieldPath('validation', 'fontUnsupported'),
+  [VALIDATION.radiusUnsupported]: fieldPath('validation', 'radiusUnsupported'),
+  [VALIDATION.spacingUnsupported]: fieldPath('validation', 'spacingUnsupported'),
 } as const satisfies Record<WebsiteCode, ValidKeys>;
 
-export const GENERIC_ERROR_MESSAGE_KEY = fieldPath( 'errors', 'unexpected');
+export const GENERIC_ERROR_MESSAGE_KEY = fieldPath('errors', 'unexpected');
 
 export type MessageKey =
-  | (typeof MESSAGE_KEY_BY_CODE)[WebsiteCode]
-  | typeof GENERIC_ERROR_MESSAGE_KEY;
+  (typeof MESSAGE_KEY_BY_CODE)[WebsiteCode] | typeof GENERIC_ERROR_MESSAGE_KEY;
 
 function isWebsiteCode(code: string): code is WebsiteCode {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code);
@@ -71,9 +70,18 @@ export const MESSAGE_PARAMS = {
 } as const;
 
 export const TEMPLATE_MESSAGE_KEYS = {
-  municipal: { label: fieldPath('templates', 'municipal', 'label'), description: fieldPath('templates', 'municipal', 'description') },
-  'smart-city': { label: fieldPath('templates', 'smartCity', 'label'), description: fieldPath('templates', 'smartCity', 'description') },
-  association: { label: fieldPath('templates', 'association', 'label'), description: fieldPath('templates', 'association', 'description') },
+  municipal: {
+    label: fieldPath('templates', 'municipal', 'label'),
+    description: fieldPath('templates', 'municipal', 'description'),
+  },
+  'smart-city': {
+    label: fieldPath('templates', 'smartCity', 'label'),
+    description: fieldPath('templates', 'smartCity', 'description'),
+  },
+  association: {
+    label: fieldPath('templates', 'association', 'label'),
+    description: fieldPath('templates', 'association', 'description'),
+  },
 } as const satisfies Record<TemplateKey, { label: ValidKeys; description: ValidKeys }>;
 
 export const RADIUS_MESSAGE_KEYS = {

@@ -1,31 +1,23 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { Badge } from '@components/ui/badge';
 import { Card, CardContent } from '@components/ui/card';
 import { Trash2 } from '@components/ui/icons';
 
-import { getLocale, getTimeZone, getTranslations } from '@i18n/server';
+import { getAppFormatters, getTranslations } from '@i18n/server';
 
-import { formatDate, trimToNull } from '@lib/utils';
+import { trimToNull } from '@lib/utils';
 
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
 
 import type {
+  WASTE_TYPES,
   ComponentProps,
   RenderContext,
 } from '../../../../application/contracts/component-platform-constraints';
 import type { LoadContent } from '../../page-renderer/load-content';
 
-type WasteType =
-  | 'restmuell'
-  | 'biomuell'
-  | 'papier'
-  | 'gelberSack'
-  | 'sperrmuell';
+type WasteKind = (typeof WASTE_TYPES)[number];
 
 const BADGE_VARIANTS = {
   restmuell: 'muted',
@@ -33,7 +25,7 @@ const BADGE_VARIANTS = {
   papier: 'muted',
   gelberSack: 'warning',
   sperrmuell: 'warning',
-} as const satisfies Record<WasteType, 'default' | 'muted' | 'warning'>;
+} as const satisfies Record<WasteKind, 'default' | 'muted' | 'warning'>;
 
 const DATE_FORMAT = {
   weekday: 'short',
@@ -48,15 +40,10 @@ export interface WasteCalendarComponentProps {
 }
 
 /** The next waste collections, colour-coded by waste type. */
-export async function WasteCalendar({
-  props,
-  context,
-  loadContent,
-}: WasteCalendarComponentProps) {
-  const [t, locale, timeZone, result] = await Promise.all([
+export async function WasteCalendar({ props, context, loadContent }: WasteCalendarComponentProps) {
+  const [t, format, result] = await Promise.all([
     getTranslations('componentPlatform'),
-    getLocale(),
-    getTimeZone(),
+    getAppFormatters(),
     loadContent({
       kind: 'WasteCollectionEntry',
       mode: context.mode,
@@ -66,8 +53,7 @@ export async function WasteCalendar({
       limit: props.limit,
     }),
   ]);
-  const heading =
-    trimToNull(props.heading) ?? t('wasteCalendar.defaultHeading');
+  const heading = trimToNull(props.heading) ?? t('wasteCalendar.defaultHeading');
 
   if (result.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -91,18 +77,13 @@ export async function WasteCalendar({
                   className="flex items-center justify-between gap-3 py-2.5 text-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <Trash2
-                      className="h-4 w-4 shrink-0 text-copy-muted"
-                      aria-hidden="true"
-                    />
+                    <Trash2 className="h-4 w-4 shrink-0 text-copy-muted" aria-hidden="true" />
                     <div>
                       <time dateTime={entry.date} className="text-copy">
-                        {formatDate(entry.date, locale, timeZone, DATE_FORMAT)}
+                        {format.date(entry.date, DATE_FORMAT)}
                       </time>
                       {entry.district !== undefined && (
-                        <p className="text-xs text-copy-muted">
-                          {entry.district}
-                        </p>
+                        <p className="text-xs text-copy-muted">{entry.district}</p>
                       )}
                     </div>
                   </div>

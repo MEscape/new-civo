@@ -27,9 +27,7 @@ const INITIAL_STATE: CanvasRenderState = {
  * its effect cleanup, never applied late. The last good render stays on
  * screen while a newer one is pending or has failed.
  */
-export function useCanvasRender(
-  children: readonly PageNode[]
-): CanvasRenderState {
+export function useCanvasRender(children: readonly PageNode[]): CanvasRenderState {
   const pageId = useBuilderSelector(selectPageId);
   const [state, setState] = useState(INITIAL_STATE);
 
@@ -38,11 +36,13 @@ export function useCanvasRender(
     const timeout = setTimeout(() => {
       setState((previous) => ({ ...previous, isRendering: true }));
       void requestDraftRender(pageId, children).then((outcome) => {
-        if (!isCurrent) {return;}
+        if (!isCurrent) {
+          return;
+        }
         setState((previous) =>
           outcome.ok
             ? { node: outcome.node, isRendering: false, errorCode: null }
-            : { ...previous, isRendering: false, errorCode: outcome.errorCode }
+            : { ...previous, isRendering: false, errorCode: outcome.errorCode },
         );
       });
     }, RENDER_DEBOUNCE_MS);

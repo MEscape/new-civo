@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 
 import { getTranslations } from '@i18n/server';
 
@@ -27,11 +23,7 @@ export interface MetricChartComponentProps {
 }
 
 /** A simple bar chart comparing metrics at one point in time. */
-export async function MetricChart({
-  props,
-  context,
-  loadContent,
-}: MetricChartComponentProps) {
+export async function MetricChart({ props, context, loadContent }: MetricChartComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({

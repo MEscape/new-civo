@@ -1,16 +1,13 @@
 import { useState } from 'react';
 import type { RefObject } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { useCanvasRender } from '../../hooks/use-canvas-render';
 import { useCanvasSelection } from '../../hooks/use-canvas-selection';
 import { useNodeRects } from '../../hooks/use-node-rects';
 import { nodeSelected } from '../../state/builder-actions';
-import {
-  useBuilderDispatch,
-  useBuilderSelector,
-} from '../../state/builder-hooks';
+import { useBuilderDispatch, useBuilderSelector } from '../../state/builder-hooks';
 import {
   selectChildren,
   selectSelectedNodeId,
@@ -40,11 +37,7 @@ export interface BuilderCanvasProps {
  * outlines, drag handles and the drop indicator live in a sibling overlay
  * so they can never leak into or be affected by the component styles.
  */
-export function BuilderCanvas({
-  themeStyle,
-  containerRef,
-  dnd,
-}: BuilderCanvasProps) {
+export function BuilderCanvas({ themeStyle, containerRef, dnd }: BuilderCanvasProps) {
   const t = useTranslations('builder');
   const dispatch = useBuilderDispatch();
   const nodes = useBuilderSelector(selectChildren);
@@ -54,19 +47,12 @@ export function BuilderCanvas({
 
   const { node, isRendering, errorCode } = useCanvasRender(nodes);
   const rects = useNodeRects(containerRef, node);
-  const selection = useCanvasSelection(
-    (id) => dispatch(nodeSelected(id)),
-    setHoveredNodeId
-  );
+  const selection = useCanvasSelection((id) => dispatch(nodeSelected(id)), setHoveredNodeId);
 
   return (
     <ViewportFrame viewport={viewport}>
       <div className="civo-canvas rounded-token border border-border bg-canvas">
-        <div
-          ref={containerRef}
-          className="civo-canvas-content"
-          {...selection}
-        >
+        <div ref={containerRef} className="civo-canvas-content" {...selection}>
           {nodes.length === 0 ? (
             <CanvasEmptyState />
           ) : (
@@ -83,16 +69,11 @@ export function BuilderCanvas({
       </div>
 
       {isRendering && nodes.length > 0 && node === null && (
-        <p
-          role="status"
-          className="mt-3 text-center text-xs text-copy-muted"
-        >
+        <p role="status" className="mt-3 text-center text-xs text-copy-muted">
           {t('canvas.rendering')}
         </p>
       )}
-      {errorCode !== null && (
-        <ErrorMessage code={errorCode} className="mt-3 text-center" />
-      )}
+      {errorCode !== null && <ErrorMessage code={errorCode} className="mt-3 text-center" />}
     </ViewportFrame>
   );
 }

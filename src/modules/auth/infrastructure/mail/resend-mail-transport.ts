@@ -9,11 +9,11 @@ import type { MailTransport, OutboundMail } from './mail-transport';
 const REQUEST_TIMEOUT_MS = 10_000;
 
 export interface ResendMailTransportOptions {
-    readonly apiKey: string;
-    /** Verified sender, e.g. `Civo <no-reply@example.org>`. */
-    readonly from: string;
-    /** Explicit URL to Resend's API (e.g. 'https://api.resend.com/emails') */
-    readonly apiUrl: string;
+  readonly apiKey: string;
+  /** Verified sender, e.g. `Civo <no-reply@example.org>`. */
+  readonly from: string;
+  /** Explicit URL to Resend's API (e.g. 'https://api.resend.com/emails') */
+  readonly apiUrl: string;
 }
 
 /**
@@ -23,32 +23,29 @@ export interface ResendMailTransportOptions {
  * request header.
  */
 export class ResendMailTransport implements MailTransport {
-    constructor(private readonly options: ResendMailTransportOptions) {}
+  constructor(private readonly options: ResendMailTransportOptions) {}
 
-    send(mail: OutboundMail): AppResultAsync<void, InfrastructureAppError> {
-        return fromThrowableAsync(
-            async () =>
-                fetch(this.options.apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${this.options.apiKey}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        from: this.options.from,
-                        to: [mail.to],
-                        subject: mail.subject,
-                        text: mail.text,
-                        html: mail.html,
-                    }),
-                    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-                }),
-            mailDeliveryFailed
-        ).andThen(
-            (response): AppResultAsync<void, InfrastructureAppError> =>
-                response.ok
-                    ? okAsync(undefined)
-                    : errAsync(mailDeliveryFailed({ status: response.status }))
-        );
-    }
+  send(mail: OutboundMail): AppResultAsync<void, InfrastructureAppError> {
+    return fromThrowableAsync(
+      async () =>
+        fetch(this.options.apiUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.options.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: this.options.from,
+            to: [mail.to],
+            subject: mail.subject,
+            text: mail.text,
+            html: mail.html,
+          }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        }),
+      mailDeliveryFailed,
+    ).andThen((response): AppResultAsync<void, InfrastructureAppError> =>
+      response.ok ? okAsync(undefined) : errAsync(mailDeliveryFailed({ status: response.status })),
+    );
+  }
 }

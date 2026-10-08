@@ -50,22 +50,19 @@ export interface SavePageConfigInput {
  * error kinds before returning (errors.md).
  */
 export interface PageRepository {
-  findById(
-    id: PageId,
-    tenantId: TenantId
-  ): AppResultAsync<Page | null, PageReadError>;
+  findById(id: PageId, tenantId: TenantId): AppResultAsync<Page | null, PageReadError>;
 
   /** Identity and ownership only: no page JSON is read, so it is cheap on hot paths. */
   findSummaryById(
     id: PageId,
-    tenantId: TenantId
+    tenantId: TenantId,
   ): AppResultAsync<PageSummary | null, InfrastructureAppError>;
 
   /** Bounded: never returns more than `limit` items (performance.md). */
   listByWebsite(
     websiteId: WebsiteId,
     tenantId: TenantId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly PageSummary[], InfrastructureAppError>;
 
   /**
@@ -75,25 +72,19 @@ export interface PageRepository {
    */
   listReleasePages(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly ReleasePage[], InfrastructureAppError>;
 
   /** `NotFoundAppError` means the website does not exist in this tenant. */
   create(
-    input: NewPage
-  ): AppResultAsync<
-    Page,
-    NotFoundAppError | ConflictAppError | InfrastructureAppError
-  >;
+    input: NewPage,
+  ): AppResultAsync<Page, NotFoundAppError | ConflictAppError | InfrastructureAppError>;
 
   /**
    * Stores a new revision atomically against `expectedVersion`, so two
    * editors can never silently overwrite each other.
    */
   saveConfig(
-    input: SavePageConfigInput
-  ): AppResultAsync<
-    SavedRevision,
-    ConflictAppError | NotFoundAppError | InfrastructureAppError
-  >;
+    input: SavePageConfigInput,
+  ): AppResultAsync<SavedRevision, ConflictAppError | NotFoundAppError | InfrastructureAppError>;
 }

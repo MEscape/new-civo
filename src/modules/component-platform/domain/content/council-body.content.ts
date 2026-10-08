@@ -12,7 +12,7 @@ export const councilBodyContent = defineContent({
     description: shortText(),
     members: list(
       object({ id: recordId(), name: title(), role: label(), party: label() }),
-      LIMITS.members
+      LIMITS.members,
     ),
   },
   rule: {},

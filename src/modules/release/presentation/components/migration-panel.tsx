@@ -2,14 +2,14 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useRouter } from 'next/navigation';
-
-import { useTranslations } from 'next-intl';
-
 import { FieldMessage } from '@components/shared/field-message';
 import { Alert, AlertDescription } from '@components/ui/alert';
 import { Button } from '@components/ui/button';
 import { Spinner } from '@components/ui/icons';
+
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { proposeMigrationAction } from '../actions/propose-migration-action';
 import { messageKeyForError } from '../messages/message-keys';
@@ -19,9 +19,9 @@ import { MigrationHistoryList } from './migration-history-list';
 import { MigrationReview } from './migration-review';
 import { PlanCounts } from './plan-counts';
 
+import type { MigrationHistoryDto } from '../dto/migration-history-dto';
 import type { MigrationProposalDto } from '../dto/migration-plan-dto';
 import type { ApplyMigrationResultDto } from '../dto/migration-result-dto';
-import type { MigrationHistoryDto } from '../dto/migration-history-dto';
 import type { MessageKey } from '../messages/message-keys';
 
 export interface MigrationPanelProps {
@@ -35,6 +35,15 @@ export interface MigrationPanelProps {
  * proposed changes and apply them as new drafts. The live site is never
  * touched: the result is reviewed in the builder and published as usual.
  */
+/** A proposal needs review only if something was recorded and something is out of date. */
+function reviewableOf(proposal: MigrationProposalDto | null) {
+  if (proposal === null) {
+    return null;
+  }
+  const { migrationId, plan } = proposal;
+  return migrationId === null || plan.isUpToDate ? null : { migrationId, plan };
+}
+
 export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
   const t = useTranslations('release');
   const router = useRouter();
@@ -68,11 +77,7 @@ export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
     router.refresh();
   }
 
-  // A proposal needs review only if something was recorded and something is out of date.
-  const reviewable =
-    proposal?.migrationId != null && !proposal.plan.isUpToDate
-      ? { migrationId: proposal.migrationId, plan: proposal.plan }
-      : null;
+  const reviewable = reviewableOf(proposal);
 
   return (
     <div className="space-y-8" aria-busy={isPending}>
@@ -81,9 +86,7 @@ export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
           <h2 id={`${id}-title`} className="text-xl font-semibold text-copy">
             {t('migration.panel.title')}
           </h2>
-          <p className="text-sm text-copy-muted">
-            {t('migration.panel.description')}
-          </p>
+          <p className="text-sm text-copy-muted">{t('migration.panel.description')}</p>
         </div>
 
         <FieldMessage
@@ -94,9 +97,7 @@ export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
 
         <Button type="button" disabled={isPending} onClick={handleCheck}>
           {isPending && <Spinner className="mr-2" aria-hidden="true" />}
-          {isPending
-            ? t('migration.panel.checking')
-            : t('migration.panel.check')}
+          {isPending ? t('migration.panel.checking') : t('migration.panel.check')}
         </Button>
 
         {proposal?.plan.isUpToDate === true && (

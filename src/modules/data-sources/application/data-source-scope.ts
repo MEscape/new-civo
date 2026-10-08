@@ -10,5 +10,5 @@ import type { Dataset } from '../domain/models/dataset';
  * cross-tenant check a comparison instead of trust.
  */
 export function scopeOf(record: DataSource | Dataset): ResourceScope {
-    return { tenantId: record.tenantId };
+  return { tenantId: record.tenantId };
 }

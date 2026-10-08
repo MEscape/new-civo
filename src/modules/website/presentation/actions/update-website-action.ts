@@ -13,11 +13,9 @@ import { websiteEditSchema } from '../schemas/website-edit-schema';
 
 import type { WebsiteDto } from '../dto/website-dto';
 
-export async function updateWebsiteAction(
-  input: unknown
-): Promise<ActionResult<WebsiteDto>> {
-  const result = await parseWebsiteInput(websiteEditSchema, input).asyncAndThen(
-    (command) => websiteCommands.updateWebsite.execute(command)
+export async function updateWebsiteAction(input: unknown): Promise<ActionResult<WebsiteDto>> {
+  const result = await parseWebsiteInput(websiteEditSchema, input).asyncAndThen((command) =>
+    websiteCommands.updateWebsite.execute(command),
   );
 
   if (result.isOk()) {

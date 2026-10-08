@@ -27,7 +27,11 @@ export const naming = [
     ],
     plugins: { 'check-file': /** @type {any} */ (checkFile) },
     rules: {
-      'check-file/filename-naming-convention': ['error', { '**/*.{ts,tsx}': 'KEBAB_CASE' }, { ignoreMiddleExtensions: true }],
+      'check-file/filename-naming-convention': [
+        'error',
+        { '**/*.{ts,tsx}': 'KEBAB_CASE' },
+        { ignoreMiddleExtensions: true },
+      ],
     },
   },
   {

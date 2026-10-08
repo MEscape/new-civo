@@ -15,12 +15,8 @@ export function RichText({ props }: RichTextComponentProps) {
   return (
     <Section>
       <Container className="max-w-3xl">
-        {heading !== null && (
-          <h2 className="mb-4 font-heading text-2xl text-copy">{heading}</h2>
-        )}
-        <p className="whitespace-pre-line text-base leading-relaxed text-copy">
-          {props.body}
-        </p>
+        {heading !== null && <h2 className="mb-4 font-heading text-2xl text-copy">{heading}</h2>}
+        <p className="whitespace-pre-line text-base leading-relaxed text-copy">{props.body}</p>
       </Container>
     </Section>
   );

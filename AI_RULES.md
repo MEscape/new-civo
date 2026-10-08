@@ -26,6 +26,8 @@ Use this file when the full engineering context is needed in one place, especial
 - Prefer dependency inversion over direct infrastructure dependencies.
 - Domain and application code must not read the clock, randomness, or environment directly; inject them through ports.
 - Shared code must be genuinely generic; do not extract module code prematurely.
+- Modules are integrated in composition roots: a module's `composition.ts` is the only place that wires another module into it at runtime.
+- The module dependency graph is acyclic.
 - Architectural dependency violations must fail lint/build checks.
 - A deviation from these rules must be recorded as a short decision note and the owning rule updated.
 
@@ -42,7 +44,7 @@ Allowed direction:
 | Domain              | Nothing outside the domain       |
 
 - Ports are defined in the domain and implemented in infrastructure.
-- Cross-module access uses the target module's public API.
+- Cross-module access uses the target module's public API (`index.ts`, or `client.ts` from browser code).
 - Dependency direction must be enforced by linting wherever practical.
 
 ## Layer boundaries
@@ -56,6 +58,19 @@ Allowed direction:
 - Shared UI must not import business modules.
 - Modules must not import another module's infrastructure.
 - Framework entry points may depend on application and presentation APIs.
+- Runtime calls into another module happen only in the module's `composition.ts` and in infrastructure adapters that implement the module's own domain ports.
+- Domain and application may `import type` from another module's public API; at runtime they may call only the pure functions the architecture policy lists (`CROSS_MODULE_RUNTIME_ALLOW`).
+- Presentation may import another module's browser-safe API (`client.ts`: routes, vocabulary, Server Actions) or its types; another module's server-side parts are handed in by `composition.ts`.
+- Repositories and record mappers may import only trusted brand constructors (`to<Name>Id`) from another module.
+- A port defined in shared code (`Clock`) may be imported as a type by every layer; its implementation is wired only by composition roots.
+
+## Shared code
+
+- Shared code lives in `src/lib`, `src/components` (`ui` primitives, `layout` primitives, `shared` composites), `src/hooks` and `src/i18n`; it never imports a business module.
+- Extract to shared code only when a second module needs the same concept, not because two pieces look alike.
+- A mechanism every module needs (audit log, persistence failure mapping, action input parsing) is written once in `src/lib`; each module keeps only its own vocabulary.
+- Remove a shared piece when its last consumer goes.
+- Check `src/lib/README.md` and `src/components/README.md` before adding shared code, and update them in the same change.
 
 ---
 
@@ -72,8 +87,11 @@ Allowed direction:
 - Shared UI components belong outside modules.
 - A module must not import another module's infrastructure or internal implementation details.
 - Cross-module communication must use the other module's public API.
-- `index.ts` exposes the module's intentional public API.
-- Internal implementation details must not be exported from the module public API.
+- `composition.ts` is the module's composition root: the only file that knows both use cases and adapters, and the only place another module is wired in.
+- `index.ts` exposes the module's intentional server-side public API; `client.ts` exposes the browser-safe part. Nothing else in a module is a barrel file.
+- Internal implementation details must not be exported from the module public API; re-export named members, never `export *`.
+- A module that refers to another module's aggregate declares its own branded reference id under the same brand name (for example `WebsiteId`) instead of importing the owner's.
+- Every use case is protected by default; a `public` or `system` use case carries an `@authorization <category> <reason>` tag.
 
 ---
 
@@ -97,12 +115,14 @@ Allowed direction:
 - Use `proxy.ts` only for request-level concerns.
 - Do not put business authorization rules in `proxy.ts`.
 - Use `loading.tsx` for meaningful route loading states.
-- Use `error.tsx` for unexpected route-level failures.
+- Use `error.tsx` for unexpected route-level failures; it shows translated generic text, never `error.message`. `global-error.tsx` covers the locale layout.
 - Use `not-found.tsx` or `notFound()` for missing resources.
 - Use Suspense boundaries for independently streamable UI.
 - Use async request APIs such as `params`, `searchParams`, `cookies`, and `headers`.
 - Use Next.js navigation primitives instead of raw equivalents where applicable.
-- Use route metadata APIs for page metadata.
+- Use route metadata APIs for page metadata, through the builders in `@lib/seo`; private and single-use-link pages are `noindex`.
+- `robots.ts`, `sitemap.ts` and `manifest.ts` are the only sources of those files.
+- With `cacheComponents`, route segment options such as `dynamic` are rejected; make a handler per-request with `connection()`.
 - Keep Node-only dependencies out of Edge-compatible code.
 - Declare runtime requirements explicitly when they matter.
 
@@ -373,8 +393,13 @@ Allowed direction:
 - Format dates, times, numbers, and currencies using locale-aware APIs.
 - Store dates as UTC instants; convert to the user's time zone only at presentation.
 - Server-rendered translations must use the request locale.
-- Client Components must receive only the translation data they require.
-- Keep translation resources organized by feature or bounded context.
+- Client Components must receive only the translation data they require: a subtree declares its namespaces through `I18nProvider`.
+- Keep translation resources organized by feature or bounded context: one namespace per module, owned by that module, plus the app shell's `app` namespace for framework entry points.
+- One catalog per locale is assembled in `src/i18n/locales/<locale>.ts`; namespaces are never merged into each other.
+- A module's message map points only at keys of its own namespace, including its fallback error texts.
+- Format dates and numbers through `getAppFormatters` / `useAppFormatters`; never pass a locale to `@lib/utils` from a component.
+- Every locale has exactly the keys and ICU arguments of the default locale (`npm run i18n:check`).
+- Product names are brands and are not translated.
 - Domain errors use stable error codes; presentation maps them to translations.
 
 ---
@@ -442,6 +467,7 @@ Allowed direction:
 - Include request/correlation identifiers where available.
 - Record important application failures with sufficient context.
 - Instrument external integrations and important persistence operations.
+- Audit events are built with `createAuditLog('<module>.audit', LEVEL_BY_EVENT)` from `@lib/logger`; the module owns the event types and their levels.
 - Use log levels consistently:
   - `error` for unexpected failures
   - `warn` for recoverable anomalies
@@ -473,15 +499,16 @@ Allowed direction:
 
 # 23. Project Rules and Documentation Structure
 
-The repository may also contain the organized rule files:
+The organized rule files live in `docs/`:
 
 ```text
-rules/
+docs/rules/
 ├── README.md
 ├── architecture.md
 ├── boundaries.md
 ├── modules.md
 ├── dependencies.md
+├── shared.md
 ├── nextjs.md
 ├── react.md
 ├── api.md
@@ -502,7 +529,7 @@ rules/
 ├── testing.md
 └── observability.md
 
-conventions/
+docs/conventions/
 ├── README.md
 ├── adding-a-module.md
 ├── adding-a-use-case.md
@@ -528,12 +555,12 @@ Conventions describe step-by-step procedures for recurring tasks. They link to r
 When performing a recurring task:
 
 1. Read the relevant rule(s).
-2. Read the matching convention in `conventions/`.
+2. Read the matching convention in `docs/conventions/`.
 3. Follow its numbered checklist.
 4. Verify its "Done when" criteria.
 5. Update the convention when a rule change alters its procedure.
 
-Use `conventions/README.md` as the index for all available procedures.
+Use `docs/conventions/README.md` as the index for all available procedures.
 
 ---
 

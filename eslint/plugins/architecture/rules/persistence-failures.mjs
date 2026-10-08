@@ -10,10 +10,12 @@ const PRISMA_CODE = /^P\d{4}$|^(?:ORM|RUNTIME|CONTRACT)\.[A-Z_]+$/;
  * where `failures = createPersistenceFailures(...)` from '@lib/db'.
  */
 export const persistenceFailures = defineRule({
-  description: "Prisma repositories use createPersistenceFailures + fromThrowableAsync, with stable operation names and no local Prisma error mapping.",
+  description:
+    'Prisma repositories use createPersistenceFailures + fromThrowableAsync, with stable operation names and no local Prisma error mapping.',
   create(context) {
     const { file } = classifyContext(context);
-    const isRepository = file.area === 'module' && file.layer === 'infrastructure' && file.dir === 'prisma';
+    const isRepository =
+      file.area === 'module' && file.layer === 'infrastructure' && file.dir === 'prisma';
     if (!isRepository) return {};
     const isMapper = /-record-mapper\.ts$/.test(file.file);
     const isRepositoryFile = /\.repository\.ts$/.test(file.file);
@@ -25,25 +27,48 @@ export const persistenceFailures = defineRule({
     return {
       ImportDeclaration(node) {
         for (const s of node.specifiers) {
-          imported.set(s.local.name, { source: node.source.value, name: s.type === 'ImportSpecifier' ? (s.imported.name ?? s.imported.value) : 'default' });
+          imported.set(s.local.name, {
+            source: node.source.value,
+            name: s.type === 'ImportSpecifier' ? (s.imported.name ?? s.imported.value) : 'default',
+          });
         }
         if (node.source.value === 'neverthrow') {
-          report(context, node, "Import result helpers from '@lib/result' (the shared wrapper), not from 'neverthrow'.");
+          report(
+            context,
+            node,
+            "Import result helpers from '@lib/result' (the shared wrapper), not from 'neverthrow'.",
+          );
         }
         if (node.source.value === '@lib/db') {
           for (const s of node.specifiers) {
             if (s.type === 'ImportSpecifier' && s.imported.name === 'mapPrismaError') {
-              report(context, s, "Do not map Prisma errors locally. `createPersistenceFailures` already applies the shared mapping (conflict, not found, infrastructure).");
+              report(
+                context,
+                s,
+                'Do not map Prisma errors locally. `createPersistenceFailures` already applies the shared mapping (conflict, not found, infrastructure).',
+              );
             }
             if (isMapper && s.type === 'ImportSpecifier' && s.imported.name === 'db') {
-              report(context, s, 'Record mappers are pure conversions between records and domain models; they must not access `db`.');
+              report(
+                context,
+                s,
+                'Record mappers are pure conversions between records and domain models; they must not access `db`.',
+              );
             }
           }
         }
       },
       Literal(node) {
-        if (typeof node.value === 'string' && PRISMA_CODE.test(node.value) && node.parent.type !== 'ImportDeclaration') {
-          report(context, node, `Do not branch on Prisma/ORM error code '${node.value}' locally. Use failures.orConflict(...) / failures.orNotFound(...) so the shared mapping stays the single source of truth.`);
+        if (
+          typeof node.value === 'string' &&
+          PRISMA_CODE.test(node.value) &&
+          node.parent.type !== 'ImportDeclaration'
+        ) {
+          report(
+            context,
+            node,
+            `Do not branch on Prisma/ORM error code '${node.value}' locally. Use failures.orConflict(...) / failures.orNotFound(...) so the shared mapping stays the single source of truth.`,
+          );
         }
       },
       VariableDeclarator(node) {
@@ -72,20 +97,36 @@ export const persistenceFailures = defineRule({
           handler.callee.object.name === failuresName &&
           FAILURE_KINDS.has(handler.callee.property.name);
         if (!isFailureCall) {
-          report(context, node, 'Pass `failures.infraOnly(<operation>)`, `failures.orConflict(<operation>, <factory>)` or `failures.orNotFound(<operation>, <factory>)` as the error mapper of fromThrowableAsync.');
+          report(
+            context,
+            node,
+            'Pass `failures.infraOnly(<operation>)`, `failures.orConflict(<operation>, <factory>)` or `failures.orNotFound(<operation>, <factory>)` as the error mapper of fromThrowableAsync.',
+          );
           return;
         }
         const kind = handler.callee.property.name;
         const [operation, factory] = handler.arguments;
         if (operation?.type !== 'Literal' || typeof operation.value !== 'string') {
-          report(context, handler, 'Operation names are stable string literals (they appear in logs and alerts), not computed values.');
+          report(
+            context,
+            handler,
+            'Operation names are stable string literals (they appear in logs and alerts), not computed values.',
+          );
         } else if (operations.has(operation.value)) {
-          report(context, operation, `Operation name '${operation.value}' is already used in this repository; names identify one operation.`);
+          report(
+            context,
+            operation,
+            `Operation name '${operation.value}' is already used in this repository; names identify one operation.`,
+          );
         } else {
           operations.set(operation.value, true);
         }
         if (NEEDS_FACTORY.has(kind) && factory === undefined) {
-          report(context, handler, `failures.${kind}(...) takes the domain error factory as its second argument.`);
+          report(
+            context,
+            handler,
+            `failures.${kind}(...) takes the domain error factory as its second argument.`,
+          );
         }
       },
       Identifier(node) {
@@ -110,15 +151,25 @@ export const persistenceFailures = defineRule({
           }
           if (parent === method) break;
         }
-        report(context, node, 'Database calls must run inside `fromThrowableAsync(() => …, failures.<kind>(...))` so every persistence failure is mapped to an AppError.');
+        report(
+          context,
+          node,
+          'Database calls must run inside `fromThrowableAsync(() => …, failures.<kind>(...))` so every persistence failure is mapped to an AppError.',
+        );
       },
       'Program:exit'(program) {
         if (!isRepositoryFile) return;
         const usesDb = imported.get('db')?.source === '@lib/db';
         if (usesDb && failuresName === null) {
-          report(context, program, "A Prisma repository must create its failure mapper: `const failures = createPersistenceFailures({ module, code, subject })` from '@lib/db'.");
+          report(
+            context,
+            program,
+            "A Prisma repository must create its failure mapper: `const failures = createPersistenceFailures({ module, code, subject })` from '@lib/db'.",
+          );
         }
-        const importsFailures = [...imported.values()].some((b) => b.name === 'createPersistenceFailures' && b.source === '@lib/db');
+        const importsFailures = [...imported.values()].some(
+          (b) => b.name === 'createPersistenceFailures' && b.source === '@lib/db',
+        );
         if (failuresName !== null && !importsFailures) {
           report(context, program, "`createPersistenceFailures` must come from '@lib/db'.");
         }

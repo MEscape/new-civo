@@ -15,15 +15,10 @@ export interface MetricGaugeChartClientProps {
 }
 
 /** Progress-to-target gauge, e.g. "62 % of the 2030 CO₂ goal". */
-export function MetricGaugeChartClient({
-  percent,
-  caption,
-}: MetricGaugeChartClientProps) {
+export function MetricGaugeChartClient({ percent, caption }: MetricGaugeChartClientProps) {
   const fmt = useAppFormatters();
   const clamped = Math.max(0, Math.min(MAX_PERCENT, percent));
-  const data = [
-    { name: 'progress', value: clamped, fill: CHART_COLORS.primary },
-  ];
+  const data = [{ name: 'progress', value: clamped, fill: CHART_COLORS.primary }];
 
   return (
     <div className="relative h-56 w-56">

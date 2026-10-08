@@ -6,8 +6,8 @@ import { connectorUnavailable } from '../../domain/errors/data-source-errors';
 
 import type { DataSource } from '../../domain/models/data-source';
 import type {
-    ConnectorError,
-    DataSourceConnector,
+  ConnectorError,
+  DataSourceConnector,
 } from '../../domain/ports/data-source-connector.port';
 
 /**
@@ -18,30 +18,26 @@ import type {
  * `connectorUnavailable()`, as the port promises.
  */
 export class KindRoutingConnector implements DataSourceConnector {
-    constructor(private readonly rest: DataSourceConnector) {}
+  constructor(private readonly rest: DataSourceConnector) {}
 
-    test(source: DataSource): AppResultAsync<void, ConnectorError> {
-        const connector = this.forKind(source);
-        return connector === null
-            ? errAsync(connectorUnavailable())
-            : connector.test(source);
-    }
+  test(source: DataSource): AppResultAsync<void, ConnectorError> {
+    const connector = this.forKind(source);
+    return connector === null ? errAsync(connectorUnavailable()) : connector.test(source);
+  }
 
-    fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError> {
-        const connector = this.forKind(source);
-        return connector === null
-            ? errAsync(connectorUnavailable())
-            : connector.fetchBody(source);
-    }
+  fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError> {
+    const connector = this.forKind(source);
+    return connector === null ? errAsync(connectorUnavailable()) : connector.fetchBody(source);
+  }
 
-    private forKind(source: DataSource): DataSourceConnector | null {
-        switch (source.kind) {
-            case 'REST':
-                return this.rest;
-            case 'MOCK':
-                return null;
-            default:
-                return assertNever(source.kind);
-        }
+  private forKind(source: DataSource): DataSourceConnector | null {
+    switch (source.kind) {
+      case 'REST':
+        return this.rest;
+      case 'MOCK':
+        return null;
+      default:
+        return assertNever(source.kind);
     }
+  }
 }

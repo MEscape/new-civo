@@ -1,8 +1,4 @@
-import type {
-  PublicWebsiteView,
-  WebsiteSummaryView,
-  WebsiteView,
-} from './contracts/website-views';
+import type { PublicWebsiteView, WebsiteSummaryView, WebsiteView } from './contracts/website-views';
 import type { Website, WebsiteSummary } from '../domain/models/website';
 
 export function toWebsiteView(website: Website): WebsiteView {

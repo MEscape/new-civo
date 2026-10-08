@@ -18,7 +18,12 @@ export interface WebsiteDto {
 
 export function toWebsiteDto(view: WebsiteView): WebsiteDto {
   return {
-    ...view,
+    id: view.id,
+    name: view.name,
+    slug: view.slug,
+    description: view.description,
+    templateKey: view.templateKey,
+    theme: view.theme,
     createdAt: view.createdAt.toISOString(),
     updatedAt: view.updatedAt.toISOString(),
   };

@@ -8,7 +8,7 @@ export type { Role };
  * and must not be echoed to the browser.
  */
 export interface ActorView {
-    readonly id: string;
-    readonly tenantId: string;
-    readonly roles: readonly Role[];
+  readonly id: string;
+  readonly tenantId: string;
+  readonly roles: readonly Role[];
 }

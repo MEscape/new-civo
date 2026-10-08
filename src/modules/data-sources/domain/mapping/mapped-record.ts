@@ -36,7 +36,7 @@ export type TextHasher = (text: string) => string;
 export function deriveMappedRecordId(
   raw: unknown,
   mapped: Readonly<Record<string, unknown>>,
-  hash: TextHasher
+  hash: TextHasher,
 ): string {
   for (const field of ID_FIELDS) {
     const value = getPath(raw, field);
@@ -79,7 +79,7 @@ export function toRecordList(body: unknown): readonly unknown[] {
 export function mapRecords(
   mapping: DatasetMapping,
   body: unknown,
-  hash: TextHasher
+  hash: TextHasher,
 ): MappedRecords {
   const all = toRecordList(body);
   const records: MappedRecord[] = [];

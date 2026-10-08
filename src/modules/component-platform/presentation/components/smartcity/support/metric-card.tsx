@@ -24,10 +24,7 @@ export interface MetricCardProps {
   readonly size?: keyof typeof SIZES;
 }
 
-export async function MetricCard({
-  metric,
-  size = 'regular',
-}: MetricCardProps) {
+export async function MetricCard({ metric, size = 'regular' }: MetricCardProps) {
   const fmt = await getAppFormatters();
   const sizes = SIZES[size];
 
@@ -40,9 +37,7 @@ export async function MetricCard({
             {fmt.number(metric.value)}
           </span>
           {metric.unit !== undefined && (
-            <span className={`text-copy-muted ${sizes.unit}`}>
-              {metric.unit}
-            </span>
+            <span className={`text-copy-muted ${sizes.unit}`}>{metric.unit}</span>
           )}
         </div>
         {metric.trend !== undefined && metric.changePercent !== undefined && (

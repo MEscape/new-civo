@@ -61,40 +61,30 @@ export const BUILDER_VALIDATION_CODES = {
   versionInvalid: 'builder.validation.version_invalid',
 } as const;
 
-export type BuilderErrorCode =
-  (typeof BUILDER_ERROR_CODES)[keyof typeof BUILDER_ERROR_CODES];
+export type BuilderErrorCode = (typeof BUILDER_ERROR_CODES)[keyof typeof BUILDER_ERROR_CODES];
 export type BuilderValidationCode =
   (typeof BUILDER_VALIDATION_CODES)[keyof typeof BUILDER_VALIDATION_CODES];
 export type BuilderCode = BuilderErrorCode | BuilderValidationCode;
 
 /** Also covers a foreign tenant's page: see `BUILDER_ERROR_CODES`. */
 export function pageNotFound(): NotFoundAppError {
-  return notFoundError(
-    BUILDER_ERROR_CODES.pageNotFound,
-    'The page was not found.'
-  );
+  return notFoundError(BUILDER_ERROR_CODES.pageNotFound, 'The page was not found.');
 }
 
 /** Also covers a foreign tenant's website: see `BUILDER_ERROR_CODES`. */
 export function websiteNotFound(): NotFoundAppError {
-  return notFoundError(
-    BUILDER_ERROR_CODES.websiteNotFound,
-    'The website was not found.'
-  );
+  return notFoundError(BUILDER_ERROR_CODES.websiteNotFound, 'The website was not found.');
 }
 
 export function pageNodeNotFound(): NotFoundAppError {
-  return notFoundError(
-    BUILDER_ERROR_CODES.nodeNotFound,
-    'The node was not found.'
-  );
+  return notFoundError(BUILDER_ERROR_CODES.nodeNotFound, 'The node was not found.');
 }
 
 /** Paths are unique per website because they become public URL segments. */
 export function pagePathTaken(): ConflictAppError {
   return conflictError(
     BUILDER_ERROR_CODES.pagePathTaken,
-    'A page with this path already exists on this website.'
+    'A page with this path already exists on this website.',
   );
 }
 
@@ -102,7 +92,7 @@ export function pagePathTaken(): ConflictAppError {
 export function pageVersionConflict(): ConflictAppError {
   return conflictError(
     BUILDER_ERROR_CODES.pageVersionConflict,
-    'The page was changed by someone else since it was loaded.'
+    'The page was changed by someone else since it was loaded.',
   );
 }
 
@@ -110,17 +100,15 @@ export function pageVersionConflict(): ConflictAppError {
 export function pageLimitExceeded(): ConflictAppError {
   return conflictError(
     BUILDER_ERROR_CODES.pageLimitExceeded,
-    'The website has more pages than can be processed at once.'
+    'The website has more pages than can be processed at once.',
   );
 }
 
-export function builderValidationFailed(
-  fieldErrors: Record<string, string[]>
-): ValidationAppError {
+export function builderValidationFailed(fieldErrors: Record<string, string[]>): ValidationAppError {
   return validationError(
     BUILDER_ERROR_CODES.validationFailed,
     'The builder input is invalid.',
-    fieldErrors
+    fieldErrors,
   );
 }
 
@@ -132,7 +120,7 @@ export function createBuilderErrorBag(): FieldErrorBag {
 /** A validation failure on a single field. */
 export function fieldValidationFailed(
   field: string,
-  code: BuilderValidationCode
+  code: BuilderValidationCode,
 ): ValidationAppError {
   return builderValidationFailed({ [field]: [code] });
 }
@@ -142,21 +130,21 @@ export function placementRejected(): ValidationAppError {
   return validationError(
     BUILDER_ERROR_CODES.placementRejected,
     'The node cannot be placed there.',
-    { placement: [BUILDER_VALIDATION_CODES.placementInvalid] }
+    { placement: [BUILDER_VALIDATION_CODES.placementInvalid] },
   );
 }
 
 export function structureChangeNotPermitted(): ForbiddenAppError {
   return forbiddenError(
     BUILDER_ERROR_CODES.structureChangeNotPermitted,
-    'This editor may not change the page structure.'
+    'This editor may not change the page structure.',
   );
 }
 
 export function propChangeNotPermitted(): ForbiddenAppError {
   return forbiddenError(
     BUILDER_ERROR_CODES.propChangeNotPermitted,
-    'This editor may not change these properties.'
+    'This editor may not change these properties.',
   );
 }
 
@@ -169,6 +157,6 @@ export function pageConfigCorrupted(cause: unknown): UnexpectedAppError {
   return unexpectedError(
     BUILDER_ERROR_CODES.pageConfigCorrupted,
     'The stored page configuration is invalid.',
-    cause
+    cause,
   );
 }

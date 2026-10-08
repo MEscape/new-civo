@@ -1,12 +1,12 @@
-import postgres from "@prisma/orm-postgres/runtime";
+import postgres from '@prisma/orm-postgres/runtime';
 
-import { serverEnv } from "@lib/config";
-import { logger } from "@lib/logger";
+import { serverEnv } from '@lib/config';
+import { logger } from '@lib/logger';
 
-import contractJson from "./contract.json" with { type: "json" };
-import { queryLogger } from "./query-logger";
+import contractJson from './contract.json' with { type: 'json' };
+import { queryLogger } from './query-logger';
 
-import type { Contract } from "./contract.d";
+import type { Contract } from './contract.d';
 
 /**
  * Prisma client singleton. This is the ONLY file in the codebase that may
@@ -26,7 +26,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ReturnType<typeof postgres<Contract>> | undefined;
 };
 
-const dbLogger = logger.withContext({ module: "infrastructure.prisma" });
+const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
 
 /**
  * Builds the database connection URL with pool parameters derived from
@@ -50,15 +50,9 @@ const dbLogger = logger.withContext({ module: "infrastructure.prisma" });
 function buildConnectionUrl(): string {
   const url = new URL(serverEnv.DATABASE_URL);
 
-  url.searchParams.set(
-    "connection_limit",
-    String(serverEnv.DATABASE_POOL_SIZE),
-  );
+  url.searchParams.set('connection_limit', String(serverEnv.DATABASE_POOL_SIZE));
 
-  url.searchParams.set(
-    "pool_timeout",
-    String(serverEnv.DATABASE_POOL_TIMEOUT_SECONDS),
-  );
+  url.searchParams.set('pool_timeout', String(serverEnv.DATABASE_POOL_TIMEOUT_SECONDS));
 
   return url.toString();
 }
@@ -99,7 +93,7 @@ function createPrismaClient(): ReturnType<typeof postgres<Contract>> {
  */
 export const db = globalForPrisma.prisma ?? createPrismaClient();
 
-if (serverEnv.NODE_ENV !== "production") {
+if (serverEnv.NODE_ENV !== 'production') {
   globalForPrisma.prisma = db;
 }
 
@@ -123,7 +117,7 @@ export async function disconnectDb(): Promise<void> {
   try {
     await db.close();
   } catch (error) {
-    dbLogger.error("db.disconnect_failed", error);
+    dbLogger.error('db.disconnect_failed', error);
     throw error;
   }
 }

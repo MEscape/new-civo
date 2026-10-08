@@ -26,25 +26,25 @@ type ValidKeys = NestedKeyOf<MessageCatalog['release']>;
  * until it has a message.
  */
 export const MESSAGE_KEY_BY_CODE = {
-  [ERRORS.notFound]: fieldPath( 'errors', 'notFound'),
-  [ERRORS.websiteNotFound]: fieldPath( 'errors', 'websiteNotFound'),
-  [ERRORS.notPublished]: fieldPath( 'errors', 'notPublished'),
-  [ERRORS.notRestorable]: fieldPath( 'errors', 'notRestorable'),
-  [ERRORS.numberConflict]: fieldPath( 'errors', 'numberConflict'),
-  [ERRORS.validationFailed]: fieldPath( 'errors', 'validationFailed'),
-  [ERRORS.publishBlocked]: fieldPath( 'errors', 'publishBlocked'),
-  [ERRORS.persistenceFailed]: fieldPath( 'errors', 'persistenceFailed'),
-  [ERRORS.sourceFailed]: fieldPath( 'errors', 'persistenceFailed'),
-  [ERRORS.snapshotCorrupted]: fieldPath( 'errors', 'snapshotCorrupted'),
+  [ERRORS.notFound]: fieldPath('errors', 'notFound'),
+  [ERRORS.websiteNotFound]: fieldPath('errors', 'websiteNotFound'),
+  [ERRORS.notPublished]: fieldPath('errors', 'notPublished'),
+  [ERRORS.notRestorable]: fieldPath('errors', 'notRestorable'),
+  [ERRORS.numberConflict]: fieldPath('errors', 'numberConflict'),
+  [ERRORS.validationFailed]: fieldPath('errors', 'validationFailed'),
+  [ERRORS.publishBlocked]: fieldPath('errors', 'publishBlocked'),
+  [ERRORS.persistenceFailed]: fieldPath('errors', 'persistenceFailed'),
+  [ERRORS.sourceFailed]: fieldPath('errors', 'persistenceFailed'),
+  [ERRORS.snapshotCorrupted]: fieldPath('errors', 'snapshotCorrupted'),
   [ERRORS.migrationNotFound]: fieldPath('errors', 'migrationNotFound'),
   [ERRORS.migrationAlreadyApplied]: fieldPath('errors', 'migrationAlreadyApplied'),
   [ERRORS.migrationStale]: fieldPath('errors', 'migrationStale'),
   [ERRORS.migrationPlanCorrupted]: fieldPath('errors', 'snapshotCorrupted'),
-  [VALIDATION.idInvalid]: fieldPath( 'validation', 'idInvalid'),
-  [VALIDATION.noPages]: fieldPath( 'validation', 'noPages'),
-  [VALIDATION.pageConfigMissing]: fieldPath( 'validation', 'pageConfigMissing'),
-  [VALIDATION.pageConfigInvalid]: fieldPath( 'validation', 'pageConfigInvalid'),
-  [VALIDATION.contractIncompatible]: fieldPath( 'validation', 'contractIncompatible'),
+  [VALIDATION.idInvalid]: fieldPath('validation', 'idInvalid'),
+  [VALIDATION.noPages]: fieldPath('validation', 'noPages'),
+  [VALIDATION.pageConfigMissing]: fieldPath('validation', 'pageConfigMissing'),
+  [VALIDATION.pageConfigInvalid]: fieldPath('validation', 'pageConfigInvalid'),
+  [VALIDATION.contractIncompatible]: fieldPath('validation', 'contractIncompatible'),
   [VALIDATION.resolutionPageUnknown]: fieldPath('validation', 'resolutionUnknown'),
   [VALIDATION.resolutionNodeUnknown]: fieldPath('validation', 'resolutionUnknown'),
   [VALIDATION.resolutionFieldUnknown]: fieldPath('validation', 'resolutionUnknown'),
@@ -52,11 +52,10 @@ export const MESSAGE_KEY_BY_CODE = {
   [VALIDATION.resolutionValueInvalid]: fieldPath('validation', 'resolutionValueInvalid'),
 } as const satisfies Record<ReleaseCode, ValidKeys>;
 
-export const GENERIC_ERROR_MESSAGE_KEY = fieldPath( 'errors', 'unexpected');
+export const GENERIC_ERROR_MESSAGE_KEY = fieldPath('errors', 'unexpected');
 
 export type MessageKey =
-  | (typeof MESSAGE_KEY_BY_CODE)[ReleaseCode]
-  | typeof GENERIC_ERROR_MESSAGE_KEY;
+  (typeof MESSAGE_KEY_BY_CODE)[ReleaseCode] | typeof GENERIC_ERROR_MESSAGE_KEY;
 
 function isReleaseCode(code: string): code is ReleaseCode {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code);
@@ -67,9 +66,7 @@ function isReleaseCode(code: string): code is ReleaseCode {
  * structural messages are unknown here and get the generic message.
  */
 export function messageKeyForCode(code: string): MessageKey {
-  return isReleaseCode(code)
-    ? MESSAGE_KEY_BY_CODE[code]
-    : GENERIC_ERROR_MESSAGE_KEY;
+  return isReleaseCode(code) ? MESSAGE_KEY_BY_CODE[code] : GENERIC_ERROR_MESSAGE_KEY;
 }
 
 /**

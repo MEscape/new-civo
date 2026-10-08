@@ -10,21 +10,21 @@ import type { DatasetRepository } from '../domain/ports/dataset.repository';
 
 /** What every protected data-source use case is built from. */
 export interface DataSourceDependencies {
-    readonly authorization: AuthorizationService;
-    readonly dataSources: DataSourceRepository;
-    readonly datasets: DatasetRepository;
-    readonly audit: DataSourceAuditLog;
-    readonly clock: Clock;
+  readonly authorization: AuthorizationService;
+  readonly dataSources: DataSourceRepository;
+  readonly datasets: DatasetRepository;
+  readonly audit: DataSourceAuditLog;
+  readonly clock: Clock;
 }
 
 /** Use cases that call the external system (test, discover, preview, save mapping). */
 export interface ConnectedDataSourceDependencies extends DataSourceDependencies {
-    readonly connector: DataSourceConnector;
+  readonly connector: DataSourceConnector;
 }
 
 /** The public site has no actor, so it gets no authorization service. */
 export interface PublicDatasetDependencies {
-    readonly datasets: DatasetRepository;
-    readonly connector: DataSourceConnector;
-    readonly hasher: ContentHasher;
+  readonly datasets: DatasetRepository;
+  readonly connector: DataSourceConnector;
+  readonly hasher: ContentHasher;
 }

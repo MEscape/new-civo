@@ -1,19 +1,17 @@
 import 'server-only';
 import type { ReactElement, ReactNode } from 'react';
 
-import { getLocale, getMessages, getTimeZone } from 'next-intl/server';
-
 import type { Locale, Namespace } from '@i18n';
+
+import { getLocale, getMessages, getTimeZone } from '@i18n/server';
 
 import { serverEnv } from '@lib/config';
 import { pick, unique } from '@lib/utils';
 
 import { I18nClientProvider } from './i18n-client-provider';
 
-const CLIENT_SHELL_NAMESPACES = [
-  'errors',
-  'controls',
-] as const satisfies readonly Namespace[];
+/** The app shell's own texts: `error.tsx` boundaries are Client Components and need them everywhere. */
+const CLIENT_SHELL_NAMESPACES = ['app'] as const satisfies readonly Namespace[];
 
 interface I18nProviderProps {
   /**
@@ -41,10 +39,7 @@ export async function I18nProvider({
   return (
     <I18nClientProvider
       locale={locale}
-      messages={pick(
-        messages,
-        unique([...CLIENT_SHELL_NAMESPACES, ...namespaces])
-      )}
+      messages={pick(messages, unique([...CLIENT_SHELL_NAMESPACES, ...namespaces]))}
       timeZone={timeZone}
       isDevelopment={serverEnv.NODE_ENV !== 'production'}
     >

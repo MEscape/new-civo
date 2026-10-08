@@ -6,7 +6,6 @@ import { getAccessControl } from '@modules/auth';
 import { componentPlatformQueries, renderPageNodes } from '@modules/component-platform';
 
 import { systemClock } from '@lib/clock';
-
 import type { UnexpectedAppError } from '@lib/errors';
 import type { AppResult, AppResultAsync } from '@lib/result';
 
@@ -21,7 +20,7 @@ import { createComponentCatalog } from './domain/models/component-catalog';
 import { restorePageConfig } from './domain/models/page-config';
 import { ComponentPlatformDescriptorProvider } from './infrastructure/component-platform/component-platform-descriptor-provider';
 import { ComponentPlatformDraftRenderer } from './infrastructure/component-platform/component-platform-draft-renderer';
-import { LoggerBuilderAuditLog } from './infrastructure/logging/logger-builder-audit-log';
+import { loggerBuilderAuditLog } from './infrastructure/logging/logger-builder-audit-log';
 import { PrismaPageRepository } from './infrastructure/prisma/prisma-page.repository';
 
 import type { CreateSystemPageError } from './application/commands/create-system-page';
@@ -50,35 +49,28 @@ import type { ListPagesForReleaseError } from './application/queries/list-pages-
  */
 const authorization = getAccessControl();
 const pages = new PrismaPageRepository(systemClock);
-const audit = new LoggerBuilderAuditLog();
 /*
  * Both platform queries are infallible (`AppResult<_, never>`), so the error
  * branch has type `never` and needs no handling.
  */
-const platformCatalog = componentPlatformQueries.listComponentCatalog
-  .execute()
-  .match(
-    (view) => view.components,
-    (error) => error
-  );
+const platformCatalog = componentPlatformQueries.listComponentCatalog.execute().match(
+  (view) => view.components,
+  (error) => error,
+);
 const components = createComponentCatalog(
-  new ComponentPlatformDescriptorProvider(
-    platformCatalog,
-    (parentType, childType) =>
-      componentPlatformQueries.canNestComponent
-        .execute({ parentType, childType })
-        .match(
-          (allowed) => allowed,
-          (error) => error
-        )
-  ).listDescriptors()
+  new ComponentPlatformDescriptorProvider(platformCatalog, (parentType, childType) =>
+    componentPlatformQueries.canNestComponent.execute({ parentType, childType }).match(
+      (allowed) => allowed,
+      (error) => error,
+    ),
+  ).listDescriptors(),
 );
 
 const dependencies: PageDependencies = {
   authorization,
   pages,
   components,
-  audit,
+  audit: loggerBuilderAuditLog,
 };
 
 export const builderCommands = {
@@ -99,7 +91,7 @@ export const builderQueries = {
 const createSystemPageCommand = new CreateSystemPage({
   pages,
   components,
-  audit,
+  audit: loggerBuilderAuditLog,
 });
 const listPagesForReleaseQuery = new ListPagesForRelease({ pages });
 
@@ -112,14 +104,14 @@ const listPagesForReleaseQuery = new ListPagesForRelease({ pages });
 
 /** Seeds a page for a website a trusted module just created. */
 export function createSystemPage(
-  input: CreateSystemPageInput
+  input: CreateSystemPageInput,
 ): AppResultAsync<PageSummaryView, CreateSystemPageError> {
   return createSystemPageCommand.execute(input);
 }
 
 /** Every page of a website with its latest saved configuration, for publishing. */
 export function listPagesForRelease(
-  websiteId: string
+  websiteId: string,
 ): AppResultAsync<readonly ReleasePageView[], ListPagesForReleaseError> {
   return listPagesForReleaseQuery.execute(websiteId);
 }
@@ -131,7 +123,7 @@ export function listPagesForRelease(
  * valid tree is, so no module keeps its own tree reader or its own limits.
  */
 export function restoreStoredPageConfig(
-  stored: unknown
+  stored: unknown,
 ): AppResult<PageConfigView, UnexpectedAppError> {
   return restorePageConfig(stored);
 }
@@ -142,7 +134,7 @@ export function restoreStoredPageConfig(
  * editor's save, so a trusted module never writes around the builder.
  */
 export function savePageDraft(
-  input: SavePageConfigInput
+  input: SavePageConfigInput,
 ): AppResultAsync<SavedRevisionView, SavePageConfigError> {
   return builderCommands.savePageConfig.execute(input);
 }

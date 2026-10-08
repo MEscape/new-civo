@@ -21,10 +21,7 @@ import {
 
 import type { MigrationRecord } from './migration-record-mapper';
 import type { MigrationId, WebsiteId } from '../../domain/models/ids';
-import type {
-  Migration,
-  MigrationSummary,
-} from '../../domain/models/migration';
+import type { Migration, MigrationSummary } from '../../domain/models/migration';
 import type {
   MarkApplied,
   MigrationReadError,
@@ -47,7 +44,7 @@ const persistenceLogger = logger.withContext({ module: MODULE });
  * here, where it is detected, with ids only.
  */
 function restore(
-  record: MigrationRecord | null
+  record: MigrationRecord | null,
 ): AppResultAsync<Migration | null, MigrationReadError> {
   if (record === null) {
     return okAsync(null);
@@ -71,40 +68,36 @@ function restore(
  * closes a migration reports a miss as "already applied".
  */
 export class PrismaMigrationRepository implements MigrationRepository {
-  create(
-    input: NewMigration
-  ): AppResultAsync<MigrationSummary, InfrastructureAppError> {
+  create(input: NewMigration): AppResultAsync<MigrationSummary, InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
-        db.orm.public.WebsiteMigration.select(
-          ...MIGRATION_SUMMARY_SELECT
-        ).create({
+        db.orm.public.WebsiteMigration.select(...MIGRATION_SUMMARY_SELECT).create({
           websiteId: input.websiteId,
           sourceReleaseId: input.sourceReleaseId,
           proposedBy: input.proposedBy,
           status: MIGRATION_RECORD_STATUS.proposed,
           plan: serializeMigrationPlan(input.plan),
         }),
-      failures.infraOnly('create')
+      failures.infraOnly('create'),
     ).map(toMigrationSummary);
   }
 
   findById(
     websiteId: WebsiteId,
-    id: MigrationId
+    id: MigrationId,
   ): AppResultAsync<Migration | null, MigrationReadError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.WebsiteMigration.where({ id, websiteId })
           .select(...MIGRATION_SELECT)
           .first(),
-      failures.infraOnly('findById')
+      failures.infraOnly('findById'),
     ).andThen(restore);
   }
 
   listByWebsite(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly MigrationSummary[], InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
@@ -114,16 +107,13 @@ export class PrismaMigrationRepository implements MigrationRepository {
           .orderBy([(m) => m.createdAt.desc(), (m) => m.id.desc()])
           .limit(limit)
           .all(),
-      failures.infraOnly('listByWebsite')
+      failures.infraOnly('listByWebsite'),
     ).map((records) => records.map(toMigrationSummary));
   }
 
   markApplied(
-    input: MarkApplied
-  ): AppResultAsync<
-    MigrationSummary,
-    ConflictAppError | InfrastructureAppError
-  > {
+    input: MarkApplied,
+  ): AppResultAsync<MigrationSummary, ConflictAppError | InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.WebsiteMigration.where({
@@ -140,12 +130,11 @@ export class PrismaMigrationRepository implements MigrationRepository {
             // Prisma 8 does not accept a `Date` for a `DateTime` column.
             appliedAt: dateToInstant(input.appliedAt),
           }),
-      failures.infraOnly('markApplied')
-    ).andThen(
-      (record): AppResultAsync<MigrationSummary, ConflictAppError> =>
-        record === null
-          ? errAsync(releaseMigrationAlreadyApplied())
-          : okAsync(toMigrationSummary(record))
+      failures.infraOnly('markApplied'),
+    ).andThen((record): AppResultAsync<MigrationSummary, ConflictAppError> =>
+      record === null
+        ? errAsync(releaseMigrationAlreadyApplied())
+        : okAsync(toMigrationSummary(record)),
     );
   }
 }

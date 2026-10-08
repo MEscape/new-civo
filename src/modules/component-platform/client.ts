@@ -5,17 +5,10 @@
  */
 export {
   COMPONENT_CATEGORIES,
-  PROP_CONTROLS,
   PROP_GROUPS,
 } from './application/contracts/component-platform-constraints';
 
-export type {
-  CatalogBoundsView,
-  CatalogContractView,
-  CatalogFieldView,
-  CatalogOptionView,
-  ComponentCatalogEntry,
-} from './application/contracts/catalog-views';
+export type { CatalogBoundsView } from './application/contracts/catalog-views';
 export type {
   ComponentCategory,
   ContentKind,

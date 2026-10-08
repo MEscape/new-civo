@@ -17,10 +17,7 @@ import { toWebsiteView } from '../website-view-mappers';
 import type { Website } from '../../domain/models/website';
 import type { TemplateKey } from '../../domain/models/website-template';
 import type { HomePageProvisioningError } from '../../domain/ports/home-page-provisioner.port';
-import type {
-  CreateWebsiteInput,
-  WebsiteView,
-} from '../contracts/website-views';
+import type { CreateWebsiteInput, WebsiteView } from '../contracts/website-views';
 import type { CreateWebsiteDependencies } from '../website-dependencies';
 
 export type CreateWebsiteError =
@@ -41,9 +38,7 @@ export type CreateWebsiteError =
 export class CreateWebsite {
   constructor(private readonly deps: CreateWebsiteDependencies) {}
 
-  execute(
-    input: CreateWebsiteInput
-  ): AppResultAsync<WebsiteView, CreateWebsiteError> {
+  execute(input: CreateWebsiteInput): AppResultAsync<WebsiteView, CreateWebsiteError> {
     const { authorization, websites, audit } = this.deps;
 
     return authorization.requireInTenant('website.create').andThen((actor) =>
@@ -55,13 +50,13 @@ export class CreateWebsite {
               draft,
               theme: DEFAULT_WEBSITE_THEME,
             })
-            .map((website) => ({ website, templateKey: draft.templateKey }))
+            .map((website) => ({ website, templateKey: draft.templateKey })),
         )
         .andThen(({ website, templateKey }) =>
-          this.provisionHomePage(website, templateKey).map((website) => ({
-            website,
+          this.provisionHomePage(website, templateKey).map((provisioned) => ({
+            website: provisioned,
             templateKey,
-          }))
+          })),
         )
         .map(({ website, templateKey }) => {
           audit.record({
@@ -72,13 +67,13 @@ export class CreateWebsite {
             templateKey,
           });
           return toWebsiteView(website);
-        })
+        }),
     );
   }
 
   private provisionHomePage(
     website: Website,
-    templateKey: TemplateKey
+    templateKey: TemplateKey,
   ): AppResultAsync<Website, HomePageProvisioningError> {
     return this.deps.homePages
       .provision({
@@ -93,7 +88,7 @@ export class CreateWebsite {
   /** The provisioning error always wins; a failed rollback is logged, not returned. */
   private rollBack(
     website: Website,
-    cause: HomePageProvisioningError
+    cause: HomePageProvisioningError,
   ): AppResultAsync<never, HomePageProvisioningError> {
     return this.deps.websites
       .deleteById(website.id, website.tenantId)

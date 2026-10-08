@@ -34,6 +34,10 @@ export function fieldPlaceholderKey(type: string, field: string): string {
   return `${TEXT_ROOT}.${type}.fields.${field}.placeholder`;
 }
 
+export function itemFieldLabelKey(type: string, field: string, itemField: string): string {
+  return `${TEXT_ROOT}.${type}.fields.${field}.fields.${itemField}.label`;
+}
+
 export function fieldOptionKey(type: string, field: string, value: string | number): string {
   return `${TEXT_ROOT}.${type}.fields.${field}.options.${String(value)}`;
 }
@@ -55,7 +59,14 @@ function toFieldView(
     })),
     bounds: field.bounds,
     canonicalKind:
-      field.control === 'dataset' ? (definition.dataBinding?.canonicalKind ?? null) : null,
+      field.control === 'dataset'
+        ? (field.datasetKind ?? definition.dataBinding?.canonicalKind ?? null)
+        : null,
+    itemFields: field.itemFields.map((itemField) => ({
+      key: itemField.key,
+      labelKey: itemFieldLabelKey(definition.type, field.key, itemField.key),
+      multiline: itemField.multiline,
+    })),
   };
 }
 

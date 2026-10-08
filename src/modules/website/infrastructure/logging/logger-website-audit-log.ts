@@ -1,11 +1,6 @@
-import { logger } from '@lib/logger';
+import { createAuditLog } from '@lib/logger';
 
-import type {
-  WebsiteAuditLog,
-  WebsiteEvent,
-} from '../../domain/ports/website-audit-log.port';
-
-const auditLogger = logger.withContext({ module: 'website.audit' });
+import type { WebsiteAuditLog, WebsiteEvent } from '../../domain/ports/website-audit-log.port';
 
 /** Failures are `warn` so alerting can key on them. Exhaustive per event type. */
 const LEVEL_BY_EVENT = {
@@ -15,13 +10,8 @@ const LEVEL_BY_EVENT = {
   'website.provisioning_rollback_failed': 'warn',
 } as const satisfies Record<WebsiteEvent['type'], 'info' | 'warn'>;
 
-export class LoggerWebsiteAuditLog implements WebsiteAuditLog {
-  record(event: WebsiteEvent): void {
-    const { type, ...details } = event;
-    try {
-      auditLogger[LEVEL_BY_EVENT[type]](type, details);
-    } catch {
-      // Auditing must never fail the request it describes.
-    }
-  }
-}
+/** One structured log line per event under `website.audit`; never throws. */
+export const loggerWebsiteAuditLog: WebsiteAuditLog = createAuditLog(
+  'website.audit',
+  LEVEL_BY_EVENT,
+);

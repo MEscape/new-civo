@@ -24,23 +24,16 @@ export class GetMigration {
 
   execute(
     rawWebsiteId: string,
-    rawMigrationId: string
+    rawMigrationId: string,
   ): AppResultAsync<MigrationDetailView, GetMigrationError> {
-    return loadAuthorizedReleaseWebsite(
-      this.deps,
-      rawWebsiteId,
-      'release.read'
-    )
+    return loadAuthorizedReleaseWebsite(this.deps, rawWebsiteId, 'release.read')
       .andThen(({ website }) =>
         parseMigrationId(rawMigrationId).asyncAndThen((id) =>
-          this.deps.migrations.findById(website.id, id)
-        )
+          this.deps.migrations.findById(website.id, id),
+        ),
       )
-      .andThen(
-        (migration): AppResultAsync<Migration, NotFoundAppError> =>
-          migration === null
-            ? errAsync(releaseMigrationNotFound())
-            : okAsync(migration)
+      .andThen((migration): AppResultAsync<Migration, NotFoundAppError> =>
+        migration === null ? errAsync(releaseMigrationNotFound()) : okAsync(migration),
       )
       .map(toMigrationDetailView);
   }

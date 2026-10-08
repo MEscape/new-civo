@@ -1,5 +1,16 @@
-import { checkAuthorizationCategories, checkCommandAuditDependency, checkTranslationOwnership } from './checks-behavior.mjs';
-import { checkClientServerBoundary, checkCompositionWiring, checkLayerDependencies, checkModuleGraph, checkPrismaContainment, checkPublicApi } from './checks-dependencies.mjs';
+import {
+  checkAuthorizationCategories,
+  checkCommandAuditDependency,
+  checkTranslationOwnership,
+} from './checks-behavior.mjs';
+import {
+  checkClientServerBoundary,
+  checkCompositionWiring,
+  checkLayerDependencies,
+  checkModuleGraph,
+  checkPrismaContainment,
+  checkPublicApi,
+} from './checks-dependencies.mjs';
 import { checkModuleStructure } from './checks-structure.mjs';
 import { loadProject } from './project.mjs';
 
@@ -19,7 +30,9 @@ export const CHECKS = {
 
 export function runAllChecks(root) {
   const project = loadProject(root);
-  return Object.entries(CHECKS).flatMap(([name, check]) => check(project).map((v) => ({ ...v, group: name })));
+  return Object.entries(CHECKS).flatMap(([name, check]) =>
+    check(project).map((v) => ({ ...v, group: name })),
+  );
 }
 
 export { loadProject };

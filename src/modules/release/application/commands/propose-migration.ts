@@ -1,10 +1,6 @@
 import type { Actor } from '@modules/auth';
 
-import type {
-  InfrastructureAppError,
-  NotFoundAppError,
-  UnexpectedAppError,
-} from '@lib/errors';
+import type { InfrastructureAppError, NotFoundAppError, UnexpectedAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
@@ -19,24 +15,14 @@ import type { MigrationPlan } from '../../domain/models/migration-plan';
 import type { MigrationSource } from '../../domain/models/migration-source';
 import type { Release } from '../../domain/models/release';
 import type { ReleaseReadError } from '../../domain/ports/release.repository';
-import type {
-  MigrationProposalView,
-  ProposeMigrationInput,
-} from '../contracts/release-views';
+import type { MigrationProposalView, ProposeMigrationInput } from '../contracts/release-views';
 import type { LoadReleaseWebsiteError } from '../load-authorized-release-website';
 import type { ProposeMigrationDependencies } from '../release-dependencies';
 
-export type ProposeMigrationError =
-  | LoadReleaseWebsiteError
-  | ReleaseReadError
-  | UnexpectedAppError;
+export type ProposeMigrationError = LoadReleaseWebsiteError | ReleaseReadError | UnexpectedAppError;
 
-function requirePublished(
-  release: Release | null
-): AppResultAsync<Release, NotFoundAppError> {
-  return release === null
-    ? errAsync(releaseNotPublished())
-    : okAsync(release);
+function requirePublished(release: Release | null): AppResultAsync<Release, NotFoundAppError> {
+  return release === null ? errAsync(releaseNotPublished()) : okAsync(release);
 }
 
 /**
@@ -52,49 +38,47 @@ export class ProposeMigration {
   constructor(private readonly deps: ProposeMigrationDependencies) {}
 
   execute(
-    input: ProposeMigrationInput
+    input: ProposeMigrationInput,
   ): AppResultAsync<MigrationProposalView, ProposeMigrationError> {
     const { releases, pages, components } = this.deps;
 
-    return loadAuthorizedReleaseWebsite(
-      this.deps,
-      input.websiteId,
-      'release.publish'
-    ).andThen(({ actor, website }) =>
-      releases
-        .findPublished(website.id)
-        .andThen(requirePublished)
-        .andThen((release) =>
-          pages
-            .readTrees(release.snapshot.pages)
-            .asyncAndThen((trees) =>
-              okAsync(toMigrationSource(release, trees))
-            )
-        )
-        .andThen((source) =>
-          this.record(
-            actor,
-            website.id,
-            source,
-            planMigration(source, components)
+    return loadAuthorizedReleaseWebsite(this.deps, input.websiteId, 'release.publish').andThen(
+      ({ actor, website }) =>
+        releases
+          .findPublished(website.id)
+          .andThen(requirePublished)
+          .andThen((release) =>
+            pages
+              .readTrees(release.snapshot.pages)
+              .asyncAndThen((trees) => okAsync(toMigrationSource(release, trees))),
           )
-        )
+          .andThen((source) =>
+            this.record({
+              actor,
+              websiteId: website.id,
+              source,
+              plan: planMigration(source, components),
+            }),
+          ),
     );
   }
 
-  private record(
-    actor: Actor,
-    websiteId: WebsiteId,
-    source: MigrationSource,
-    plan: MigrationPlan
-  ): AppResultAsync<MigrationProposalView, InfrastructureAppError> {
+  private record({
+    actor,
+    websiteId,
+    source,
+    plan,
+  }: {
+    readonly actor: Actor;
+    readonly websiteId: WebsiteId;
+    readonly source: MigrationSource;
+    readonly plan: MigrationPlan;
+  }): AppResultAsync<MigrationProposalView, InfrastructureAppError> {
     const { migrations, audit } = this.deps;
     const sourceReleaseId = source.releaseId;
 
     if (isUpToDate(plan)) {
-      return okAsync(
-        toMigrationProposalView({ migrationId: null, sourceReleaseId, plan })
-      );
+      return okAsync(toMigrationProposalView({ migrationId: null, sourceReleaseId, plan }));
     }
 
     return migrations

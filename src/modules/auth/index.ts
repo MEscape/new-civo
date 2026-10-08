@@ -5,30 +5,26 @@
  * code through `composition.ts` and must never end up in a client bundle.
  */
 
-export * from './domain/models/ids';
+export { toTenantId } from './domain/models/ids';
+export type { ActorId, TenantId } from './domain/models/ids';
 export type { Permission } from './domain/models/permission';
 export type { ResourceScope } from './domain/models/authorize';
 export type { Actor } from './domain/models/actor';
 export { actorHasPermission } from './domain/models/authorize';
 
 /** Authorization: every protected use case of every module receives this. */
-export type {
-    AuthorizationError,
-    AuthorizationService,
-} from './application/authorization-service';
+export type { AuthorizationError, AuthorizationService } from './application/authorization-service';
 export { getAccessControl, isAuthEnabled } from './composition';
 
 /** Framework entry points: the auth Route Handler and the page guard. */
 export { authRouteHandlers } from './composition';
 export { requireSignedIn } from './presentation/guards/require-signed-in';
-export type { ActorView, Role } from './application/contracts/auth-views';
 
-export { AUTH_ERROR_CODES } from './domain/errors/auth-errors';
 export { authRoutes } from './presentation/routes';
 export {
-    parseEmailVerifiedPageParams,
-    parseResetPasswordPageParams,
-    parseSignInPageParams,
+  parseEmailVerifiedPageParams,
+  parseResetPasswordPageParams,
+  parseSignInPageParams,
 } from './presentation/schemas/page-params-schema';
 
 export { EmailVerificationResult } from './presentation/components/email-verification-result';

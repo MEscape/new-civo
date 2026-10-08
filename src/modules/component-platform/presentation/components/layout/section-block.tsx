@@ -1,15 +1,9 @@
 import type { ReactNode } from 'react';
 
+import { sectionToneClass } from '@components/layout/layout-primitives';
+import type { SectionTone } from '@components/layout/layout-primitives';
+
 import { cn } from '@lib/utils';
-
-import type { ComponentProps } from '../../../application/contracts/component-platform-constraints';
-
-type SectionTone = ComponentProps<'section'>['tone'];
-
-const TONE_CLASSES = {
-  default: '',
-  muted: 'bg-surface',
-} as const satisfies Record<SectionTone, string>;
 
 export interface SectionBlockProps {
   readonly tone: SectionTone;
@@ -22,5 +16,5 @@ export interface SectionBlockProps {
  * second layer would double the gap.
  */
 export function SectionBlock({ tone, children }: SectionBlockProps) {
-  return <div className={cn('w-full', TONE_CLASSES[tone])}>{children}</div>;
+  return <div className={cn('w-full', sectionToneClass(tone))}>{children}</div>;
 }

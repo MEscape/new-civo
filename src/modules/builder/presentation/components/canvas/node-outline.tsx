@@ -1,16 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { findNode } from '../../../application/contracts/editor-model';
 import { useComponentText } from '../../hooks/use-component-text';
 import { useBuilderSession } from '../builder-session-context';
 
-import type {
-  PageNode,
-  PageNodeId,
-  Rect,
-} from '../../../application/contracts/editor-model';
+import type { PageNode, PageNodeId, Rect } from '../../../application/contracts/editor-model';
 
 const OUTLINE_CLASS = {
   hover: 'civo-canvas-outline civo-canvas-outline--hover',
@@ -31,13 +27,7 @@ export interface NodeOutlineProps {
 }
 
 /** A positioned outline with the component's name. The rect is measured layout, hence inline. */
-export function NodeOutline({
-  variant,
-  nodes,
-  nodeId,
-  rect,
-  children,
-}: NodeOutlineProps) {
+export function NodeOutline({ variant, nodes, nodeId, rect, children }: NodeOutlineProps) {
   const t = useTranslations('builder');
   const { catalog } = useBuilderSession();
   const text = useComponentText();

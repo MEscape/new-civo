@@ -1,13 +1,13 @@
 # Conventions
 
-Step-by-step procedures for recurring tasks. Rules in [`rules/`](../../rules/README.md) say what is allowed; conventions say how to do the task.
+Step-by-step procedures for recurring tasks. Rules in [`rules/`](../rules/README.md) say what is allowed; conventions say how to do the task.
 
 Conventions link to rules and never restate them. If a convention and a rule disagree, the rule wins and the convention must be fixed.
 
 ## Index
 
-| Task                        | Convention                                                                 |
-| --------------------------- | -------------------------------------------------------------------------- |
+| Task                        | Convention                                                               |
+| --------------------------- | ------------------------------------------------------------------------ |
 | Add a business module       | [`adding-a-module.md`](adding-a-module.md)                               |
 | Add a command or query      | [`adding-a-use-case.md`](adding-a-use-case.md)                           |
 | Add a repository            | [`adding-a-repository.md`](adding-a-repository.md)                       |

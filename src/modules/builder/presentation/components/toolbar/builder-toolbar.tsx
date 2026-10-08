@@ -8,7 +8,7 @@ import { ToolbarHistoryControls } from './toolbar-history-controls';
 import { ToolbarModeLinks } from './toolbar-mode-links';
 import { ToolbarViewportControls } from './toolbar-viewport-controls';
 
-import type { EditorLinks } from '../../editor-links';
+import type { EditorLinks } from '../../navigation/editor-links';
 
 export interface BuilderToolbarProps {
   readonly websiteName: string;
@@ -16,11 +16,7 @@ export interface BuilderToolbarProps {
   readonly links: EditorLinks;
 }
 
-export function BuilderToolbar({
-  websiteName,
-  pageTitle,
-  links,
-}: BuilderToolbarProps) {
+export function BuilderToolbar({ websiteName, pageTitle, links }: BuilderToolbarProps) {
   const editorMode = useBuilderSelector(selectEditorMode);
 
   return (
@@ -35,9 +31,7 @@ export function BuilderToolbar({
         <ToolbarViewportControls />
         <ToolbarModeLinks
           publicSiteHref={links.publicSite}
-          settingsHref={
-            hasCapability(editorMode, 'manageTheme') ? links.settings : null
-          }
+          settingsHref={hasCapability(editorMode, 'manageTheme') ? links.settings : null}
         />
         <SaveControls />
       </div>

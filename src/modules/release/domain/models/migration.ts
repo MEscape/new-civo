@@ -2,10 +2,7 @@ import type { ConflictAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
 
-import {
-  releaseMigrationAlreadyApplied,
-  releaseMigrationStale,
-} from '../errors/release-errors';
+import { releaseMigrationAlreadyApplied, releaseMigrationStale } from '../errors/release-errors';
 
 import type { MigrationId, ReleaseId, WebsiteId } from './ids';
 import type { MigrationPlan } from './migration-plan';
@@ -36,19 +33,15 @@ export interface Migration extends MigrationSummary {
 
 /** A plan is applied once. */
 export function ensureApplicable<T extends MigrationSummary>(
-  migration: T
+  migration: T,
 ): AppResult<T, ConflictAppError> {
-  return migration.status === 'proposed'
-    ? ok(migration)
-    : err(releaseMigrationAlreadyApplied());
+  return migration.status === 'proposed' ? ok(migration) : err(releaseMigrationAlreadyApplied());
 }
 
 /** The plan only describes the release it came from; once another is live it is stale. */
 export function ensureSourceIsLive<T extends MigrationSummary>(
   migration: T,
-  liveReleaseId: ReleaseId
+  liveReleaseId: ReleaseId,
 ): AppResult<T, ConflictAppError> {
-  return migration.sourceReleaseId === liveReleaseId
-    ? ok(migration)
-    : err(releaseMigrationStale());
+  return migration.sourceReleaseId === liveReleaseId ? ok(migration) : err(releaseMigrationStale());
 }

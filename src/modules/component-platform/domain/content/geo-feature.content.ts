@@ -10,13 +10,7 @@ import {
 import { CONTENT_LIMITS as LIMITS } from './content-limits';
 import { defineContent } from './define-content';
 import { sampleInstant } from './sample-instant';
-import {
-  label,
-  optionalLinkTarget,
-  recordId,
-  shortText,
-  title,
-} from './shared-fields';
+import { label, optionalLinkTarget, recordId, shortText, title } from './shared-fields';
 
 /**
  * One located thing on a map: a point, a line or an area. The contract is
@@ -29,14 +23,18 @@ import {
  * degrades to "absent", so a feature with valid `latitude`/`longitude`
  * still shows.
  */
+/** Sample positions are written as named longitude/latitude pairs; GeoJSON wants `[lng, lat]`. */
+function positions(
+  points: ReadonlyArray<{ readonly lng: number; readonly lat: number }>,
+): Array<[number, number]> {
+  return points.map(({ lng, lat }) => [lng, lat]);
+}
+
 export const geoFeatureContent = defineContent({
   shape: {
     id: recordId(),
     name: title(),
-    geometry: withFallback(
-      optional(opaqueRecord({ maxNodes: LIMITS.geometryNodes })),
-      undefined
-    ),
+    geometry: withFallback(optional(opaqueRecord({ maxNodes: LIMITS.geometryNodes })), undefined),
     latitude: optional(number({ min: -90, max: 90 })),
     longitude: optional(number({ min: -180, max: 180 })),
     category: label(),
@@ -52,9 +50,9 @@ export const geoFeatureContent = defineContent({
           maxEntries: LIMITS.propertyEntries,
           maxKeyLength: LIMITS.propertyKey,
           maxTextLength: LIMITS.label,
-        })
+        }),
       ),
-      undefined
+      undefined,
     ),
   },
   rule: {
@@ -100,11 +98,11 @@ export const geoFeatureContent = defineContent({
     category: 'Radweg',
     geometry: {
       type: 'LineString',
-      coordinates: [
-        [9.98, 50.99],
-        [9.995, 51.002],
-        [10.01, 51.006],
-      ],
+      coordinates: positions([
+        { lng: 9.98, lat: 50.99 },
+        { lng: 9.995, lat: 51.002 },
+        { lng: 10.01, lat: 51.006 },
+      ]),
     },
   },
   {
@@ -114,13 +112,13 @@ export const geoFeatureContent = defineContent({
     geometry: {
       type: 'Polygon',
       coordinates: [
-        [
-          [9.985, 50.994],
-          [10.008, 50.994],
-          [10.008, 51.008],
-          [9.985, 51.008],
-          [9.985, 50.994],
-        ],
+        positions([
+          { lng: 9.985, lat: 50.994 },
+          { lng: 10.008, lat: 50.994 },
+          { lng: 10.008, lat: 51.008 },
+          { lng: 9.985, lat: 51.008 },
+          { lng: 9.985, lat: 50.994 },
+        ]),
       ],
     },
   },

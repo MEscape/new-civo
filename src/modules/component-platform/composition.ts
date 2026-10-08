@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { dataSourceQueries } from '@modules/data-sources';
-import type { CanonicalKind } from '@modules/data-sources';
+import { MapSection } from '@modules/map';
 
 import { systemClock } from '@lib/clock';
 
@@ -16,30 +16,17 @@ import { createPageRenderer } from './presentation/components/page-renderer/crea
 import { createContentLoader } from './presentation/components/page-renderer/load-content';
 
 import type { PublicComponentPlatformDependencies } from './application/component-platform-dependencies';
-import type { ContentKind } from './domain/content/content-definitions';
-
-/**
- * Compile-time proof that every kind this module renders exists in
- * data-sources. One direction only: a kind data-sources adds needs nothing
- * here until a component renders it, while a kind it removes or renames
- * stops this file compiling, which is exactly when this module must change.
- */
-type EveryContentKindExistsUpstream = [ContentKind] extends [CanonicalKind]
-  ? true
-  : never;
-export const CONTENT_KINDS_EXIST_UPSTREAM =
-  true satisfies EveryContentKindExistsUpstream;
 
 /**
  * The module's composition root: the one file that knows both the use cases
- * and their adapters, and the only one that reaches another module. The
+ * and their adapters, and the only one that reaches another module at runtime. The
  * data-sources use case is passed as a function, so the adapter depends on
  * what it needs and not on how data-sources is built.
  */
 const deps: PublicComponentPlatformDependencies = {
   registry: COMPONENT_REGISTRY,
   live: new DatasetContentSource((datasetId, websiteId) =>
-    dataSourceQueries.getMappedDatasetRecords.execute(datasetId, websiteId)
+    dataSourceQueries.getMappedDatasetRecords.execute(datasetId, websiteId),
   ),
   clock: systemClock,
 };
@@ -53,10 +40,12 @@ export const componentPlatformQueries = {
 } as const;
 
 /**
- * The page renderer, wired with the one thing data components need: a loader
- * built from `listContent`. Presentation never reaches this file; the
- * dependency is handed in from here.
+ * The page renderer, wired with what components need: a loader built from
+ * `listContent`, and the map module's section for the map component.
+ * Presentation never reaches this file or another module; both are handed
+ * in from here.
  */
 export const renderPageNodes = createPageRenderer({
   loadContent: createContentLoader(componentPlatformQueries.listContent),
+  mapSection: MapSection,
 });

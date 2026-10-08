@@ -55,9 +55,6 @@ ruleTester.run('architecture/module-structure', rules['module-structure']!, {
     ].map((p) => ok(`src/modules/shop/${p}`)),
     // documented exceptions live in eslint/architecture-policy/policy.mjs and are scoped to the module that earned them
     ok('src/modules/auth/application/authorization-service.ts'),
-    // modules listed in LEGACY_MODULES have the structure family suspended (and only that)
-    ok('src/modules/component-platform/domain/registry.ts'),
-    ok('src/modules/integrations/civic/infrastructure/mock-civic-provider.ts'),
     // not module code
     ok('src/lib/utils/x.ts'),
   ],
@@ -67,25 +64,70 @@ ruleTester.run('architecture/module-structure', rules['module-structure']!, {
     bad('src/modules/shop/helpers/x.ts', /'helpers' is not a layer folder/),
     bad('src/modules/shop/domain/helpers.ts', /'helpers\.ts' says nothing about its content/),
     bad('src/modules/shop/domain/utils/x.ts', /'domain\/utils\/' is not a valid folder name/),
-    bad('src/modules/shop/domain/Templates/x.ts', /'domain\/Templates\/' is not a valid folder name/),
+    bad(
+      'src/modules/shop/domain/Templates/x.ts',
+      /'domain\/Templates\/' is not a valid folder name/,
+    ),
     bad('src/modules/shop/domain/registry.ts', /'registry\.ts' cannot sit directly in domain\//),
-    bad('src/modules/shop/infrastructure/access-control.ts', /cannot sit directly in infrastructure\//),
-    bad('src/modules/shop/presentation/return-path.ts', /cannot sit directly in presentation\/\. Allowed here: routes\.ts/),
-    bad('src/modules/shop/domain/errors/shop-error.ts', /does not follow the domain\/errors\/ naming convention/),
-    bad('src/modules/shop/domain/ports/shop.ts', /does not follow the domain\/ports\/ naming convention/),
+    bad(
+      'src/modules/shop/infrastructure/access-control.ts',
+      /cannot sit directly in infrastructure\//,
+    ),
+    bad(
+      'src/modules/shop/presentation/return-path.ts',
+      /cannot sit directly in presentation\/\. Allowed here: routes\.ts/,
+    ),
+    bad(
+      'src/modules/shop/domain/errors/shop-error.ts',
+      /does not follow the domain\/errors\/ naming convention/,
+    ),
+    bad(
+      'src/modules/shop/domain/ports/shop.ts',
+      /does not follow the domain\/ports\/ naming convention/,
+    ),
     bad('src/modules/shop/application/helpers.ts', /says nothing about its content/),
-    bad('src/modules/shop/application/enforce-rate-limit.ts', /cannot sit directly in application\/\. Allowed here:/),
+    bad(
+      'src/modules/shop/application/enforce-rate-limit.ts',
+      /cannot sit directly in application\/\. Allowed here:/,
+    ),
     // the auth exception is exactly one file in one module, not a pattern any module can use
-    bad('src/modules/shop/application/authorization-service.ts', /cannot sit directly in application\//),
-    bad('src/modules/shop/application/contracts/shop.ts', /application\/contracts\/ naming convention/),
-    bad('src/modules/shop/infrastructure/misc/x.ts', /'infrastructure\/misc\/' is not a valid folder name/),
-    bad('src/modules/shop/application/extras/x.ts', /'application\/extras\/' is not an approved folder/), // application is a closed layer
-    bad('src/modules/shop/infrastructure/prisma/shop.ts', /infrastructure\/prisma\/ naming convention/),
-    bad('src/modules/shop/presentation/actions/shop.ts', /presentation\/actions\/ naming convention.*-action\.ts/),
+    bad(
+      'src/modules/shop/application/authorization-service.ts',
+      /cannot sit directly in application\//,
+    ),
+    bad(
+      'src/modules/shop/application/contracts/shop.ts',
+      /application\/contracts\/ naming convention/,
+    ),
+    bad(
+      'src/modules/shop/infrastructure/misc/x.ts',
+      /'infrastructure\/misc\/' is not a valid folder name/,
+    ),
+    bad(
+      'src/modules/shop/application/extras/x.ts',
+      /'application\/extras\/' is not an approved folder/,
+    ), // application is a closed layer
+    bad(
+      'src/modules/shop/infrastructure/prisma/shop.ts',
+      /infrastructure\/prisma\/ naming convention/,
+    ),
+    bad(
+      'src/modules/shop/presentation/actions/shop.ts',
+      /presentation\/actions\/ naming convention.*-action\.ts/,
+    ),
     bad('src/modules/shop/presentation/dto/shop.ts', /presentation\/dto\/ naming convention/),
-    bad('src/modules/shop/presentation/messages/keys.ts', /presentation\/messages\/ naming convention/),
-    bad('src/modules/shop/presentation/schemas/shop.ts', /presentation\/schemas\/ naming convention/),
-    bad('src/modules/shop/presentation/actions/nested/create-shop-action.ts', /presentation\/actions\/ is flat/),
+    bad(
+      'src/modules/shop/presentation/messages/keys.ts',
+      /presentation\/messages\/ naming convention/,
+    ),
+    bad(
+      'src/modules/shop/presentation/schemas/shop.ts',
+      /presentation\/schemas\/ naming convention/,
+    ),
+    bad(
+      'src/modules/shop/presentation/actions/nested/create-shop-action.ts',
+      /presentation\/actions\/ is flat/,
+    ),
   ],
 });
 
@@ -97,18 +139,42 @@ ruleTester.run('architecture/module-public-api', rules['module-public-api']!, {
 export { OrderForm } from './presentation/components/order-form';
 export { shopRoutes } from './presentation/routes';
 export type { ShopView } from './application/contracts/shop-views';
-export type { ShopRepository } from './domain/ports/shop.repository';`
+export type { ShopRepository } from './domain/ports/shop.repository';`,
     ),
     valid('src/modules/shop/domain/models/shop.ts', 'export * from "./x";'), // only index.ts is a public API
   ],
   invalid: [
-    invalid('src/modules/shop/index.ts', "export * from './presentation/routes';", /Avoid `export \*` in a module public API/),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export * from './presentation/routes';",
+      /Avoid `export \*` in a module public API/,
+    ),
     invalid('src/modules/shop/index.ts', 'export default {};', /named exports/),
-    invalid('src/modules/shop/index.ts', "export { PrismaShopRepository } from './composition';", /`PrismaShopRepository` looks like an implementation detail/),
-    invalid('src/modules/shop/index.ts', "export { ShopRepository } from './composition';", /looks like an implementation detail/),
-    invalid('src/modules/shop/index.ts', "export { shopRecordMapper } from './composition';", /Mapper|implementation detail/),
-    invalid('src/modules/shop/index.ts', "export { createShopErrorBag } from './composition';", /error factory/),
-    invalid('src/modules/shop/index.ts', "export { LoggerShopAuditLog } from './composition';", /implementation detail/),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export { PrismaShopRepository } from './composition';",
+      /`PrismaShopRepository` looks like an implementation detail/,
+    ),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export { ShopRepository } from './composition';",
+      /looks like an implementation detail/,
+    ),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export { shopRecordMapper } from './composition';",
+      /Mapper|implementation detail/,
+    ),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export { createShopErrorBag } from './composition';",
+      /error factory/,
+    ),
+    invalid(
+      'src/modules/shop/index.ts',
+      "export { LoggerShopAuditLog } from './composition';",
+      /implementation detail/,
+    ),
     invalid('src/modules/shop/index.ts', 'export const x = 1;', /index\.ts only re-exports/),
   ],
 });

@@ -2,30 +2,27 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { FieldMessage } from '@components/shared/field-message';
 import { Button } from '@components/ui/button';
 import { Spinner } from '@components/ui/icons';
 
+import { useTranslations } from '@i18n/client';
+
 import { applyMigrationAction } from '../actions/apply-migration-action';
 import { messageKeyForError } from '../messages/message-keys';
-
-import { NodeMigrationItem } from './node-migration-item';
-import { PagePathLabel } from './page-path-label';
 import {
   countUnresolvedNodes,
   hasInvalidChoice,
   toResolutionsInput,
 } from '../resolutions/resolution-choices';
 
+import { NodeMigrationItem } from './node-migration-item';
+import { PagePathLabel } from './page-path-label';
+
 import type { MigrationPlanDto } from '../dto/migration-plan-dto';
 import type { ApplyMigrationResultDto } from '../dto/migration-result-dto';
 import type { MessageKey } from '../messages/message-keys';
-import type {
-  ChoiceMap,
-  ConflictChoice,
-} from '../resolutions/resolution-choices';
+import type { ChoiceMap, ConflictChoice } from '../resolutions/resolution-choices';
 
 export interface MigrationReviewProps {
   readonly websiteId: string;
@@ -40,12 +37,7 @@ export interface MigrationReviewProps {
  * Nodes without a complete set of choices are skipped by the server and
  * stay as they were, so leaving a conflict open is safe.
  */
-export function MigrationReview({
-  websiteId,
-  migrationId,
-  plan,
-  onApplied,
-}: MigrationReviewProps) {
+export function MigrationReview({ websiteId, migrationId, plan, onApplied }: MigrationReviewProps) {
   const t = useTranslations('release');
   const id = useId();
   const [isPending, startTransition] = useTransition();
@@ -53,7 +45,7 @@ export function MigrationReview({
   const [errorKey, setErrorKey] = useState<MessageKey | null>(null);
 
   const reviewPages = plan.pages.filter((page) =>
-    page.nodes.some((node) => node.status !== 'unchanged')
+    page.nodes.some((node) => node.status !== 'unchanged'),
   );
   const unresolvedCount = countUnresolvedNodes(plan, choices);
   const isBlocked = hasInvalidChoice(choices);
@@ -83,11 +75,7 @@ export function MigrationReview({
       {reviewPages.map((page) => {
         const headingId = `${id}-${page.path || 'home'}`;
         return (
-          <section
-            key={page.path}
-            aria-labelledby={headingId}
-            className="space-y-3"
-          >
+          <section key={page.path} aria-labelledby={headingId} className="space-y-3">
             <h3 id={headingId} className="text-base font-semibold text-copy">
               <PagePathLabel path={page.path} />
             </h3>
@@ -122,19 +110,11 @@ export function MigrationReview({
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="button"
-          disabled={isPending || isBlocked}
-          onClick={handleApply}
-        >
+        <Button type="button" disabled={isPending || isBlocked} onClick={handleApply}>
           {isPending && <Spinner className="mr-2" aria-hidden="true" />}
-          {isPending
-            ? t('migration.review.applying')
-            : t('migration.review.apply')}
+          {isPending ? t('migration.review.applying') : t('migration.review.apply')}
         </Button>
-        <p className="text-xs text-copy-muted">
-          {t('migration.review.applyNote')}
-        </p>
+        <p className="text-xs text-copy-muted">{t('migration.review.applyNote')}</p>
       </div>
     </div>
   );

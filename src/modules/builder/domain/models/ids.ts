@@ -2,12 +2,7 @@ import { createIdParser } from '@lib/result';
 import { identity } from '@lib/utils';
 import type { Brand } from '@lib/utils';
 
-import {
-  BUILDER_VALIDATION_CODES as CODES,
-  fieldValidationFailed,
-} from '../errors/builder-errors';
-
-
+import { BUILDER_VALIDATION_CODES as CODES, fieldValidationFailed } from '../errors/builder-errors';
 
 export type PageId = Brand<string, 'PageId'>;
 export type PageNodeId = Brand<string, 'PageNodeId'>;
@@ -67,11 +62,7 @@ export function toWebsiteId(raw: string): WebsiteId {
  * The one place the id format lives: `<type>-<seed>-<ordinal>`. The same
  * input and seed always yield the same id; no clock or randomness is involved.
  */
-export function deriveNodeId(
-  type: string,
-  seed: string,
-  ordinal: number
-): PageNodeId {
+export function deriveNodeId(type: string, seed: string, ordinal: number): PageNodeId {
   return toPageNodeId(`${type}-${seed}-${ordinal}`);
 }
 

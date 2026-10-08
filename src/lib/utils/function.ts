@@ -4,53 +4,57 @@
 
 /** Delays calls until `waitMs` has passed without another call. Only the last call's arguments are used. */
 export function debounce<Args extends unknown[]>(
-    fn: (...args: Args) => void,
-    waitMs: number
+  fn: (...args: Args) => void,
+  waitMs: number,
 ): ((...args: Args) => void) & { cancel: () => void } {
-    let timer: ReturnType<typeof setTimeout> | undefined;
+  let timer: ReturnType<typeof setTimeout> | undefined;
 
-    const debounced = (...args: Args): void => {
-        if (timer !== undefined) {clearTimeout(timer);}
-        timer = setTimeout(() => {
-            timer = undefined;
-            fn(...args);
-        }, waitMs);
-    };
+  const debounced = (...args: Args): void => {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      timer = undefined;
+      fn(...args);
+    }, waitMs);
+  };
 
-    debounced.cancel = (): void => {
-        if (timer !== undefined) {clearTimeout(timer);}
-        timer = undefined;
-    };
+  debounced.cancel = (): void => {
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
+    timer = undefined;
+  };
 
-    return debounced;
+  return debounced;
 }
 
 /** Runs the first call immediately, then ignores calls until `waitMs` has passed. */
 export function throttle<Args extends unknown[]>(
-    fn: (...args: Args) => void,
-    waitMs: number
+  fn: (...args: Args) => void,
+  waitMs: number,
 ): (...args: Args) => void {
-    let lastCall = Number.NEGATIVE_INFINITY;
-    return (...args: Args): void => {
-        const now = Date.now();
-        if (now - lastCall >= waitMs) {
-            lastCall = now;
-            fn(...args);
-        }
-    };
+  let lastCall = Number.NEGATIVE_INFINITY;
+  return (...args: Args): void => {
+    const now = Date.now();
+    if (now - lastCall >= waitMs) {
+      lastCall = now;
+      fn(...args);
+    }
+  };
 }
 
 /** Runs `fn` at most once and returns the cached result on every later call. */
 export function once<T>(fn: () => T): () => T {
-    let called = false;
-    let result: T;
-    return () => {
-        if (!called) {
-            result = fn();
-            called = true;
-        }
-        return result;
-    };
+  let called = false;
+  let result: T;
+  return () => {
+    if (!called) {
+      result = fn();
+      called = true;
+    }
+    return result;
+  };
 }
 
 /**
@@ -60,24 +64,24 @@ export function once<T>(fn: () => T): () => T {
  * unbounded, permanent cache is only appropriate when the input domain
  * itself is bounded, e.g. memoizing a formatter over a small enum).
  */
-export function memoize<Arg, Result>(
-    fn: (arg: Arg) => Result
-): (arg: Arg) => Result {
-    const cache = new Map<Arg, Result>();
-    return (arg) => {
-        if (cache.has(arg)) {return cache.get(arg) as Result;} // has() guarantees presence.
-        const result = fn(arg);
-        cache.set(arg, result);
-        return result;
-    };
+export function memoize<Arg, Result>(fn: (arg: Arg) => Result): (arg: Arg) => Result {
+  const cache = new Map<Arg, Result>();
+  return (arg) => {
+    if (cache.has(arg)) {
+      return cache.get(arg) as Result;
+    } // has() guarantees presence.
+    const result = fn(arg);
+    cache.set(arg, result);
+    return result;
+  };
 }
 
 /** Returns its argument unchanged. Useful as a default transform. */
 export function identity<T>(value: T): T {
-    return value;
+  return value;
 }
 
 /** Does nothing. Useful as a default callback. */
 export function noop(): void {
-    // Intentionally empty.
+  // Intentionally empty.
 }

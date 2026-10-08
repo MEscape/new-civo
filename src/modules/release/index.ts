@@ -11,17 +11,5 @@ export { releaseQueries } from './composition';
 export { MigrationPanel } from './presentation/components/migration-panel';
 export { ReleaseHistoryPanel } from './presentation/components/release-history-panel';
 
-export type {
-  ComponentUsageView,
-  MigrationDetailView,
-  MigrationPlanView,
-  MigrationSummaryView,
-  PublishedSnapshotView,
-  ReleaseHistoryView,
-  ReleaseSummaryView,
-} from './application/contracts/release-views';
-
-export { RELEASE_ERROR_CODES } from './domain/errors/release-errors';
-
 export { default as enRelease } from './presentation/i18n/en.json';
 export { default as deRelease } from './presentation/i18n/de.json';

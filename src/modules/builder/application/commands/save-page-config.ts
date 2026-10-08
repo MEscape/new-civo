@@ -1,32 +1,22 @@
 import type { Actor } from '@modules/auth';
 
-import type {
-  ConflictAppError,
-  ForbiddenAppError,
-  ValidationAppError,
-} from '@lib/errors';
+import type { ConflictAppError, ForbiddenAppError, ValidationAppError } from '@lib/errors';
 import { ok } from '@lib/result';
 import type { AppResult, AppResultAsync } from '@lib/result';
 
 import { hasCapability } from '../../domain/models/editor-capabilities';
 import { parsePageVersion } from '../../domain/models/page';
 import { parsePageConfig } from '../../domain/models/page-config';
-import {
-  checkComposition,
-  checkEditScope,
-} from '../../domain/rules/page-save-checks';
+import { checkComposition, checkEditScope } from '../../domain/rules/page-save-checks';
 import { countPageNodes } from '../../domain/tree/tree-operations';
 import { loadAuthorizedPage } from '../load-authorized-page';
 import { toSavedRevisionView } from '../page-view-mappers';
-import { resolveEditorMode } from '../resolve-editor-mode';
+import { resolveEditorMode } from '../services/resolve-editor-mode';
 
 import type { EditorMode } from '../../domain/models/editor-capabilities';
 import type { Page } from '../../domain/models/page';
 import type { PageConfig } from '../../domain/models/page-config';
-import type {
-  SavePageConfigInput,
-  SavedRevisionView,
-} from '../contracts/page-views';
+import type { SavePageConfigInput, SavedRevisionView } from '../contracts/page-views';
 import type { LoadPageError } from '../load-authorized-page';
 import type { PageDependencies } from '../page-dependencies';
 
@@ -56,58 +46,60 @@ interface ValidatedSave {
 export class SavePageConfig {
   constructor(private readonly deps: PageDependencies) {}
 
-  execute(
-    input: SavePageConfigInput
-  ): AppResultAsync<SavedRevisionView, SavePageConfigError> {
+  execute(input: SavePageConfigInput): AppResultAsync<SavedRevisionView, SavePageConfigError> {
     const { pages, audit } = this.deps;
 
-    return loadAuthorizedPage(this.deps, input.pageId, 'page.update').andThen(
-      ({ actor, page }) =>
-        this.validate(input, {
-          page,
-          actor,
-          mode: resolveEditorMode(actor),
-        }).asyncAndThen(({ config, expectedVersion }) =>
-          pages
-            .saveConfig({
-              id: page.id,
+    return loadAuthorizedPage(this.deps, input.pageId, 'page.update').andThen(({ actor, page }) =>
+      this.validate(input, {
+        page,
+        actor,
+        mode: resolveEditorMode(actor),
+      }).asyncAndThen(({ config, expectedVersion }) =>
+        pages
+          .saveConfig({
+            id: page.id,
+            tenantId: actor.tenantId,
+            config,
+            expectedVersion,
+          })
+          .map((revision) => {
+            audit.record({
+              type: 'page.config_saved',
+              actorId: actor.id,
               tenantId: actor.tenantId,
-              config,
-              expectedVersion,
-            })
-            .map((revision) => {
-              audit.record({
-                type: 'page.config_saved',
-                actorId: actor.id,
-                tenantId: actor.tenantId,
-                pageId: page.id,
-                websiteId: page.websiteId,
-                version: revision.version,
-                nodeCount: countPageNodes(config.children),
-              });
-              return toSavedRevisionView(revision, page);
-            })
-        )
+              pageId: page.id,
+              websiteId: page.websiteId,
+              version: revision.version,
+              nodeCount: countPageNodes(config.children),
+            });
+            return toSavedRevisionView(revision, page);
+          }),
+      ),
     );
   }
 
   private validate(
     input: SavePageConfigInput,
-    context: SaveContext
+    context: SaveContext,
   ): AppResult<ValidatedSave, ValidationAppError | ForbiddenAppError> {
     return parsePageVersion(input.expectedVersion).andThen((expectedVersion) =>
       parsePageConfig(input.config)
         .andThen((config) => this.checkScope(config, context))
         .andThen((config) => this.checkStructure(config, context.mode))
-        .map((config) => ({ config, expectedVersion }))
+        .map((config) => ({ config, expectedVersion })),
     );
   }
 
   private checkScope(
     config: PageConfig,
-    { page, actor, mode }: SaveContext
+    { page, actor, mode }: SaveContext,
   ): AppResult<PageConfig, ForbiddenAppError> {
-    return checkEditScope(page.config, config, mode, this.deps.components)
+    return checkEditScope({
+      previous: page.config,
+      next: config,
+      mode,
+      catalog: this.deps.components,
+    })
       .map(() => config)
       .mapErr((error) => {
         this.deps.audit.record({
@@ -129,9 +121,11 @@ export class SavePageConfig {
    */
   private checkStructure(
     config: PageConfig,
-    mode: EditorMode
+    mode: EditorMode,
   ): AppResult<PageConfig, ValidationAppError> {
-    if (!hasCapability(mode, 'editStructure')) {return ok(config);}
+    if (!hasCapability(mode, 'editStructure')) {
+      return ok(config);
+    }
     return checkComposition(config, this.deps.components).map(() => config);
   }
 }

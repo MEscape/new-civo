@@ -1,10 +1,6 @@
 import { z } from 'zod';
 
-import {
-  idSchema,
-  pagePathSchema,
-  pageTitleSchema,
-} from './page-fields-schema';
+import { idSchema, pagePathSchema, pageTitleSchema } from './page-fields-schema';
 
 export const newPageSchema = z.object({
   websiteId: idSchema,

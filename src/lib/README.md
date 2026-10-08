@@ -7,23 +7,37 @@ This directory contains the core shared infrastructure and utilities for the app
 ## Available Modules
 
 ### `@lib/config` (Environment Variables)
+
 Centralized environment validation via Zod. Do not use `process.env` directly in the application.
+
 - `serverEnv`: Validated server-side environment variables.
 - `publicEnv`: Validated client-side environment variables (e.g. `NEXT_PUBLIC_*`).
+- `APP_IDENTITY`: The product's name and the literal theme/background colours browsers need (`theme-color`, manifest). Not translated; colours are pinned to the `globals.css` tokens by a test.
 - **Types**: `ServerEnv`, `PublicEnv`.
 
+### `@lib/clock` (Time Port)
+
+The `Clock` port every module shares. Domain and application code import it with `import type` and are handed an instance; only `composition.ts` files import `systemClock`.
+
+- **Types**: `Clock` (`now(): Date`).
+- `systemClock`: The real clock.
+
 ### `@lib/db` (Database Access)
+
 Prisma database client singleton and error mapping.
+
 - `db`: The singleton Prisma Postgres client instance (`ReturnType<typeof postgres<Contract>>`).
 - `disconnectDb(): Promise<void>`
-- `mapPrismaError(thrown: unknown, context: { code: string; message: string }): AppError`
-- `createPersistenceFailures(config: PersistenceFailureConfig)`: Creates failure translators for a module's repository.
+- `createPersistenceFailures(config: PersistenceFailureConfig)`: Creates a repository's failure translators (`infraOnly`, `orConflict`, `requireRow`). Repositories use these, never `mapPrismaError` directly.
+- `mapPrismaError(thrown: unknown, context: { code: string; message: string }): AppError`: The classifier behind them.
 - `InstantRecord`: Interface for Temporal.Instant used by Prisma 8 for reads.
 - `instantToDate(instant: InstantRecord): Date`: Converts Prisma 8 Temporal reads to `Date`.
 - `dateToInstant(date: Date): string`: Converts `Date` to ISO-8601 string for Prisma 8 writes.
 
 ### `@lib/errors` (Error Handling & Factories)
+
 Typed application errors (Rule 5: Use strongly typed results and errors).
+
 - **Types**: `AppError`, `AppErrorKind`, and specific error types.
 - **Factories**:
   - `validationError(code: string, message: string, fieldErrors: Record<string, string[]>): ValidationAppError`
@@ -44,22 +58,28 @@ Typed application errors (Rule 5: Use strongly typed results and errors).
   - `ROOT_FIELD`: Key for validation errors that belong to no single field (`'_form'`).
   - `NestedKeyOf<ObjectType>`: Generates a union of all dotted paths for a nested object type.
   - `fieldPath<T>(...segments: T): JoinPath<T>`: Builds a strictly typed dotted field path (e.g., for `react-hook-form`).
-  - `failRoute(error: AppError, signInPath: string): never`: Translates domain errors into Next.js routing exceptions (`notFound`, `redirect`, or throw).
   - `escalate(error: AppError): never`: Logs and throws an unexpected or infrastructure error to the nearest `error.tsx` boundary.
 
 ### `@lib/fonts` (Typography)
+
 Next.js font configuration and CSS variables.
+
 - `fontDMSans`, `fontGeist`, `fontSans`, `fontSerif` (`NextFontWithVariable`).
 - `fontVariables`: Combined CSS variables string to be injected into the root layout (`string`).
 
 ### `@lib/logger` (Observability)
+
 Centralized logging via Pino. Do not use `console.log`.
+
 - `logger`: The main logger instance with levels (`debug`, `info`, `warn`, `error`).
 - `logger.withContext(context: LogContext): Logger`
-- *Note:* Always pass context objects (e.g., `logger.error("msg", { err, data })`).
+- _Note:_ Always pass context objects (e.g., `logger.error("msg", { err, data })`).
+- `createAuditLog<T>(module: string, levels: Record<T, AuditLevel>): AuditRecorder<T>`: The one implementation of every module's audit port. The module owns its event types and levels; this writes one structured line per event and never throws.
 
 ### `@lib/result` (Neverthrow Result Pattern)
+
 Wrapper around `neverthrow` to enforce Railway Oriented Programming.
+
 - **Result Types**: `AppResult<T, E>`, `AppResultAsync<T, E>`, `ActionResult<T>`.
 - **Constructors**:
   - `ok<T, E>(value: T): Result<T, E>`
@@ -73,20 +93,29 @@ Wrapper around `neverthrow` to enforce Railway Oriented Programming.
   - `combineAsync(results: ResultAsync<unknown, unknown>[]): ResultAsync<unknown[], unknown>`
   - `toActionResult<T, E extends AppError>(result: AppResult<T, E>): ActionResult<T>`
   - `isActionSuccess<T>(result: ActionResult<T>): result is { ok: true; data: T }`
+  - `createIdParser<T, E>(config: IdParserConfig<T, E>): (raw: string) => AppResult<T, E>`: Builds a module's branded id parser for request values.
 
 ### `@lib/actions` (Server Actions)
+
 Utilities for parsing inputs and applying errors in Next.js Server Actions.
-- `createActionInputParser<T>(schema: ZodSchema<T>): ActionInputParser<T>`
-- `applyActionError(error: AppError, actionState: ActionState): ActionState`
+
+- `createActionInputParser(code: string): ActionInputParser`: Returns `(schema, input) => AppResult<T, ValidationAppError>`; `code` is the module's "invalid input" code.
+- `applyActionError(error: SerializedActionError, setError: UseFormSetError, codeFields?): string | null`: Puts field errors on their inputs (focusing the first) and returns the form-level code to show, or `null`.
 
 ### `@lib/seo` (Search Engine Optimization)
-Utilities for generating metadata and alternate languages for SEO.
-- `buildAlternateLanguages`
-- `buildLocalizedMetadata`
-- `toLocalizedPath`
+
+Builders for route metadata. Pages never assemble canonical URLs or robots directives themselves.
+
+- `buildLocalizedMetadata({ locale, pathname, title, description })`: Translated platform pages: canonical, hreflang alternates, Open Graph with locale.
+- `buildContentMetadata({ pathname, title, description, siteName })`: Untranslated content (published municipal sites): one canonical URL in the default locale.
+- `buildPrivateMetadata(title)`: Pages behind sign-in or single-use emailed links: title and `noindex` only.
+- `buildAlternateLanguages(pathname)`: hreflang map including `x-default` (also used by the sitemap).
+- `toLocalizedPath(locale, pathname)`: `('de', '/')` → `/de`.
 
 ### `@lib/utils` (Pure Utility Functions)
+
 Zero-dependency, pure utility functions organized by domain.
+
 - **Array**:
   - `isDefined<T>(value: T | null | undefined): value is T`
   - `groupBy<T, K>(items: readonly T[], keyFn: (item: T) => K): Map<K, T[]>`
@@ -111,9 +140,13 @@ Zero-dependency, pure utility functions organized by domain.
   - `Brand<T, B extends string>`
 - **CSS**:
   - `cn(...inputs: ClassValue[]): string` (Tailwind class merging)
+- **Color**:
+  - `parseHexColor(hex: string): RgbColor | null` (`#rrggbb` only)
+  - `toHexColor(color: RgbColor): string`
 - **Date**:
-  - `formatDate(input: DateInput, locale: string, options?: Intl.DateTimeFormatOptions): string`
-  - `formatDateTime(input: DateInput, locale: string, options?: Intl.DateTimeFormatOptions): string`
+  - `formatDate(input: DateInput, locale: string, timeZone: string, options?: Intl.DateTimeFormatOptions): string`
+  - `formatDateTime(input: DateInput, locale: string, timeZone: string): string`
+  - _Note:_ Components never call the date and number formatters directly; they use `getAppFormatters` (`@i18n/server`) or `useAppFormatters` (`@i18n/client`), which bind the request locale and time zone.
   - `formatRelativeTime(input: DateInput, now: DateInput, locale: string): string`
   - `isSameDay(date: DateInput, other: DateInput, tz?: string): boolean`
   - `addDays(input: DateInput, days: number): Date`
@@ -136,9 +169,9 @@ Zero-dependency, pure utility functions organized by domain.
 - **Number**:
   - `clamp(value: number, min: number, max: number): number`
   - `formatNumber(value: number, locale: string, options?: Intl.NumberFormatOptions): string`
-  - `formatPercent(ratio: number, locale: string, options?: Intl.NumberFormatOptions): string`
+  - `formatPercent(ratio: number, locale: string, fractionDigits?: number): string`
   - `formatMoney(minorUnits: number, currency: string, locale: string): string`
-  - `formatBytes(bytes: number, locale: string, options?: Intl.NumberFormatOptions): string`
+  - `formatBytes(bytes: number, locale: string, fractionDigits?: number): string`
 - **Object**:
   - `isPlainObject(value: unknown): value is Record<string, unknown>`
   - `hasOwnKey<T extends object>(obj: T, key: PropertyKey): key is keyof T`

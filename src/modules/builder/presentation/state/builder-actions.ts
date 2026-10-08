@@ -7,16 +7,10 @@ import type {
   PageNodeId,
 } from '../../application/contracts/editor-model';
 
-export const snapshotCommitted = createAction<EditorSnapshot>(
-  'document/snapshotCommitted'
-);
-export const propsUpdated = createAction<readonly PageNode[]>(
-  'document/propsUpdated'
-);
+export const snapshotCommitted = createAction<EditorSnapshot>('document/snapshotCommitted');
+export const propsUpdated = createAction<readonly PageNode[]>('document/propsUpdated');
 export const propsEditFinished = createAction('document/propsEditFinished');
-export const nodeSelected = createAction<PageNodeId | null>(
-  'document/nodeSelected'
-);
+export const nodeSelected = createAction<PageNodeId | null>('document/nodeSelected');
 export const editUndone = createAction('document/editUndone');
 export const editRedone = createAction('document/editRedone');
 

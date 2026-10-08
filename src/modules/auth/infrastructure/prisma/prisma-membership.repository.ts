@@ -6,11 +6,7 @@ import type { AppResultAsync } from '@lib/result';
 
 import { AUTH_ERROR_CODES } from '../../domain/errors/auth-errors';
 
-import {
-    MAX_MEMBERSHIP_ROWS,
-    MEMBERSHIP_SELECT,
-    toRoles,
-} from './membership-record-mapper';
+import { MAX_MEMBERSHIP_ROWS, MEMBERSHIP_SELECT, toRoles } from './membership-record-mapper';
 
 import type { ActorId, TenantId } from '../../domain/models/ids';
 import type { Role } from '../../domain/models/role';
@@ -19,9 +15,9 @@ import type { MembershipRepository } from '../../domain/ports/membership.reposit
 const membershipLogger = logger.withContext({ module: 'auth.membership' });
 
 const failures = createPersistenceFailures({
-    module: 'auth.membership.persistence',
-    code: AUTH_ERROR_CODES.membershipLookupFailed,
-    subject: 'Membership',
+  module: 'auth.membership.persistence',
+  code: AUTH_ERROR_CODES.membershipLookupFailed,
+  subject: 'Membership',
 });
 
 /**
@@ -37,27 +33,27 @@ const failures = createPersistenceFailures({
  * different databases/roles by design. See migrations/app/0001_membership.sql.
  */
 export class PrismaMembershipRepository implements MembershipRepository {
-    findRoles(
-        actorId: ActorId,
-        tenantId: TenantId
-    ): AppResultAsync<readonly Role[], InfrastructureAppError> {
-        return fromThrowableAsync(
-            async () =>
-                db.orm.public.Membership.where({ actorId, tenantId })
-                    .select(...MEMBERSHIP_SELECT)
-                    // Stable order, so the same actor always resolves to the same list.
-                    .orderBy([(membership) => membership.role.asc()])
-                    .limit(MAX_MEMBERSHIP_ROWS)
-                    .all(),
-            failures.infraOnly('findRoles')
-        ).map((records) => {
-            const roles = toRoles(records);
-            if (roles.length !== records.length) {
-                membershipLogger.warn('auth.membership_unknown_role_ignored', {
-                    ignoredCount: records.length - roles.length,
-                });
-            }
-            return roles;
+  findRoles(
+    actorId: ActorId,
+    tenantId: TenantId,
+  ): AppResultAsync<readonly Role[], InfrastructureAppError> {
+    return fromThrowableAsync(
+      async () =>
+        db.orm.public.Membership.where({ actorId, tenantId })
+          .select(...MEMBERSHIP_SELECT)
+          // Stable order, so the same actor always resolves to the same list.
+          .orderBy([(membership) => membership.role.asc()])
+          .limit(MAX_MEMBERSHIP_ROWS)
+          .all(),
+      failures.infraOnly('findRoles'),
+    ).map((records) => {
+      const roles = toRoles(records);
+      if (roles.length !== records.length) {
+        membershipLogger.warn('auth.membership_unknown_role_ignored', {
+          ignoredCount: records.length - roles.length,
         });
-    }
+      }
+      return roles;
+    });
+  }
 }

@@ -16,17 +16,13 @@ export function clamp(value: number, min: number, max: number): number {
 export function formatNumber(
   value: number,
   locale: string,
-  options?: Intl.NumberFormatOptions
+  options?: Intl.NumberFormatOptions,
 ): string {
   return new Intl.NumberFormat(locale, options).format(value);
 }
 
 /** Formats a ratio as a percentage, e.g. `0.256` becomes `26 %` in `de-DE`. */
-export function formatPercent(
-  ratio: number,
-  locale: string,
-  fractionDigits = 0
-): string {
+export function formatPercent(ratio: number, locale: string, fractionDigits = 0): string {
   return new Intl.NumberFormat(locale, {
     style: 'percent',
     minimumFractionDigits: fractionDigits,
@@ -39,43 +35,25 @@ export function formatPercent(
  * Money is never handled as floating point (persistence.md), so the
  * conversion happens only here at the presentation edge.
  */
-export function formatMoney(
-  minorUnits: number,
-  currency: string,
-  locale: string
-): string {
+export function formatMoney(minorUnits: number, currency: string, locale: string): string {
   const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
   });
-  const fractionDigits =
-    formatter.resolvedOptions().maximumFractionDigits ?? 2;
+  const fractionDigits = formatter.resolvedOptions().maximumFractionDigits ?? 2;
   return formatter.format(minorUnits / 10 ** fractionDigits);
 }
 
 /** Formats a byte count using `Intl` units, e.g. `1,5 MB`. Uses binary (1024) steps. */
-export function formatBytes(
-  bytes: number,
-  locale: string,
-  fractionDigits = 1
-): string {
-  const units = [
-    'byte',
-    'kilobyte',
-    'megabyte',
-    'gigabyte',
-    'terabyte',
-  ] as const;
+export function formatBytes(bytes: number, locale: string, fractionDigits = 1): string {
+  const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte'] as const;
   const sign = bytes < 0 ? -1 : 1;
   const absolute = Math.abs(bytes);
 
   const exponent =
     absolute === 0
       ? 0
-      : Math.min(
-          Math.floor(Math.log(absolute) / Math.log(1024)),
-          units.length - 1
-        );
+      : Math.min(Math.floor(Math.log(absolute) / Math.log(1024)), units.length - 1);
 
   return new Intl.NumberFormat(locale, {
     style: 'unit',

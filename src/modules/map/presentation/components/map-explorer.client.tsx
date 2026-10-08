@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { useRouter } from '@i18n';
 
@@ -22,6 +22,7 @@ import type {
   FeatureInteraction,
   FilterState,
   FilterValue,
+  MapFeature,
   MapHeight,
 } from '../../application/contracts/map-constraints';
 import type { MapModel } from '../../application/contracts/map-views';
@@ -104,6 +105,35 @@ function MapNotes({ model, unavailableLayers, hasTiles, hasCanvasFailed }: MapNo
   );
 }
 
+/** The selected feature, while the filters still show it. */
+function findVisible(
+  visible: ReadonlyArray<{ readonly features: readonly MapFeature[] }>,
+  key: string | null,
+): MapFeature | undefined {
+  return key === null
+    ? undefined
+    : visible.flatMap((entry) => entry.features).find((feature) => feature.key === key);
+}
+
+/** How many locations pass the filters, announced politely as they change. */
+function MapSummary({ shown, total }: { readonly shown: number; readonly total: number }) {
+  const t = useTranslations('map');
+  return (
+    <p role="status" className="text-sm text-copy-muted">
+      {shown === 0 ? t('states.noMatches') : t('summary', { shown, total })}
+    </p>
+  );
+}
+
+/** Where a feature links to, when the map opens links instead of details and the feature has one. */
+function linkOf(model: MapModel, key: string | null): string | undefined {
+  if (key === null) {
+    return undefined;
+  }
+  return model.layers.flatMap((layer) => layer.features).find((candidate) => candidate.key === key)
+    ?.href;
+}
+
 /**
  * The interactive part of the map: canvas, filters, legend, details and the
  * list alternative. All state is local and small (filters, selection); the
@@ -138,10 +168,9 @@ export function MapExplorer({
   );
 
   const shown = visible.reduce((sum, entry) => sum + entry.features.length, 0);
-  const selected =
-    selectedKey === null
-      ? undefined
-      : visible.flatMap((entry) => entry.features).find((feature) => feature.key === selectedKey);
+  const selected = findVisible(visible, selectedKey);
+  const visibleSelectedKey = selected?.key ?? null;
+  const hintId = useId();
 
   const isSelectable = interaction !== 'none';
   const canShowCanvas = tiles !== null && model.featureCount > 0 && canvasStatus !== 'failed';
@@ -157,21 +186,15 @@ export function MapExplorer({
     if (!isSelectable) {
       return;
     }
-    const feature =
-      key === null
-        ? undefined
-        : model.layers
-            .flatMap((layer) => layer.features)
-            .find((candidate) => candidate.key === key);
-    if (interaction === 'link' && feature?.href !== undefined) {
-      if (feature.href.startsWith('/')) {
-        router.push(feature.href);
-      } else {
-        window.location.assign(feature.href);
-      }
-      return;
+    const href = interaction === 'link' ? linkOf(model, key) : undefined;
+    if (href === undefined) {
+      setSelectedKey(key);
+    } else if (href.startsWith('/')) {
+      // A path of this site navigates in the app; anything else leaves it.
+      router.push(href);
+    } else {
+      window.location.assign(href);
     }
-    setSelectedKey(key);
   }
 
   function handleListSelect(key: string): void {
@@ -207,7 +230,7 @@ export function MapExplorer({
               <div
                 role="group"
                 aria-label={t('canvas.label', { heading })}
-                aria-describedby="map-canvas-hint"
+                aria-describedby={hintId}
                 className={cn(
                   'overflow-hidden rounded-token border border-border bg-canvas',
                   HEIGHT_CLASSES[height],
@@ -218,7 +241,7 @@ export function MapExplorer({
                   styles={model.styles}
                   layers={visible}
                   initialBounds={model.bounds}
-                  selectedKey={selected?.key ?? null}
+                  selectedKey={visibleSelectedKey}
                   focusKey={focusKey}
                   isSelectable={isSelectable}
                   onSelect={handleSelect}
@@ -229,14 +252,10 @@ export function MapExplorer({
                 />
               </div>
             )}
-            <p id="map-canvas-hint" className="sr-only">
+            <p id={hintId} className="sr-only">
               {t('canvas.hint')}
             </p>
-            <p role="status" className="text-sm text-copy-muted">
-              {shown === 0
-                ? t('states.noMatches')
-                : t('summary', { shown, total: model.featureCount })}
-            </p>
+            <MapSummary shown={shown} total={model.featureCount} />
             {selected !== undefined && (
               <FeatureDetails
                 feature={selected}
@@ -251,7 +270,7 @@ export function MapExplorer({
 
       <FeatureList
         layers={visible}
-        selectedKey={selected?.key ?? null}
+        selectedKey={visibleSelectedKey}
         onSelect={isSelectable ? handleListSelect : null}
       />
     </div>

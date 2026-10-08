@@ -1,10 +1,6 @@
 import type { AuthorizationError } from '@modules/auth';
 
-import type {
-  ConflictAppError,
-  InfrastructureAppError,
-  UnexpectedAppError,
-} from '@lib/errors';
+import type { ConflictAppError, InfrastructureAppError, UnexpectedAppError } from '@lib/errors';
 import type { AppResult, AppResultAsync } from '@lib/result';
 
 import type { PageId, WebsiteId } from '../models/ids';
@@ -18,10 +14,7 @@ import type { SnapshotPage } from '../models/release-snapshot';
  * violates its own invariants. Authorization failures are the builder's own
  * check, which applies on top of ours.
  */
-export type PageDraftError =
-  | AuthorizationError
-  | InfrastructureAppError
-  | UnexpectedAppError;
+export type PageDraftError = AuthorizationError | InfrastructureAppError | UnexpectedAppError;
 
 export interface ReplaceChildrenInput {
   readonly pageId: PageId;
@@ -44,7 +37,7 @@ export interface PageSource {
    * domain's job.
    */
   listForRelease(
-    websiteId: WebsiteId
+    websiteId: WebsiteId,
   ): AppResultAsync<readonly PublishablePage[], InfrastructureAppError>;
 
   /**
@@ -52,17 +45,13 @@ export interface PageSource {
    * when one no longer has the shape the builder published it with: a
    * release is never planned from a partial tree.
    */
-  readTrees(
-    pages: readonly SnapshotPage[]
-  ): AppResult<readonly PageTree[], UnexpectedAppError>;
+  readTrees(pages: readonly SnapshotPage[]): AppResult<readonly PageTree[], UnexpectedAppError>;
 
   /** Every page's current draft, one read for the whole website. */
-  listDrafts(
-    websiteId: WebsiteId
-  ): AppResultAsync<readonly PageDraft[], PageDraftError>;
+  listDrafts(websiteId: WebsiteId): AppResultAsync<readonly PageDraft[], PageDraftError>;
 
   /** Saves a new revision. A concurrent save surfaces as a conflict. */
   replaceChildren(
-    input: ReplaceChildrenInput
+    input: ReplaceChildrenInput,
   ): AppResultAsync<void, ConflictAppError | PageDraftError>;
 }

@@ -4,14 +4,9 @@ import { useTranslations } from '@i18n/client';
 
 import { cn } from '@lib/utils';
 
-import {
-  OTHER_COLOR_VAR,
-  RANGE_GRADIENT,
-  SERIES_COLOR_VARS,
-} from '../theme/map-palette';
-
 import { useAttributeFormat } from '../hooks/use-attribute-format';
 import { useFieldLabel } from '../hooks/use-field-label';
+import { OTHER_COLOR_VAR, RANGE_GRADIENT, SERIES_COLOR_VARS } from '../theme/map-palette';
 
 import type {
   ColorEncoding,
@@ -36,13 +31,7 @@ function slotColor(slot: number): string {
  * only thing that tells entries apart; the label next to it carries the
  * meaning.
  */
-function Swatch({
-  color,
-  family,
-}: {
-  readonly color: string;
-  readonly family: GeometryFamily;
-}) {
+function Swatch({ color, family }: { readonly color: string; readonly family: GeometryFamily }) {
   const shape: Record<GeometryFamily, string> = {
     point: 'size-3 rounded-full',
     line: 'h-1 w-4 rounded-full',
@@ -76,10 +65,7 @@ function RangeBar({
         style={{ backgroundImage: RANGE_GRADIENT }}
         aria-hidden="true"
       />
-      <div
-        className="flex justify-between text-xs text-copy-muted"
-        aria-hidden="true"
-      >
+      <div className="flex justify-between text-xs text-copy-muted" aria-hidden="true">
         <span>
           {t('legend.low')}: {low}
         </span>
@@ -91,19 +77,11 @@ function RangeBar({
   );
 }
 
-function ColorLegend({
-  style,
-  layer,
-}: {
-  readonly style: LayerStyle;
-  readonly layer: MapLayer;
-}) {
+function ColorLegend({ style, layer }: { readonly style: LayerStyle; readonly layer: MapLayer }) {
   const t = useTranslations('map');
   const label = useFieldLabel();
   const format = useAttributeFormat();
-  const family = style.families.includes('point')
-    ? 'point'
-    : style.families[0] ?? 'point';
+  const family = style.families.includes('point') ? 'point' : (style.families[0] ?? 'point');
   const fixedLabel = (entry: GeometryFamily, count: number): string => {
     switch (entry) {
       case 'point':
@@ -121,15 +99,11 @@ function ColorLegend({
       return (
         <ul className="space-y-1">
           {style.families.map((entry) => (
-            <li
-              key={entry}
-              className="flex items-center gap-2 text-sm text-copy"
-            >
+            <li key={entry} className="flex items-center gap-2 text-sm text-copy">
               <Swatch color={slotColor(color.slot)} family={entry} />
               {fixedLabel(
                 entry,
-                layer.features.filter((feature) => feature.family === entry)
-                  .length
+                layer.features.filter((feature) => feature.family === entry).length,
               )}
             </li>
           ))}
@@ -139,10 +113,7 @@ function ColorLegend({
       return (
         <ul className="space-y-1">
           {color.entries.map((entry) => (
-            <li
-              key={entry.value}
-              className="flex items-center gap-2 text-sm text-copy"
-            >
+            <li key={entry.value} className="flex items-center gap-2 text-sm text-copy">
               <Swatch color={slotColor(entry.slot)} family={family} />
               <span>
                 {entry.value === 'true' || entry.value === 'false'
@@ -183,10 +154,7 @@ function SizeLegend({ style }: { readonly style: LayerStyle }) {
     return null;
   }
   const { field, min, max } = style.size;
-  const key =
-    style.pointStyle === 'heatmap'
-      ? 'legend.heatmapWeight'
-      : 'legend.sizeRange';
+  const key = style.pointStyle === 'heatmap' ? 'legend.heatmapWeight' : 'legend.sizeRange';
   return (
     <p className="text-xs text-copy-muted">
       {t(key, { field: label(field), min: format(min), max: format(max) })}
@@ -203,10 +171,7 @@ function DensityLegend() {
         style={{ backgroundImage: RANGE_GRADIENT }}
         aria-hidden="true"
       />
-      <div
-        className="flex justify-between text-xs text-copy-muted"
-        aria-hidden="true"
-      >
+      <div className="flex justify-between text-xs text-copy-muted" aria-hidden="true">
         <span>{t('legend.densityLow')}</span>
         <span>{t('legend.densityHigh')}</span>
       </div>
@@ -225,9 +190,7 @@ export function MapLegend({ layers, styles }: MapLegendProps) {
       style,
       layer: layers.find((layer) => layer.id === style.layerId),
     }))
-    .filter(
-      (entry) => entry.layer !== undefined && entry.layer.features.length > 0
-    );
+    .filter((entry) => entry.layer !== undefined && entry.layer.features.length > 0);
 
   if (drawable.length === 0) {
     return null;
@@ -250,12 +213,13 @@ export function MapLegend({ layers, styles }: MapLegendProps) {
                   {t('legend.layer', { name: style.label })}
                 </h4>
               )}
-              {style.pointStyle === 'heatmap' &&
-                style.families.includes('point') && <DensityLegend />}
+              {style.pointStyle === 'heatmap' && style.families.includes('point') && (
+                <DensityLegend />
+              )}
               <ColorLegend style={style} layer={layer} />
               <SizeLegend style={style} />
             </div>
-          )
+          ),
         )}
       </div>
     </section>

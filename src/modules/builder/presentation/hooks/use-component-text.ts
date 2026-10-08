@@ -1,4 +1,4 @@
-import { useMessages } from 'next-intl';
+import { useMessages } from '@i18n/client';
 
 import { useBuilderSession } from '../components/builder-session-context';
 import { createComponentText } from '../properties/component-text';

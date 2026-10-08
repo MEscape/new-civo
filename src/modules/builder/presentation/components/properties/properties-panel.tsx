@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { VISIBILITY_PROP_KEY } from '../../../application/contracts/builder-constraints';
 import { hasCapability } from '../../../application/contracts/editor-model';
@@ -41,35 +41,23 @@ export function PropertiesPanel() {
   }
 
   const descriptor = catalog.describe(node.type);
-  const fields =
-    descriptor === null ? [] : visibleFields(descriptor, editorMode, catalog);
+  const fields = descriptor === null ? [] : visibleFields(descriptor, editorMode, catalog);
   const label = text.componentLabel(node.type);
 
   return (
     <div className="p-4">
-      {ancestors.length > 0 && (
-        <NodeBreadcrumb ancestors={ancestors} currentLabel={label} />
-      )}
+      {ancestors.length > 0 && <NodeBreadcrumb ancestors={ancestors} currentLabel={label} />}
       <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide text-copy-muted">
         {t('properties.title')}
       </h2>
-      <p className="mb-4 text-sm font-medium text-copy">
-        {label}
-      </p>
+      <p className="mb-4 text-sm font-medium text-copy">{label}</p>
 
       {hasCapability(editorMode, 'toggleVisibility') && (
-        <VisibilityToggle
-          nodeId={node.id}
-          isVisible={node.props[VISIBILITY_PROP_KEY] !== false}
-        />
+        <VisibilityToggle nodeId={node.id} isVisible={node.props[VISIBILITY_PROP_KEY] !== false} />
       )}
 
       {fields.length > 0 ? (
-        <PropertyFieldGroups
-          nodeId={node.id}
-          fields={fields}
-          props={node.props}
-        />
+        <PropertyFieldGroups nodeId={node.id} fields={fields} props={node.props} />
       ) : (
         <p className={MUTED}>{t('properties.noFields')}</p>
       )}

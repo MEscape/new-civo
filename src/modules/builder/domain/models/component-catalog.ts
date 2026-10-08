@@ -36,33 +36,36 @@ interface CatalogEntry {
 const NO_PROP_KEYS: ReadonlySet<string> = new Set();
 
 export function createComponentCatalog(
-  descriptors: readonly ComponentDescriptor[]
+  descriptors: readonly ComponentDescriptor[],
 ): ComponentCatalog {
   const entries = keyBy(
-    descriptors.map(
-      (descriptor): CatalogEntry => ({
-        descriptor,
-        childTypes: new Set(descriptor.allowedChildTypes),
-        municipalPropKeys: new Set(descriptor.municipalPropKeys),
-      })
-    ),
-    (entry) => entry.descriptor.type
+    descriptors.map((descriptor): CatalogEntry => ({
+      descriptor,
+      childTypes: new Set(descriptor.allowedChildTypes),
+      municipalPropKeys: new Set(descriptor.municipalPropKeys),
+    })),
+    (entry) => entry.descriptor.type,
   );
 
   return {
     descriptors,
     isRegistered: (type) => entries.has(type),
     describe: (type) => entries.get(type)?.descriptor ?? null,
-    acceptsChildren: (type) =>
-      entries.get(type)?.descriptor.acceptsChildren ?? false,
+    acceptsChildren: (type) => entries.get(type)?.descriptor.acceptsChildren ?? false,
     canNest(parentType, childType) {
       const child = entries.get(childType);
-      if (child === undefined) {return false;}
-      if (parentType === null) {return child.descriptor.isAllowedAtRoot;}
+      if (child === undefined) {
+        return false;
+      }
+      if (parentType === null) {
+        return child.descriptor.isAllowedAtRoot;
+      }
       return entries.get(parentType)?.childTypes.has(childType) ?? false;
     },
     editablePropKeys(type, mode) {
-      if (isFullAccess(mode)) {return null;}
+      if (isFullAccess(mode)) {
+        return null;
+      }
       return entries.get(type)?.municipalPropKeys ?? NO_PROP_KEYS;
     },
   };

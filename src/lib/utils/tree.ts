@@ -13,66 +13,70 @@ export type WithChildren<T> = (node: T, children: readonly T[]) => T;
 
 /** How to read and rebuild the nodes of a tree made of immutable values. */
 export interface TreeShape<T> {
-    readonly getChildren: GetChildren<T>;
-    readonly withChildren: WithChildren<T>;
+  readonly getChildren: GetChildren<T>;
+  readonly withChildren: WithChildren<T>;
 }
 
 /** A node with its position in a flattened forest. `depth` is zero-based: roots are 0. */
 export interface ForestEntry<T> {
-    readonly node: T;
-    readonly parent: T | null;
-    readonly depth: number;
+  readonly node: T;
+  readonly parent: T | null;
+  readonly depth: number;
 }
 
 /** Where a node sits among its siblings. */
 export interface ForestLocation<T> {
-    readonly node: T;
-    readonly parent: T | null;
-    readonly siblings: readonly T[];
-    readonly index: number;
+  readonly node: T;
+  readonly parent: T | null;
+  readonly siblings: readonly T[];
+  readonly index: number;
 }
 
 /** Visits every node depth-first, parents before children. */
 export function walkTree<T>(
-    node: T,
-    getChildren: GetChildren<T>,
-    visit: (node: T, depth: number) => void,
-    depth = 0
+  node: T,
+  getChildren: GetChildren<T>,
+  visit: (node: T, depth: number) => void,
+  depth = 0,
 ): void {
-    visit(node, depth);
-    for (const child of getChildren(node) ?? []) {
-        walkTree(child, getChildren, visit, depth + 1);
-    }
+  visit(node, depth);
+  for (const child of getChildren(node) ?? []) {
+    walkTree(child, getChildren, visit, depth + 1);
+  }
 }
 
 /** Returns every node depth-first as a flat array. */
 export function flattenTree<T>(root: T, getChildren: GetChildren<T>): T[] {
-    const nodes: T[] = [];
-    walkTree(root, getChildren, (node) => nodes.push(node));
-    return nodes;
+  const nodes: T[] = [];
+  walkTree(root, getChildren, (node) => nodes.push(node));
+  return nodes;
 }
 
 /** Returns the first node (depth-first) matching the predicate, or `undefined`. */
 export function findNode<T>(
-    root: T,
-    getChildren: GetChildren<T>,
-    predicate: (node: T) => boolean
+  root: T,
+  getChildren: GetChildren<T>,
+  predicate: (node: T) => boolean,
 ): T | undefined {
-    if (predicate(root)) {return root;}
-    for (const child of getChildren(root) ?? []) {
-        const found = findNode(child, getChildren, predicate);
-        if (found !== undefined) {return found;}
+  if (predicate(root)) {
+    return root;
+  }
+  for (const child of getChildren(root) ?? []) {
+    const found = findNode(child, getChildren, predicate);
+    if (found !== undefined) {
+      return found;
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 /** Counts every node, including the root. */
 export function countNodes<T>(root: T, getChildren: GetChildren<T>): number {
-    let count = 0;
-    walkTree(root, getChildren, () => {
-        count += 1;
-    });
-    return count;
+  let count = 0;
+  walkTree(root, getChildren, () => {
+    count += 1;
+  });
+  return count;
 }
 
 /**
@@ -81,14 +85,12 @@ export function countNodes<T>(root: T, getChildren: GetChildren<T>): number {
  * tree is never mutated.
  */
 export function mapTree<T, U>(
-    root: T,
-    getChildren: GetChildren<T>,
-    transform: (node: T, children: U[]) => U
+  root: T,
+  getChildren: GetChildren<T>,
+  transform: (node: T, children: U[]) => U,
 ): U {
-    const children = (getChildren(root) ?? []).map((child) =>
-        mapTree(child, getChildren, transform)
-    );
-    return transform(root, children);
+  const children = (getChildren(root) ?? []).map((child) => mapTree(child, getChildren, transform));
+  return transform(root, children);
 }
 
 /**
@@ -96,69 +98,70 @@ export function mapTree<T, U>(
  * predicate, or `undefined` when nothing matches.
  */
 export function findPath<T>(
-    root: T,
-    getChildren: GetChildren<T>,
-    predicate: (node: T) => boolean
+  root: T,
+  getChildren: GetChildren<T>,
+  predicate: (node: T) => boolean,
 ): T[] | undefined {
-    if (predicate(root)) {return [root];}
-    for (const child of getChildren(root) ?? []) {
-        const path = findPath(child, getChildren, predicate);
-        if (path) {return [root, ...path];}
+  if (predicate(root)) {
+    return [root];
+  }
+  for (const child of getChildren(root) ?? []) {
+    const path = findPath(child, getChildren, predicate);
+    if (path) {
+      return [root, ...path];
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 /** Every node of a forest depth-first, parents before children, with its parent and depth. */
 export function flattenForest<T>(
-    roots: readonly T[],
-    getChildren: GetChildren<T>
+  roots: readonly T[],
+  getChildren: GetChildren<T>,
 ): Array<ForestEntry<T>> {
-    const entries: Array<ForestEntry<T>> = [];
-    const visit = (
-        nodes: readonly T[],
-        parent: T | null,
-        depth: number
-    ): void => {
-        for (const node of nodes) {
-            entries.push({ node, parent, depth });
-            visit(getChildren(node) ?? [], node, depth + 1);
-        }
-    };
-    visit(roots, null, 0);
-    return entries;
+  const entries: Array<ForestEntry<T>> = [];
+  const visit = (nodes: readonly T[], parent: T | null, depth: number): void => {
+    for (const node of nodes) {
+      entries.push({ node, parent, depth });
+      visit(getChildren(node) ?? [], node, depth + 1);
+    }
+  };
+  visit(roots, null, 0);
+  return entries;
 }
 
 /** The first node (depth-first) matching the predicate, with its siblings, index and parent. */
 export function locateInForest<T>(
-    roots: readonly T[],
-    getChildren: GetChildren<T>,
-    predicate: (node: T) => boolean,
-    parent: T | null = null
+  roots: readonly T[],
+  getChildren: GetChildren<T>,
+  predicate: (node: T) => boolean,
+  parent: T | null = null,
 ): ForestLocation<T> | undefined {
-    for (const [index, node] of roots.entries()) {
-        if (predicate(node)) {return { node, parent, siblings: roots, index };}
-        const found = locateInForest(
-            getChildren(node) ?? [],
-            getChildren,
-            predicate,
-            node
-        );
-        if (found !== undefined) {return found;}
+  for (const [index, node] of roots.entries()) {
+    if (predicate(node)) {
+      return { node, parent, siblings: roots, index };
     }
-    return undefined;
+    const found = locateInForest(getChildren(node) ?? [], getChildren, predicate, node);
+    if (found !== undefined) {
+      return found;
+    }
+  }
+  return undefined;
 }
 
 /** `findPath` over a forest: the path from a root to the first match, or `undefined`. */
 export function findPathInForest<T>(
-    roots: readonly T[],
-    getChildren: GetChildren<T>,
-    predicate: (node: T) => boolean
+  roots: readonly T[],
+  getChildren: GetChildren<T>,
+  predicate: (node: T) => boolean,
 ): T[] | undefined {
-    for (const root of roots) {
-        const path = findPath(root, getChildren, predicate);
-        if (path !== undefined) {return path;}
+  for (const root of roots) {
+    const path = findPath(root, getChildren, predicate);
+    if (path !== undefined) {
+      return path;
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 /**
@@ -167,18 +170,18 @@ export function findPathInForest<T>(
  * did not change (structural sharing).
  */
 export function updateForest<T>(
-    roots: readonly T[],
-    shape: TreeShape<T>,
-    transform: (node: T) => T
+  roots: readonly T[],
+  shape: TreeShape<T>,
+  transform: (node: T) => T,
 ): readonly T[] {
-    const next = roots.map((node) => {
-        const mapped = transform(node);
-        const children = shape.getChildren(mapped) ?? [];
-        const updatedChildren = updateForest(children, shape, transform);
-        return updatedChildren !== children ? shape.withChildren(mapped, updatedChildren) : mapped;
-    });
-    // Nothing changed when every node came back as the very same object.
-    return next.every((node, index) => node === roots[index]) ? roots : next;
+  const next = roots.map((node) => {
+    const mapped = transform(node);
+    const children = shape.getChildren(mapped) ?? [];
+    const updatedChildren = updateForest(children, shape, transform);
+    return updatedChildren !== children ? shape.withChildren(mapped, updatedChildren) : mapped;
+  });
+  // Nothing changed when every node came back as the very same object.
+  return next.every((node, index) => node === roots[index]) ? roots : next;
 }
 
 /**
@@ -187,25 +190,25 @@ export function updateForest<T>(
  * subtree that did not change (structural sharing).
  */
 export function removeFromForest<T>(
-    roots: readonly T[],
-    shape: TreeShape<T>,
-    predicate: (node: T) => boolean
+  roots: readonly T[],
+  shape: TreeShape<T>,
+  predicate: (node: T) => boolean,
 ): readonly T[] {
-    let changed = false;
-    const kept: T[] = [];
-    for (const node of roots) {
-        if (predicate(node)) {
-            changed = true;
-            continue;
-        }
-        const children = shape.getChildren(node) ?? [];
-        const keptChildren = removeFromForest(children, shape, predicate);
-        if (keptChildren !== children) {
-            changed = true;
-            kept.push(shape.withChildren(node, keptChildren));
-        } else {
-            kept.push(node);
-        }
+  let changed = false;
+  const kept: T[] = [];
+  for (const node of roots) {
+    if (predicate(node)) {
+      changed = true;
+      continue;
     }
-    return changed ? kept : roots;
+    const children = shape.getChildren(node) ?? [];
+    const keptChildren = removeFromForest(children, shape, predicate);
+    if (keptChildren !== children) {
+      changed = true;
+      kept.push(shape.withChildren(node, keptChildren));
+    } else {
+      kept.push(node);
+    }
+  }
+  return changed ? kept : roots;
 }

@@ -11,7 +11,7 @@ import type { Role } from './role';
  * another.
  */
 export interface Actor {
-    readonly id: ActorId;
-    readonly tenantId: TenantId;
-    readonly roles: readonly Role[];
+  readonly id: ActorId;
+  readonly tenantId: TenantId;
+  readonly roles: readonly Role[];
 }

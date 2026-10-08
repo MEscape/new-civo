@@ -20,11 +20,9 @@ import { db } from '@lib/db';
  * forgotten.
  */
 export const dataSourcesOf = (tenantId: TenantId) =>
-    db.orm.public.DataSource.where((source) =>
-        source.website.some({ tenantId })
-    );
+  db.orm.public.DataSource.where((source) => source.website.some({ tenantId }));
 
 export const datasetsOf = (tenantId: TenantId) =>
-    db.orm.public.Dataset.where((dataset) =>
-        dataset.dataSource.some((source) => source.website.some({ tenantId }))
-    );
+  db.orm.public.Dataset.where((dataset) =>
+    dataset.dataSource.some((source) => source.website.some({ tenantId })),
+  );

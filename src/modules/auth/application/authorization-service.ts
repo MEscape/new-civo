@@ -9,8 +9,8 @@ import type { Actor } from '../domain/models/actor';
 import type { ResourceScope } from '../domain/models/authorize';
 import type { Permission } from '../domain/models/permission';
 import type {
-    CurrentActorError,
-    CurrentActorProvider,
+  CurrentActorError,
+  CurrentActorProvider,
 } from '../domain/ports/current-actor-provider.port';
 import type { SecurityAuditLog } from '../domain/ports/security-audit-log.port';
 
@@ -30,29 +30,27 @@ export type AuthorizationError = CurrentActorError | ForbiddenAppError;
  * optional argument that can be forgotten.
  */
 export interface AuthorizationService {
-    /**
-     * For operations not tied to an existing resource: create, or list
-     * within the actor's own tenant. Call it FIRST, before loading anything,
-     * so a caller without the permission cannot probe for existence.
-     *
-     * The returned actor's `tenantId` is the authoritative tenant for
-     * scoping the follow-up query: look resources up by (id, actor.tenantId)
-     * so another tenant's id is simply "not found".
-     */
-    requireInTenant(
-        permission: Permission
-    ): AppResultAsync<Actor, AuthorizationError>;
+  /**
+   * For operations not tied to an existing resource: create, or list
+   * within the actor's own tenant. Call it FIRST, before loading anything,
+   * so a caller without the permission cannot probe for existence.
+   *
+   * The returned actor's `tenantId` is the authoritative tenant for
+   * scoping the follow-up query: look resources up by (id, actor.tenantId)
+   * so another tenant's id is simply "not found".
+   */
+  requireInTenant(permission: Permission): AppResultAsync<Actor, AuthorizationError>;
 
-    /**
-     * For operations on a loaded resource. `resource.tenantId` must come from
-     * the stored record, never from the request. This is the backstop behind
-     * tenant-scoped lookups: if a repository ever returns a foreign record,
-     * this refuses it.
-     */
-    requireOnResource(
-        permission: Permission,
-        resource: ResourceScope
-    ): AppResultAsync<Actor, AuthorizationError>;
+  /**
+   * For operations on a loaded resource. `resource.tenantId` must come from
+   * the stored record, never from the request. This is the backstop behind
+   * tenant-scoped lookups: if a repository ever returns a foreign record,
+   * this refuses it.
+   */
+  requireOnResource(
+    permission: Permission,
+    resource: ResourceScope,
+  ): AppResultAsync<Actor, AuthorizationError>;
 }
 
 /**
@@ -61,33 +59,34 @@ export interface AuthorizationService {
  * `permissionDenied` error.
  */
 export function createAuthorizationService(deps: {
-    readonly currentActor: CurrentActorProvider;
-    readonly audit: SecurityAuditLog;
+  readonly currentActor: CurrentActorProvider;
+  readonly audit: SecurityAuditLog;
 }): AuthorizationService {
-    function authorize(
-        permission: Permission,
-        scope?: ResourceScope
-    ): AppResultAsync<Actor, AuthorizationError> {
-        return deps.currentActor
-            .getCurrentActor()
-            .andThen((actor): AppResultAsync<Actor, AuthorizationError> => {
-                const decision = decide(actor, permission, scope);
-                if (decision.isAllowed) {return okAsync(actor);}
+  function authorize(
+    permission: Permission,
+    scope?: ResourceScope,
+  ): AppResultAsync<Actor, AuthorizationError> {
+    return deps.currentActor
+      .getCurrentActor()
+      .andThen((actor): AppResultAsync<Actor, AuthorizationError> => {
+        const decision = decide(actor, permission, scope);
+        if (decision.isAllowed) {
+          return okAsync(actor);
+        }
 
-                deps.audit.record({
-                    type: 'authorization.denied',
-                    actorId: actor.id,
-                    tenantId: actor.tenantId,
-                    permission,
-                    reason: decision.reason,
-                });
-                return errAsync(permissionDenied());
-            });
-    }
+        deps.audit.record({
+          type: 'authorization.denied',
+          actorId: actor.id,
+          tenantId: actor.tenantId,
+          permission,
+          reason: decision.reason,
+        });
+        return errAsync(permissionDenied());
+      });
+  }
 
-    return {
-        requireInTenant: (permission) => authorize(permission),
-        requireOnResource: (permission, resource) =>
-            authorize(permission, resource),
-    };
+  return {
+    requireInTenant: (permission) => authorize(permission),
+    requireOnResource: (permission, resource) => authorize(permission, resource),
+  };
 }

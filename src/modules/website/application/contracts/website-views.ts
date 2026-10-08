@@ -1,7 +1,4 @@
-import type {
-  WebsiteChangesInput,
-  WebsiteDraftInput,
-} from '../../domain/models/website';
+import type { WebsiteChangesInput, WebsiteDraftInput } from '../../domain/models/website';
 import type { TemplateKey } from '../../domain/models/website-template';
 import type { WebsiteTheme, WebsiteThemeInput } from '../../domain/models/website-theme';
 

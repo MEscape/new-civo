@@ -11,15 +11,15 @@ export const ROOT_LAYOUT_PATH = '/';
  * routes by locale.
  */
 export const authRoutes = {
-    signIn: (returnTo?: string) =>
-        returnTo === undefined
-            ? '/sign-in'
-            : `/sign-in?${new URLSearchParams({ returnTo }).toString()}`,
-    signUp: () => '/sign-up',
-    forgotPassword: () => '/forgot-password',
-    /** Landing page of the emailed reset link; Better Auth appends `?token=`. */
-    resetPassword: () => '/reset-password',
-    /** Landing page after the emailed verification link; Better Auth appends `?error=` on failure. */
-    emailVerified: () => '/email-verified',
-    api: () => '/api/auth',
+  signIn: (returnTo?: string) =>
+    returnTo === undefined
+      ? '/sign-in'
+      : `/sign-in?${new URLSearchParams({ returnTo }).toString()}`,
+  signUp: () => '/sign-up',
+  forgotPassword: () => '/forgot-password',
+  /** Landing page of the emailed reset link; Better Auth appends `?token=`. */
+  resetPassword: () => '/reset-password',
+  /** Landing page after the emailed verification link; Better Auth appends `?error=` on failure. */
+  emailVerified: () => '/email-verified',
+  api: () => '/api/auth',
 } as const;

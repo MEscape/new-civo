@@ -11,19 +11,19 @@ import { isPlainObject } from './object';
  * `Object.prototype` for the whole process.
  */
 const UNSAFE_PATH_SEGMENTS: ReadonlySet<string> = new Set([
-    '__proto__',
-    'prototype',
-    'constructor',
+  '__proto__',
+  'prototype',
+  'constructor',
 ]);
 
 /** True when a single path segment could reach or pollute a prototype. */
 export function isUnsafePathSegment(segment: string): boolean {
-    return UNSAFE_PATH_SEGMENTS.has(segment);
+  return UNSAFE_PATH_SEGMENTS.has(segment);
 }
 
 /** Converts bracket indexes to dot form: `items[0].name` -> `items.0.name`. */
 export function normalizePath(path: string): string {
-    return path.replace(/\[(\d+)\]/g, '.$1');
+  return path.replace(/\[(\d+)\]/g, '.$1');
 }
 
 /**
@@ -31,7 +31,7 @@ export function normalizePath(path: string): string {
  * Empty segments are dropped: `"a..b"` -> `["a", "b"]`.
  */
 export function pathSegments(path: string): string[] {
-    return normalizePath(path).split('.').filter(Boolean);
+  return normalizePath(path).split('.').filter(Boolean);
 }
 
 /**
@@ -39,18 +39,22 @@ export function pathSegments(path: string): string[] {
  * A boolean check for validating paths up front, unlike `setPath`, which throws.
  */
 export function hasUnsafePathSegment(path: string): boolean {
-    return pathSegments(path).some(isUnsafePathSegment);
+  return pathSegments(path).some(isUnsafePathSegment);
 }
 
 /** Reads a nested value by dot path (`"a.b.0.c"`). Returns `undefined` when any segment is missing. */
 export function getPath(obj: unknown, path: string): unknown {
-    let current: unknown = obj;
-    for (const segment of path.split('.')) {
-        if (current === null || typeof current !== 'object') {return undefined;}
-        if (!Object.hasOwn(current, segment)) {return undefined;}
-        current = (current as Record<string, unknown>)[segment]; // Own-key presence was checked above.
+  let current: unknown = obj;
+  for (const segment of path.split('.')) {
+    if (current === null || typeof current !== 'object') {
+      return undefined;
     }
-    return current;
+    if (!Object.hasOwn(current, segment)) {
+      return undefined;
+    }
+    current = (current as Record<string, unknown>)[segment]; // Own-key presence was checked above.
+  }
+  return current;
 }
 
 /**
@@ -60,26 +64,24 @@ export function getPath(obj: unknown, path: string): unknown {
  * `hasUnsafePathSegment`.
  */
 export function setPath<T extends Record<string, unknown>>(
-    obj: T,
-    path: string,
-    value: unknown
+  obj: T,
+  path: string,
+  value: unknown,
 ): T {
-    const segments = path.split('.');
-    if (segments.some(isUnsafePathSegment)) {
-        throw new Error(`Unsafe path segment in "${path}"`);
-    }
+  const segments = path.split('.');
+  if (segments.some(isUnsafePathSegment)) {
+    throw new Error(`Unsafe path segment in "${path}"`);
+  }
 
-    const [head, ...rest] = segments;
-    if (head === undefined) {return obj;}
+  const [head, ...rest] = segments;
+  if (head === undefined) {
+    return obj;
+  }
 
-    const next =
-        rest.length === 0
-            ? value
-            : setPath(
-                isPlainObject(obj[head]) ? obj[head] : {},
-                rest.join('.'),
-                value
-            );
+  const next =
+    rest.length === 0
+      ? value
+      : setPath(isPlainObject(obj[head]) ? obj[head] : {}, rest.join('.'), value);
 
-    return { ...obj, [head]: next };
+  return { ...obj, [head]: next };
 }

@@ -20,6 +20,8 @@ Map module  BuildMapModel (server): validate → profile fields → style → fi
 MapExplorer (client): filters · legend · details · list ─► MapRenderer ─► Mapbox GL JS
 ```
 
+The component platform never imports the map at runtime: its `composition.ts` hands `MapSection` (the map module's public API, wired in the map's own `composition.ts` with a logging `DataIssueReporter`) to the page renderer, and the `map` component renders what it is given.
+
 Mapbox is confined to `presentation/mapbox/`. `mapbox-layers.ts` turns a `LayerStyle` into Mapbox layers and expressions; `create-mapbox-renderer.ts` is the only file that imports `mapbox-gl`, and only when a map is shown (dynamic import).
 
 ## Connecting data (admin)

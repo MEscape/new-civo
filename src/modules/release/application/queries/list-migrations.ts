@@ -23,26 +23,16 @@ export class ListMigrations {
 
   execute(
     rawWebsiteId: string,
-    options: ListMigrationsOptions = {}
+    options: ListMigrationsOptions = {},
   ): AppResultAsync<readonly MigrationSummaryView[], LoadReleaseWebsiteError> {
     const requested =
       options.limit !== undefined && Number.isInteger(options.limit)
         ? options.limit
         : DEFAULT_MIGRATION_LIST_LIMIT;
-    const limit = clamp(
-      requested,
-      MIN_MIGRATION_LIST_LIMIT,
-      MAX_MIGRATION_LIST_LIMIT
-    );
+    const limit = clamp(requested, MIN_MIGRATION_LIST_LIMIT, MAX_MIGRATION_LIST_LIMIT);
 
-    return loadAuthorizedReleaseWebsite(
-      this.deps,
-      rawWebsiteId,
-      'release.read'
-    )
-      .andThen(({ website }) =>
-        this.deps.migrations.listByWebsite(website.id, limit)
-      )
+    return loadAuthorizedReleaseWebsite(this.deps, rawWebsiteId, 'release.read')
+      .andThen(({ website }) => this.deps.migrations.listByWebsite(website.id, limit))
       .map((summaries) => summaries.map(toMigrationSummaryView));
   }
 }

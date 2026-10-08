@@ -10,37 +10,37 @@ import type { AuthRateLimitAction } from '../models/rate-limit';
  * updated (it is `satisfies Record<SecurityEvent['type'], ...>`).
  */
 export type SecurityEvent =
-    | {
-    readonly type: 'authorization.denied';
-    readonly actorId: ActorId;
-    readonly tenantId: TenantId;
-    readonly permission: Permission;
-    readonly reason: DenialReason;
-}
-    | {
-    readonly type: 'authentication.sign_in_failed';
-    readonly errorCode: string;
-}
-    | {
-    readonly type: 'authentication.rate_limited';
-    readonly action: AuthRateLimitAction;
-}
-    | {
-    readonly type: 'authentication.session_created';
-    readonly actorId: ActorId;
-}
-    | {
-    readonly type: 'authentication.session_revoked';
-    readonly actorId: ActorId;
-}
-    | {
-    readonly type: 'authentication.account_created';
-    readonly actorId: ActorId;
-}
-    | {
-    readonly type: 'authentication.password_reset_completed';
-    readonly actorId: ActorId;
-};
+  | {
+      readonly type: 'authorization.denied';
+      readonly actorId: ActorId;
+      readonly tenantId: TenantId;
+      readonly permission: Permission;
+      readonly reason: DenialReason;
+    }
+  | {
+      readonly type: 'authentication.sign_in_failed';
+      readonly errorCode: string;
+    }
+  | {
+      readonly type: 'authentication.rate_limited';
+      readonly action: AuthRateLimitAction;
+    }
+  | {
+      readonly type: 'authentication.session_created';
+      readonly actorId: ActorId;
+    }
+  | {
+      readonly type: 'authentication.session_revoked';
+      readonly actorId: ActorId;
+    }
+  | {
+      readonly type: 'authentication.account_created';
+      readonly actorId: ActorId;
+    }
+  | {
+      readonly type: 'authentication.password_reset_completed';
+      readonly actorId: ActorId;
+    };
 
 /**
  * Append-only security trail. `record` is synchronous and MUST NOT throw or
@@ -49,5 +49,5 @@ export type SecurityEvent =
  * without touching any caller.
  */
 export interface SecurityAuditLog {
-    record(event: SecurityEvent): void;
+  record(event: SecurityEvent): void;
 }

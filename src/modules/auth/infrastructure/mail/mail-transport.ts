@@ -3,10 +3,10 @@ import type { AppResultAsync } from '@lib/result';
 
 /** A fully rendered message. Contains single-use links: never log it. */
 export interface OutboundMail {
-    readonly to: string;
-    readonly subject: string;
-    readonly text: string;
-    readonly html: string;
+  readonly to: string;
+  readonly subject: string;
+  readonly text: string;
+  readonly html: string;
 }
 
 /**
@@ -15,5 +15,5 @@ export interface OutboundMail {
  * writing one class that implements this.
  */
 export interface MailTransport {
-    send(mail: OutboundMail): AppResultAsync<void, InfrastructureAppError>;
+  send(mail: OutboundMail): AppResultAsync<void, InfrastructureAppError>;
 }

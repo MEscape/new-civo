@@ -15,14 +15,17 @@ import { classifyContext, defineRule, findAncestor, report } from '../util.mjs';
  * process boots) sits at the module root, which is not one of these layers.
  */
 export const noThrowInCoreLayers = defineRule({
-  description: 'Forbid `throw` and custom Error subclasses for expected failures in domain, application and infrastructure.',
+  description:
+    'Forbid `throw` and custom Error subclasses for expected failures in domain, application and infrastructure.',
   create(context) {
     const { file } = classifyContext(context);
     if (file.area !== 'module') return {};
     if (!['domain', 'application', 'infrastructure'].includes(file.layer)) return {};
     // A `'use cache'` function does not cache a thrown error, so a typed failure is thrown THROUGH the cache and
     // converted back to an AppError by the caller. That containment lives in the file that declares the directive.
-    const crossesCacheBoundary = /^\s*['"]use cache(?::\s*[\w-]+)?['"]/m.test(context.sourceCode.text);
+    const crossesCacheBoundary = /^\s*['"]use cache(?::\s*[\w-]+)?['"]/m.test(
+      context.sourceCode.text,
+    );
 
     return {
       ThrowStatement(node) {
@@ -38,13 +41,17 @@ export const noThrowInCoreLayers = defineRule({
         report(
           context,
           node,
-          `Do not \`throw\` in the ${file.layer} layer. Return \`err(<domain error>)\` / \`errAsync(...)\` (AppResult/AppResultAsync from '@lib/result') using this module's domain errors; wrap third-party calls with fromThrowable/fromThrowableAsync.`
+          `Do not \`throw\` in the ${file.layer} layer. Return \`err(<domain error>)\` / \`errAsync(...)\` (AppResult/AppResultAsync from '@lib/result') using this module's domain errors; wrap third-party calls with fromThrowable/fromThrowableAsync.`,
         );
       },
       ClassDeclaration(node) {
         if (crossesCacheBoundary) return;
         if (node.superClass?.type === 'Identifier' && /Error$/.test(node.superClass.name)) {
-          report(context, node, `Do not define Error subclasses in the ${file.layer} layer. Use the AppError kinds and factories from '@lib/errors' (domain/errors/<module>-errors.ts).`);
+          report(
+            context,
+            node,
+            `Do not define Error subclasses in the ${file.layer} layer. Use the AppError kinds and factories from '@lib/errors' (domain/errors/<module>-errors.ts).`,
+          );
         }
       },
     };

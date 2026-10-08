@@ -20,6 +20,9 @@ generated/
 
 # Database
 prisma/migrations/
+# Emitted by `npm run db:generate`; CI checks they match its output byte for byte.
+src/lib/db/contract.json
+src/lib/db/contract.d.ts
 
 # Lockfiles (never hand-format; owned by the package manager)
 package-lock.json

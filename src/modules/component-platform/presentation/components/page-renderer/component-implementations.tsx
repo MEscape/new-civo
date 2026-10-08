@@ -1,55 +1,51 @@
-import {
-  TabsBlock,
-  RichText,
-  Hero,
-  CardGrid,
-  CallToAction,
-  AccordionBlock,
-} from '../content';
-
-import { AlertBanner, AlertBannerSkeleton } from '../civic/alert-banner';
-import { ContactCard, ContactCardSkeleton } from '../civic/contact-card';
-import { CouncilBlock, CouncilBlockSkeleton } from '../civic/council-block';
-import {
-  DepartmentDirectory,
-  DepartmentDirectorySkeleton,
-} from '../civic/department-directory';
-import { EventsGrid, EventsGridSkeleton } from '../civic/events-grid';
-import {
-  NewsAndEventsSplit,
-  NewsAndEventsSplitSkeleton,
-} from '../civic/news-and-events-split';
-import { NewsGrid, NewsGridSkeleton } from '../civic/news-grid';
-import { OpeningHours, OpeningHoursSkeleton } from '../civic/opening-hours';
-import { QuickLinks } from '../civic/quick-links';
-import { ServiceFinder, ServiceFinderSkeleton } from '../civic/service-finder';
-import { ServiceGrid, ServiceGridSkeleton } from '../civic/service-grid';
-import { WasteCalendar, WasteCalendarSkeleton } from '../civic/waste-calendar';
+import { AlertBanner } from '../civic/alert-banner/alert-banner';
+import { AlertBannerSkeleton } from '../civic/alert-banner/alert-banner.skeleton';
+import { ContactCard } from '../civic/contact-card/contact-card';
+import { ContactCardSkeleton } from '../civic/contact-card/contact-card.skeleton';
+import { CouncilBlock } from '../civic/council-block/council-block';
+import { CouncilBlockSkeleton } from '../civic/council-block/council-block.skeleton';
+import { DepartmentDirectory } from '../civic/department-directory/department-directory';
+import { DepartmentDirectorySkeleton } from '../civic/department-directory/department-directory.skeleton';
+import { EventsGrid } from '../civic/events-grid/events-grid';
+import { EventsGridSkeleton } from '../civic/events-grid/events-grid.skeleton';
+import { NewsAndEventsSplit } from '../civic/news-and-events-split/news-and-events-split';
+import { NewsAndEventsSplitSkeleton } from '../civic/news-and-events-split/news-and-events-split.skeleton';
+import { NewsGrid } from '../civic/news-grid/news-grid';
+import { NewsGridSkeleton } from '../civic/news-grid/news-grid.skeleton';
+import { OpeningHours } from '../civic/opening-hours/opening-hours';
+import { OpeningHoursSkeleton } from '../civic/opening-hours/opening-hours.skeleton';
+import { QuickLinks } from '../civic/quick-links/quick-links';
+import { ServiceFinder } from '../civic/service-finder/service-finder';
+import { ServiceFinderSkeleton } from '../civic/service-finder/service-finder.skeleton';
+import { ServiceGrid } from '../civic/service-grid/service-grid';
+import { ServiceGridSkeleton } from '../civic/service-grid/service-grid.skeleton';
+import { WasteCalendar } from '../civic/waste-calendar/waste-calendar';
+import { WasteCalendarSkeleton } from '../civic/waste-calendar/waste-calendar.skeleton';
+import { AccordionBlock } from '../content/accordion-block';
+import { CallToAction } from '../content/call-to-action';
+import { CardGrid } from '../content/card-grid';
+import { Hero } from '../content/hero';
+import { RichText } from '../content/rich-text';
+import { TabsBlock } from '../content/tabs-block';
 import { SectionBlock } from '../layout/section-block';
-import {
-  DashboardGrid,
-  DashboardGridSkeleton,
-} from '../smartcity/dashboard-grid';
-import { KpiGrid, KpiGridSkeleton } from '../smartcity/kpi-grid';
-import { MapBlock, MapBlockSkeleton } from '../smartcity/map';
-import { MetricChart, MetricChartSkeleton } from '../smartcity/metric-chart';
-import {
-  MetricComparisonChart,
-  MetricComparisonChartSkeleton,
-} from '../smartcity/comparison-chart';
-import {
-  MetricDonutChart,
-  MetricDonutChartSkeleton,
-} from '../smartcity/donut-chart';
-import {
-  MetricGaugeChart,
-  MetricGaugeChartSkeleton,
-} from '../smartcity/gauge-chart';
-import { MetricTable, MetricTableSkeleton } from '../smartcity/metric-table';
-import {
-  MetricTrendChart,
-  MetricTrendChartSkeleton,
-} from '../smartcity/trend-chart';
+import { MetricComparisonChart } from '../smartcity/comparison-chart/metric-comparison-chart';
+import { MetricComparisonChartSkeleton } from '../smartcity/comparison-chart/metric-comparison-chart.skeleton';
+import { DashboardGrid } from '../smartcity/dashboard-grid/dashboard-grid';
+import { DashboardGridSkeleton } from '../smartcity/dashboard-grid/dashboard-grid.skeleton';
+import { MetricDonutChart } from '../smartcity/donut-chart/metric-donut-chart';
+import { MetricDonutChartSkeleton } from '../smartcity/donut-chart/metric-donut-chart.skeleton';
+import { MetricGaugeChart } from '../smartcity/gauge-chart/metric-gauge-chart';
+import { MetricGaugeChartSkeleton } from '../smartcity/gauge-chart/metric-gauge-chart.skeleton';
+import { KpiGrid } from '../smartcity/kpi-grid/kpi-grid';
+import { KpiGridSkeleton } from '../smartcity/kpi-grid/kpi-grid.skeleton';
+import { MapBlock } from '../smartcity/map/map-block';
+import { MapBlockSkeleton } from '../smartcity/map/map-block.skeleton';
+import { MetricChart } from '../smartcity/metric-chart/metric-chart';
+import { MetricChartSkeleton } from '../smartcity/metric-chart/metric-chart.skeleton';
+import { MetricTable } from '../smartcity/metric-table/metric-table';
+import { MetricTableSkeleton } from '../smartcity/metric-table/metric-table.skeleton';
+import { MetricTrendChart } from '../smartcity/trend-chart/metric-trend-chart';
+import { MetricTrendChartSkeleton } from '../smartcity/trend-chart/metric-trend-chart.skeleton';
 
 import { implementComponent } from './component-implementation';
 
@@ -67,9 +63,7 @@ import type { RegisteredComponentName } from '../../../application/contracts/com
 export const COMPONENT_IMPLEMENTATIONS = {
   // layout
   section: implementComponent('section', {
-    render: ({ props, children }) => (
-      <SectionBlock tone={props.tone}>{children}</SectionBlock>
-    ),
+    render: ({ props, children }) => <SectionBlock tone={props.tone}>{children}</SectionBlock>,
   }),
 
   // content
@@ -113,11 +107,7 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   departmentDirectory: implementComponent('departmentDirectory', {
     render: ({ props, context, loadContent }) => (
-      <DepartmentDirectory
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <DepartmentDirectory props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <DepartmentDirectorySkeleton />,
   }),
@@ -129,11 +119,7 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   newsAndEventsSplit: implementComponent('newsAndEventsSplit', {
     render: ({ props, context, loadContent }) => (
-      <NewsAndEventsSplit
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <NewsAndEventsSplit props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <NewsAndEventsSplitSkeleton />,
   }),
@@ -154,11 +140,7 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   serviceFinder: implementComponent('serviceFinder', {
     render: ({ props, context, loadContent }) => (
-      <ServiceFinder
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <ServiceFinder props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <ServiceFinderSkeleton />,
   }),
@@ -170,11 +152,7 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   wasteCalendar: implementComponent('wasteCalendar', {
     render: ({ props, context, loadContent }) => (
-      <WasteCalendar
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <WasteCalendar props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <WasteCalendarSkeleton />,
   }),
@@ -182,11 +160,7 @@ export const COMPONENT_IMPLEMENTATIONS = {
   // smartcity
   dashboardGrid: implementComponent('dashboardGrid', {
     render: ({ props, context, loadContent }) => (
-      <DashboardGrid
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <DashboardGrid props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <DashboardGridSkeleton />,
   }),
@@ -197,8 +171,8 @@ export const COMPONENT_IMPLEMENTATIONS = {
     skeleton: <KpiGridSkeleton />,
   }),
   map: implementComponent('map', {
-    render: ({ props, context, loadContent }) => (
-      <MapBlock props={props} context={context} loadContent={loadContent} />
+    render: ({ props, context, loadContent, mapSection }) => (
+      <MapBlock props={props} context={context} loadContent={loadContent} mapSection={mapSection} />
     ),
     skeleton: <MapBlockSkeleton />,
   }),
@@ -210,31 +184,19 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   metricComparisonChart: implementComponent('metricComparisonChart', {
     render: ({ props, context, loadContent }) => (
-      <MetricComparisonChart
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <MetricComparisonChart props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <MetricComparisonChartSkeleton />,
   }),
   metricDonut: implementComponent('metricDonut', {
     render: ({ props, context, loadContent }) => (
-      <MetricDonutChart
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <MetricDonutChart props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <MetricDonutChartSkeleton />,
   }),
   metricGauge: implementComponent('metricGauge', {
     render: ({ props, context, loadContent }) => (
-      <MetricGaugeChart
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <MetricGaugeChart props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <MetricGaugeChartSkeleton />,
   }),
@@ -246,25 +208,20 @@ export const COMPONENT_IMPLEMENTATIONS = {
   }),
   metricTrendChart: implementComponent('metricTrendChart', {
     render: ({ props, context, loadContent }) => (
-      <MetricTrendChart
-        props={props}
-        context={context}
-        loadContent={loadContent}
-      />
+      <MetricTrendChart props={props} context={context} loadContent={loadContent} />
     ),
     skeleton: <MetricTrendChartSkeleton />,
   }),
 } as const satisfies Record<RegisteredComponentName, ComponentImplementation>;
 
-const IMPLEMENTATIONS_BY_TYPE: ReadonlyMap<string, ComponentImplementation> =
-  new Map(Object.entries(COMPONENT_IMPLEMENTATIONS));
+const IMPLEMENTATIONS_BY_TYPE: ReadonlyMap<string, ComponentImplementation> = new Map(
+  Object.entries(COMPONENT_IMPLEMENTATIONS),
+);
 
 /**
  * Looks a type up by exact key. A `Map` rather than property access, so a
  * stored type such as "constructor" can never resolve to an inherited member.
  */
-export function findImplementation(
-  type: string
-): ComponentImplementation | undefined {
+export function findImplementation(type: string): ComponentImplementation | undefined {
   return IMPLEMENTATIONS_BY_TYPE.get(type);
 }

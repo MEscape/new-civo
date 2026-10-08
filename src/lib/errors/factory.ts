@@ -20,36 +20,24 @@ import type {
 export function validationError(
   code: string,
   message: string,
-  fieldErrors: Record<string, string[]>
+  fieldErrors: Record<string, string[]>,
 ): ValidationAppError {
   return { kind: 'validation', code, message, fieldErrors };
 }
 
-export function notFoundError(
-  code: string,
-  message: string
-): NotFoundAppError {
+export function notFoundError(code: string, message: string): NotFoundAppError {
   return { kind: 'not_found', code, message };
 }
 
-export function conflictError(
-  code: string,
-  message: string
-): ConflictAppError {
+export function conflictError(code: string, message: string): ConflictAppError {
   return { kind: 'conflict', code, message };
 }
 
-export function unauthorizedError(
-  code: string,
-  message: string
-): UnauthorizedAppError {
+export function unauthorizedError(code: string, message: string): UnauthorizedAppError {
   return { kind: 'unauthorized', code, message };
 }
 
-export function forbiddenError(
-  code: string,
-  message: string
-): ForbiddenAppError {
+export function forbiddenError(code: string, message: string): ForbiddenAppError {
   return { kind: 'forbidden', code, message };
 }
 
@@ -61,7 +49,7 @@ export function forbiddenError(
 export function infrastructureError(
   code: string,
   message: string,
-  cause?: unknown
+  cause?: unknown,
 ): InfrastructureAppError {
   return { kind: 'infrastructure', code, message, cause };
 }
@@ -69,7 +57,7 @@ export function infrastructureError(
 export function unexpectedError(
   code: string,
   message: string,
-  cause?: unknown
+  cause?: unknown,
 ): UnexpectedAppError {
   return { kind: 'unexpected', code, message, cause };
 }
@@ -84,7 +72,7 @@ export function matchAppError<T>(
   error: AppError,
   handlers: {
     [K in AppError['kind']]: (error: Extract<AppError, { kind: K }>) => T;
-  }
+  },
 ): T {
   // TS cannot narrow `handlers[error.kind]` to a single call signature
   // through an indexed access on a mapped type; the runtime invariant

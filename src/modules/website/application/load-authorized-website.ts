@@ -1,10 +1,6 @@
 import type { Actor, AuthorizationError, Permission } from '@modules/auth';
 
-import type {
-  InfrastructureAppError,
-  NotFoundAppError,
-  ValidationAppError,
-} from '@lib/errors';
+import type { InfrastructureAppError, NotFoundAppError, ValidationAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
@@ -18,10 +14,7 @@ import type { Website } from '../domain/models/website';
 
 /** Everything an operation on one existing website can fail with. */
 export type LoadWebsiteError =
-  | AuthorizationError
-  | ValidationAppError
-  | NotFoundAppError
-  | InfrastructureAppError;
+  AuthorizationError | ValidationAppError | NotFoundAppError | InfrastructureAppError;
 
 export interface AuthorizedWebsite {
   readonly actor: Actor;
@@ -41,21 +34,20 @@ export interface AuthorizedWebsite {
 export function loadAuthorizedWebsite(
   deps: WebsiteDependencies,
   rawId: string,
-  permission: Permission
+  permission: Permission,
 ): AppResultAsync<AuthorizedWebsite, LoadWebsiteError> {
   const { authorization, websites } = deps;
 
   return authorization.requireInTenant(permission).andThen((actor) =>
     parseWebsiteId(rawId)
       .asyncAndThen((id) => websites.findById(id, actor.tenantId))
-      .andThen(
-        (website): AppResultAsync<Website, NotFoundAppError> =>
-          website === null ? errAsync(websiteNotFound()) : okAsync(website)
+      .andThen((website): AppResultAsync<Website, NotFoundAppError> =>
+        website === null ? errAsync(websiteNotFound()) : okAsync(website),
       )
       .andThen((website) =>
         authorization
           .requireOnResource(permission, scopeOf(website))
-          .map((verifiedActor) => ({ actor: verifiedActor, website }))
-      )
+          .map((verifiedActor) => ({ actor: verifiedActor, website })),
+      ),
   );
 }

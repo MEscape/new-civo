@@ -20,6 +20,7 @@ graph TD
   STRUCT --> BOUND["boundaries.md"]
   STRUCT --> MOD["modules.md"]
   STRUCT --> DEP["dependencies.md"]
+  STRUCT --> SHARED["shared.md"]
 
   FW --> NEXT["nextjs.md"]
   FW --> REACT["react.md"]
@@ -80,12 +81,13 @@ Ports are defined in the domain and implemented in infrastructure. Enforced impo
 
 ## Rule ownership
 
-| Concern                                   | Rule                                     |
-| ----------------------------------------- | ---------------------------------------- |
+| Concern                                   | Rule                                   |
+| ----------------------------------------- | -------------------------------------- |
 | Overall architecture                      | [`architecture.md`](architecture.md)   |
 | Import/dependency boundaries              | [`boundaries.md`](boundaries.md)       |
 | Module structure                          | [`modules.md`](modules.md)             |
 | Package/dependency choices                | [`dependencies.md`](dependencies.md)   |
+| Shared code (`src/lib`, `src/components`) | [`shared.md`](shared.md)               |
 | Next.js                                   | [`nextjs.md`](nextjs.md)               |
 | React                                     | [`react.md`](react.md)                 |
 | HTTP and APIs                             | [`api.md`](api.md)                     |
@@ -116,6 +118,7 @@ rules/
 ├── boundaries.md
 ├── modules.md
 ├── dependencies.md
+├── shared.md
 │
 ├── nextjs.md
 ├── react.md

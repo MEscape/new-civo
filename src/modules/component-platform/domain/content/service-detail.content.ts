@@ -15,9 +15,7 @@ export const serviceDetailContent = defineContent({
     category: label(),
     department: label(),
     processingNote: label(),
-    keywords: optional(
-      list(text({ min: 1, max: LIMITS.label }), LIMITS.keywords)
-    ),
+    keywords: optional(list(text({ min: 1, max: LIMITS.label }), LIMITS.keywords)),
   },
   rule: {
     categoryOf: (service) => service.category,

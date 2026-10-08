@@ -2,12 +2,13 @@
 
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { TextField } from '@components/shared/text-field';
 
-import { ConflictValues } from './conflict-values';
+import { useTranslations } from '@i18n/client';
+
 import { parseCustomValue } from '../resolutions/resolution-choices';
+
+import { ConflictValues } from './conflict-values';
 
 import type { ResolutionAction } from '../../application/contracts/release-constraints';
 import type { FieldConflict } from '../../application/contracts/release-views';
@@ -29,12 +30,7 @@ interface ChoiceOption {
  * One conflict as a radio group, so assistive technology announces "choose
  * one of these" and arrow keys move the choice.
  */
-export function ConflictField({
-  conflict,
-  choice,
-  isDisabled,
-  onChoose,
-}: ConflictFieldProps) {
+export function ConflictField({ conflict, choice, isDisabled, onChoose }: ConflictFieldProps) {
   const t = useTranslations('release.migration.conflict');
   const id = useId();
 
@@ -57,25 +53,17 @@ export function ConflictField({
   }
 
   return (
-    <fieldset
-      className="space-y-3 rounded-token border border-border p-3"
-      disabled={isDisabled}
-    >
+    <fieldset className="space-y-3 rounded-token border border-border p-3" disabled={isDisabled}>
       <legend className="px-1 text-sm font-medium text-copy">
         {t('legend', { field: conflict.key })}
       </legend>
-      <p className="text-xs text-copy-muted">
-        {t(isRemoved ? 'removedHint' : 'bothChangedHint')}
-      </p>
+      <p className="text-xs text-copy-muted">{t(isRemoved ? 'removedHint' : 'bothChangedHint')}</p>
 
       <ConflictValues conflict={conflict} />
 
       <div className="space-y-2">
         {options.map(({ action, label }) => (
-          <label
-            key={action}
-            className="flex cursor-pointer items-center gap-2 text-sm text-copy"
-          >
+          <label key={action} className="flex cursor-pointer items-center gap-2 text-sm text-copy">
             <input
               type="radio"
               className="size-4 accent-primary"
@@ -97,11 +85,7 @@ export function ConflictField({
           label={t('customLabel')}
           hint={t('customHint')}
           value={customText}
-          error={
-            parseCustomValue(customText).isValid
-              ? undefined
-              : t('customInvalid')
-          }
+          error={parseCustomValue(customText).isValid ? undefined : t('customInvalid')}
           onChange={(event) => {
             onChoose({ action: 'custom', text: event.target.value });
           }}

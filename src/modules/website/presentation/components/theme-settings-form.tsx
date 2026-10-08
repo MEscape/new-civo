@@ -2,15 +2,16 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { SelectField } from '@components/shared/select-field';
 import { Button } from '@components/ui/button';
+
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 
@@ -21,7 +22,11 @@ import {
   THEME_SPACING_SCALES,
 } from '../../application/contracts/website-constraints';
 import { updateWebsiteThemeAction } from '../actions/update-website-theme-action';
-import { RADIUS_MESSAGE_KEYS, SPACING_MESSAGE_KEYS, messageKeyForCode } from '../messages/message-keys';
+import {
+  RADIUS_MESSAGE_KEYS,
+  SPACING_MESSAGE_KEYS,
+  messageKeyForCode,
+} from '../messages/message-keys';
 import { themeSettingsSchema } from '../schemas/theme-settings-schema';
 import { toPreviewTheme } from '../theme/preview-theme';
 
@@ -36,11 +41,11 @@ export interface ThemeSettingsFormProps {
   readonly initialTheme: WebsiteThemeView;
 }
 
-export function ThemeSettingsForm({
-  websiteId,
-  initialTheme,
-}: ThemeSettingsFormProps) {
+export function ThemeSettingsForm({ websiteId, initialTheme }: ThemeSettingsFormProps) {
   const t = useTranslations('website');
+  /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+  const errorText = (code: string | undefined) =>
+    code === undefined ? undefined : t(messageKeyForCode(code));
 
   const router = useRouter();
   const id = useId();
@@ -53,10 +58,7 @@ export function ThemeSettingsForm({
     defaultValues: initialTheme,
   });
   const { errors, isDirty } = form.formState;
-  const previewTheme = toPreviewTheme(
-    useWatch({ control: form.control }),
-    initialTheme
-  );
+  const previewTheme = toPreviewTheme(useWatch({ control: form.control }), initialTheme);
 
   // Derived, not stored: the confirmation disappears as soon as the user edits again.
   const showSaved = hasSaved && !isDirty;
@@ -82,10 +84,7 @@ export function ThemeSettingsForm({
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <section aria-labelledby={`${id}-title`}>
-        <h2
-          id={`${id}-title`}
-          className="mb-6 text-xl font-semibold text-copy"
-        >
+        <h2 id={`${id}-title`} className="mb-6 text-xl font-semibold text-copy">
           {t('themeSettings.title')}
         </h2>
         <form
@@ -95,9 +94,7 @@ export function ThemeSettingsForm({
           className="space-y-6 rounded-token border border-border bg-surface p-6"
         >
           <fieldset className="space-y-4">
-            <legend className="text-sm font-medium text-copy">
-              {t('themeSettings.colors')}
-            </legend>
+            <legend className="text-sm font-medium text-copy">{t('themeSettings.colors')}</legend>
             <div className="grid grid-cols-3 gap-4">
               <ColorField
                 control={form.control}
@@ -125,7 +122,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-heading-font`}
                 label={t('themeSettings.headingFont')}
-                errorMessage={errors.typography?.headingFont?.message ? t(messageKeyForCode(errors.typography.headingFont.message)) : undefined}
+                errorMessage={errorText(errors.typography?.headingFont?.message)}
                 {...form.register('typography.headingFont')}
               >
                 {THEME_FONT_FAMILIES.map((font) => (
@@ -137,7 +134,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-body-font`}
                 label={t('themeSettings.bodyFont')}
-                errorMessage={errors.typography?.bodyFont?.message ? t(messageKeyForCode(errors.typography.bodyFont.message)) : undefined}
+                errorMessage={errorText(errors.typography?.bodyFont?.message)}
                 {...form.register('typography.bodyFont')}
               >
                 {BODY_FONT_FAMILIES.map((font) => (
@@ -150,14 +147,12 @@ export function ThemeSettingsForm({
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="text-sm font-medium text-copy">
-              {t('themeSettings.layout')}
-            </legend>
+            <legend className="text-sm font-medium text-copy">{t('themeSettings.layout')}</legend>
             <div className="grid grid-cols-2 gap-4">
               <SelectField
                 id={`${id}-radius`}
                 label={t('themeSettings.radiusLabel')}
-                errorMessage={errors.radius?.message ? t(messageKeyForCode(errors.radius.message)) : undefined}
+                errorMessage={errorText(errors.radius?.message)}
                 {...form.register('radius')}
               >
                 {THEME_RADII.map((radius) => (
@@ -169,7 +164,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-spacing`}
                 label={t('themeSettings.spacingLabel')}
-                errorMessage={errors.spacingScale?.message ? t(messageKeyForCode(errors.spacingScale.message)) : undefined}
+                errorMessage={errorText(errors.spacingScale?.message)}
                 {...form.register('spacingScale')}
               >
                 {THEME_SPACING_SCALES.map((scale) => (
@@ -195,9 +190,7 @@ export function ThemeSettingsForm({
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending
-              ? t('themeSettings.submitting')
-              : t('themeSettings.submit')}
+            {isPending ? t('themeSettings.submitting') : t('themeSettings.submit')}
           </Button>
         </form>
       </section>

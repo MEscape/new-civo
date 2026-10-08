@@ -20,7 +20,7 @@ describe('isPlainObject', () => {
   it('rejects arrays, dates, class instances, and null', () => {
     expect(isPlainObject([])).toBe(false);
     expect(isPlainObject(new Date())).toBe(false);
-    expect(isPlainObject(new (class Foo { })())).toBe(false);
+    expect(isPlainObject(new (class Foo {})())).toBe(false);
     expect(isPlainObject(null)).toBe(false);
   });
 });
@@ -78,10 +78,7 @@ describe('deepEqual', () => {
 
 describe('deepMerge', () => {
   it('merges nested plain objects and replaces arrays', () => {
-    const result = deepMerge(
-      { a: { x: 1, y: 2 }, list: [1, 2] },
-      { a: { y: 3 }, list: [9] }
-    );
+    const result = deepMerge({ a: { x: 1, y: 2 }, list: [1, 2] }, { a: { y: 3 }, list: [9] });
     expect(result).toEqual({ a: { x: 1, y: 3 }, list: [9] });
   });
 
@@ -91,4 +88,3 @@ describe('deepMerge', () => {
     expect(target).toEqual({ a: { x: 1 } });
   });
 });
-

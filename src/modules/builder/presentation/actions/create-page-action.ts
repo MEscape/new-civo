@@ -14,11 +14,9 @@ import { parseBuilderInput } from '../schemas/parse-builder-input';
 import type { PageSummaryDto } from '../dto/page-dto';
 
 /** Framework adapter: validate, call the use case, invalidate. */
-export async function createPageAction(
-  input: unknown
-): Promise<ActionResult<PageSummaryDto>> {
-  const result = await parseBuilderInput(newPageSchema, input).asyncAndThen(
-    (command) => builderCommands.createPage.execute(command)
+export async function createPageAction(input: unknown): Promise<ActionResult<PageSummaryDto>> {
+  const result = await parseBuilderInput(newPageSchema, input).asyncAndThen((command) =>
+    builderCommands.createPage.execute(command),
   );
 
   if (result.isOk()) {

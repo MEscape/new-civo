@@ -59,11 +59,7 @@ describe('error constructors', () => {
 
   it('infrastructureError preserves cause without exposing it in message', () => {
     const cause = new Error('connection refused');
-    const error = infrastructureError(
-      'db.unreachable',
-      'Service unavailable',
-      cause
-    );
+    const error = infrastructureError('db.unreachable', 'Service unavailable', cause);
     expect(error.kind).toBe('infrastructure');
     expect(error.message).toBe('Service unavailable');
     expect(error.cause).toBe(cause);
@@ -76,11 +72,7 @@ describe('error constructors', () => {
 
   it('unexpectedError preserves cause without exposing it in message', () => {
     const cause = new Error('boom');
-    const error = unexpectedError(
-      'internal.error',
-      'Something went wrong',
-      cause
-    );
+    const error = unexpectedError('internal.error', 'Something went wrong', cause);
     expect(error.kind).toBe('unexpected');
     expect(error.message).toBe('Something went wrong');
     expect(error.cause).toBe(cause);

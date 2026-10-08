@@ -1,8 +1,5 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { ContentLink } from '@components/ui/content-link';
 import { ArrowRight } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
@@ -30,13 +27,13 @@ export async function QuickLinks({ props }: QuickLinksComponentProps) {
         <ul className="divide-y divide-border">
           {props.links.map((link, index) => (
             <li key={`${String(index)}-${link.href}`}>
-              <a
+              <ContentLink
                 href={link.href}
-                className="flex items-center justify-between py-3 text-sm font-medium text-copy hover:text-primary"
+                className="flex items-center justify-between py-3 text-sm font-medium text-copy hover:text-primary-copy"
               >
                 {link.label}
                 <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
-              </a>
+              </ContentLink>
             </li>
           ))}
         </ul>

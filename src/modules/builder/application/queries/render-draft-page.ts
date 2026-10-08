@@ -23,20 +23,14 @@ export type RenderDraftPageError = LoadPageSummaryError;
 export class RenderDraftPage<TOutput> {
   constructor(private readonly deps: RenderDraftPageDependencies<TOutput>) {}
 
-  execute(
-    input: RenderDraftPageInput
-  ): AppResultAsync<TOutput, RenderDraftPageError> {
-    return loadAuthorizedPageSummary(
-      this.deps,
-      input.pageId,
-      'page.update'
-    ).andThen(({ page }) =>
+  execute(input: RenderDraftPageInput): AppResultAsync<TOutput, RenderDraftPageError> {
+    return loadAuthorizedPageSummary(this.deps, input.pageId, 'page.update').andThen(({ page }) =>
       parsePageConfig(input.config).map((config) =>
         this.deps.renderer.render({
           websiteId: page.websiteId,
           children: config.children,
-        })
-      )
+        }),
+      ),
     );
   }
 }

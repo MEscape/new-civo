@@ -1,12 +1,9 @@
-import { useTranslations } from 'next-intl';
-
 import { Redo2, Undo2 } from '@components/ui/icons';
 
+import { useTranslations } from '@i18n/client';
+
 import { editRedone, editUndone } from '../../state/builder-actions';
-import {
-  useBuilderDispatch,
-  useBuilderSelector,
-} from '../../state/builder-hooks';
+import { useBuilderDispatch, useBuilderSelector } from '../../state/builder-hooks';
 import { selectCanRedo, selectCanUndo } from '../../state/builder-selectors';
 
 import { ToolbarIconButton } from './toolbar-icon-button';

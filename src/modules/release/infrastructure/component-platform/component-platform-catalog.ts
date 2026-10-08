@@ -10,13 +10,13 @@ import type { ComponentCatalog } from '../../domain/ports/component-catalog.port
 
 /** The platform's `getComponentReleaseInfo`, as `composition.ts` hands it in. */
 export type GetComponentReleaseInfoFn = (
-  type: string
+  type: string,
 ) => AppResult<ComponentReleaseInfo, NotFoundAppError>;
 
 /** The platform's `getComponentDefaultProps`, as `composition.ts` hands it in. */
 export type GetComponentDefaultPropsFn = (
   type: string,
-  version: number
+  version: number,
 ) => AppResult<Readonly<Record<string, unknown>> | null, NotFoundAppError>;
 
 /**
@@ -33,7 +33,7 @@ export type GetComponentDefaultPropsFn = (
 export class ComponentPlatformCatalog implements ComponentCatalog {
   constructor(
     private readonly getReleaseInfo: GetComponentReleaseInfoFn,
-    private readonly getDefaultProps: GetComponentDefaultPropsFn
+    private readonly getDefaultProps: GetComponentDefaultPropsFn,
   ) {}
 
   resolve(type: string): ResolvedComponent | null {
@@ -48,7 +48,7 @@ export class ComponentPlatformCatalog implements ComponentCatalog {
         })),
       }),
       // The only failure is "not registered", which this port reports as null.
-      () => null
+      () => null,
     );
   }
 
@@ -56,7 +56,7 @@ export class ComponentPlatformCatalog implements ComponentCatalog {
     return this.getDefaultProps(type, version).match(
       // Defaults that are not plain JSON cannot be a merge BASE.
       (props) => (isJsonRecord(props) ? props : null),
-      () => null
+      () => null,
     );
   }
 }

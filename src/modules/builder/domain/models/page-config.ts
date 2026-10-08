@@ -1,8 +1,4 @@
-import type {
-  FieldErrorBag,
-  UnexpectedAppError,
-  ValidationAppError,
-} from '@lib/errors';
+import type { FieldErrorBag, UnexpectedAppError, ValidationAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
 import { isPlainObject } from '@lib/utils';
@@ -37,16 +33,14 @@ export const EMPTY_PAGE_CONFIG: PageConfig = { type: 'page', children: [] };
 export function readPageConfig(
   rawChildren: unknown,
   path: string,
-  bag: FieldErrorBag
+  bag: FieldErrorBag,
 ): PageConfig | null {
   const children = parseNodeForest(rawChildren, path, bag);
   return bag.hasErrors ? null : { type: 'page', children };
 }
 
 /** The only way a config from a request enters the system. */
-export function parsePageConfig(
-  input: unknown
-): AppResult<PageConfig, ValidationAppError> {
+export function parsePageConfig(input: unknown): AppResult<PageConfig, ValidationAppError> {
   const bag = createBuilderErrorBag();
   if (!isPlainObject(input) || input['type'] !== 'page') {
     bag.add('type', CODES.configInvalid);
@@ -61,9 +55,7 @@ export function parsePageConfig(
  * a data bug rather than bad input, so it surfaces as `unexpected` with the
  * validation failure preserved as the cause.
  */
-export function restorePageConfig(
-  stored: unknown
-): AppResult<PageConfig, UnexpectedAppError> {
+export function restorePageConfig(stored: unknown): AppResult<PageConfig, UnexpectedAppError> {
   return parsePageConfig(stored).mapErr(pageConfigCorrupted);
 }
 

@@ -15,8 +15,8 @@ import type { Role } from '../models/role';
  * does not know are discarded by the adapter, never granted.
  */
 export interface MembershipRepository {
-    findRoles(
-        actorId: ActorId,
-        tenantId: TenantId
-    ): AppResultAsync<readonly Role[], InfrastructureAppError>;
+  findRoles(
+    actorId: ActorId,
+    tenantId: TenantId,
+  ): AppResultAsync<readonly Role[], InfrastructureAppError>;
 }

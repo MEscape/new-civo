@@ -1,13 +1,13 @@
-import { toDatasetDto } from "./dataset-dto";
+import { toDatasetDto } from './dataset-dto';
 
-import type { DatasetDto } from "./dataset-dto";
+import type { DatasetDto } from './dataset-dto';
 import type {
   ConnectionTestOutcome,
   ConnectionTestView,
   DataSourceKind,
   DataSourceStatus,
   DataSourceWithDatasetsView,
-} from "../../application/contracts/data-source-views";
+} from '../../application/contracts/data-source-views';
 
 /** JSON-safe shapes the UI receives: dates as ISO-8601 strings. */
 export interface DataSourceDto {
@@ -24,9 +24,7 @@ export interface DataSourceDto {
   readonly datasets: readonly DatasetDto[];
 }
 
-export function toDataSourceDto(
-  view: DataSourceWithDatasetsView,
-): DataSourceDto {
+export function toDataSourceDto(view: DataSourceWithDatasetsView): DataSourceDto {
   return {
     id: view.id,
     websiteId: view.websiteId,
@@ -47,8 +45,6 @@ export interface ConnectionTestDto {
   readonly outcome: ConnectionTestOutcome;
 }
 
-export function toConnectionTestDto(
-  view: ConnectionTestView,
-): ConnectionTestDto {
+export function toConnectionTestDto(view: ConnectionTestView): ConnectionTestDto {
   return { dataSourceId: view.dataSourceId, outcome: view.outcome };
 }

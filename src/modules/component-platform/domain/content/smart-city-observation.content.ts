@@ -25,12 +25,11 @@ export const smartCityObservationContent = defineContent({
     category: smartCityCategory(),
   },
   rule: {
-    compare: (first, second) =>
-      compareText(second.observedAt, first.observedAt),
+    compare: (first, second) => compareText(second.observedAt, first.observedAt),
     categoryOf: (observation) => observation.category,
   },
 }).withSample((now) => {
-  const point = (monthsAgo: number, value: number) => ({
+  const point = ({ monthsAgo, value }: { readonly monthsAgo: number; readonly value: number }) => ({
     id: `sample-observation-${monthsAgo}`,
     series: 'CO₂-Emissionen',
     observedAt: sampleInstant(now, {
@@ -43,11 +42,11 @@ export const smartCityObservationContent = defineContent({
   });
 
   return [
-    point(0, 4.2),
-    point(1, 4.3),
-    point(2, 4.5),
-    point(3, 4.6),
-    point(4, 4.7),
-    point(5, 4.8),
+    point({ monthsAgo: 0, value: 4.2 }),
+    point({ monthsAgo: 1, value: 4.3 }),
+    point({ monthsAgo: 2, value: 4.5 }),
+    point({ monthsAgo: 3, value: 4.6 }),
+    point({ monthsAgo: 4, value: 4.7 }),
+    point({ monthsAgo: 5, value: 4.8 }),
   ];
 });

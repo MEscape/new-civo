@@ -15,13 +15,10 @@ import { renderDraftPageSchema } from '../schemas/render-draft-page-schema';
  * website whose data components preview against is read from the STORED
  * page by the use case, never from this input.
  */
-export async function renderDraftPageAction(
-  input: unknown
-): Promise<ActionResult<ReactNode>> {
-  const result = await parseBuilderInput(
-    renderDraftPageSchema,
-    input
-  ).asyncAndThen((query) => builderQueries.renderDraftPage.execute(query));
+export async function renderDraftPageAction(input: unknown): Promise<ActionResult<ReactNode>> {
+  const result = await parseBuilderInput(renderDraftPageSchema, input).asyncAndThen((query) =>
+    builderQueries.renderDraftPage.execute(query),
+  );
 
   return toActionResult(result);
 }

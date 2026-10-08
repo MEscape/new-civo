@@ -21,6 +21,7 @@ export const PROP_CONTROLS = [
   'columns',
   'switch',
   'dataset',
+  'items',
 ] as const;
 export type PropControl = (typeof PROP_CONTROLS)[number];
 
@@ -33,6 +34,13 @@ export const GRID_COLUMN_COUNTS = [1, 2, 3, 4] as const;
 export type GridColumnCount = (typeof GRID_COLUMN_COUNTS)[number];
 
 const NO_ITEMS = 0;
+
+/** One field of an `items` entry, as the properties panel edits it. */
+export interface PropItemField {
+  readonly key: string;
+  /** Edited in a multi-line field (an answer, a tab body) rather than a single line. */
+  readonly multiline: boolean;
+}
 
 export interface PropBounds {
   readonly min: number;
@@ -54,6 +62,10 @@ export interface PropField<T> {
   readonly hasPlaceholder: boolean;
   /** Whether a municipality admin may edit it. */
   readonly municipal: boolean;
+  /** The fields of one entry of an `items` list, in display order; empty for every other control. */
+  readonly itemFields: readonly PropItemField[];
+  /** The kind a `dataset` prop accepts when it differs from the component's own data binding. */
+  readonly datasetKind: ContentKind | null;
   readonly schema: FieldSchema<T>;
   /** Applies when the stored value is missing or invalid: the single place a default is written. */
   readonly fallback: T;
@@ -72,7 +84,7 @@ interface PropFieldInit<T> {
   readonly options?: ReadonlyArray<string | number>;
   readonly bounds?: PropBounds;
   readonly hasPlaceholder?: boolean;
-  readonly itemKeys?: readonly string[];
+  readonly itemFields?: readonly PropItemField[];
   readonly datasetKind?: ContentKind | undefined;
 }
 
@@ -84,7 +96,7 @@ function propField<T>(init: PropFieldInit<T>): PropField<T> {
     bounds: init.bounds ?? null,
     hasPlaceholder: init.hasPlaceholder ?? false,
     municipal: init.meta?.municipal ?? false,
-    itemKeys: init.itemKeys ?? [],
+    itemFields: init.itemFields ?? [],
     datasetKind: init.datasetKind ?? null,
     schema: init.schema,
     fallback: init.fallback,
@@ -96,7 +108,7 @@ export const prop = {
   /** Trimmed free text; absent or blank means "use the translated default". */
   text(
     max: number,
-    meta?: PropMeta & { readonly placeholder?: boolean }
+    meta?: PropMeta & { readonly placeholder?: boolean },
   ): PropField<string | undefined> {
     return propField({
       control: 'text',
@@ -110,7 +122,7 @@ export const prop = {
   /** Like `text`, edited in a multi-line field. */
   longText(
     max: number,
-    meta?: PropMeta & { readonly placeholder?: boolean }
+    meta?: PropMeta & { readonly placeholder?: boolean },
   ): PropField<string | undefined> {
     return propField({
       control: 'textarea',
@@ -131,7 +143,7 @@ export const prop = {
     options: PropMeta & {
       readonly allowRelative: boolean;
       readonly placeholder?: boolean;
-    }
+    },
   ): PropField<string | undefined> {
     return propField({
       control: 'text',
@@ -142,10 +154,7 @@ export const prop = {
     });
   },
 
-  number(
-    bounds: PropBounds & { readonly initial: number },
-    meta?: PropMeta
-  ): PropField<number> {
+  number(bounds: PropBounds & { readonly initial: number }, meta?: PropMeta): PropField<number> {
     return propField({
       control: 'number',
       schema: numberField({ min: bounds.min, max: bounds.max, integer: true }),
@@ -155,11 +164,7 @@ export const prop = {
     });
   },
 
-  select<const V extends string>(
-    options: readonly V[],
-    initial: V,
-    meta?: PropMeta
-  ): PropField<V> {
+  select<const V extends string>(options: readonly V[], initial: V, meta?: PropMeta): PropField<V> {
     return propField({
       control: 'select',
       schema: oneOf(options),
@@ -169,10 +174,7 @@ export const prop = {
     });
   },
 
-  columns(
-    initial: GridColumnCount,
-    meta?: PropMeta
-  ): PropField<GridColumnCount> {
+  columns(initial: GridColumnCount, meta?: PropMeta): PropField<GridColumnCount> {
     return propField({
       control: 'columns',
       schema: oneOf(GRID_COLUMN_COUNTS),
@@ -198,15 +200,19 @@ export const prop = {
   items<S extends Shape>(
     shape: S,
     max: number,
-    meta?: PropMeta
+    meta?: PropMeta & { readonly multiline?: ReadonlyArray<keyof S & string> },
   ): PropField<ReadonlyArray<Infer<S>>> {
+    const multiline: readonly string[] = meta?.multiline ?? [];
     return propField({
       control: 'items',
       schema: list(object(shape), max),
       fallback: [],
       meta,
       bounds: { min: NO_ITEMS, max },
-      itemKeys: Object.keys(shape),
+      itemFields: Object.keys(shape).map((key) => ({
+        key,
+        multiline: multiline.includes(key),
+      })),
     });
   },
 

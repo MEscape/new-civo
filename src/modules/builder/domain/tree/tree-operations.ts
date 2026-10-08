@@ -2,14 +2,15 @@ import type { NotFoundAppError, ValidationAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
 import {
-    countNodes,
-    findPathInForest,
-    flattenForest,
-    insertItem, isDefined,
-    locateInForest,
-    removeFromForest,
-    unique,
-    updateForest,
+  countNodes,
+  findPathInForest,
+  flattenForest,
+  insertItem,
+  isDefined,
+  locateInForest,
+  removeFromForest,
+  unique,
+  updateForest,
 } from '@lib/utils';
 import type { JsonValue, TreeShape } from '@lib/utils';
 
@@ -25,11 +26,7 @@ import { isWithinDepthLimit, isWithinNodeLimit } from '../models/page-node';
 import type { ComponentCatalog, NestingPolicy } from '../models/component-catalog';
 import type { NodeBlueprint } from '../models/component-descriptor';
 import type { PageNodeId } from '../models/ids';
-import type {
-  PageNode,
-  PageNodeProps,
-  PageNodePropsPatch,
-} from '../models/page-node';
+import type { PageNode, PageNodeProps, PageNodePropsPatch } from '../models/page-node';
 
 /*
  * Pure page-tree operations. Deterministic, never mutating, independent of
@@ -80,16 +77,11 @@ const PAGE_TREE: TreeShape<PageNode> = {
   withChildren: (node, children) => ({ ...node, children }),
 };
 
-export function locateNode(
-  nodes: readonly PageNode[],
-  nodeId: PageNodeId
-): NodeLocation | null {
-  const found = locateInForest(
-    nodes,
-    PAGE_TREE.getChildren,
-    (node) => node.id === nodeId
-  );
-  if (found === undefined) {return null;}
+export function locateNode(nodes: readonly PageNode[], nodeId: PageNodeId): NodeLocation | null {
+  const found = locateInForest(nodes, PAGE_TREE.getChildren, (node) => node.id === nodeId);
+  if (found === undefined) {
+    return null;
+  }
   return {
     node: found.node,
     siblings: found.siblings,
@@ -98,51 +90,38 @@ export function locateNode(
   };
 }
 
-export function findNode(
-  nodes: readonly PageNode[],
-  nodeId: PageNodeId
-): PageNode | null {
+export function findNode(nodes: readonly PageNode[], nodeId: PageNodeId): PageNode | null {
   return locateNode(nodes, nodeId)?.node ?? null;
 }
 
 /** The siblings array under `parentId`, or `null` when that parent does not exist. */
 export function childrenOf(
   nodes: readonly PageNode[],
-  parentId: PageNodeId | null
+  parentId: PageNodeId | null,
 ): readonly PageNode[] | null {
-  if (parentId === null) {return nodes;}
+  if (parentId === null) {
+    return nodes;
+  }
   return findNode(nodes, parentId)?.children ?? null;
 }
 
 /** Root-to-parent chain of a node, excluding the node itself. */
-export function getAncestors(
-  nodes: readonly PageNode[],
-  nodeId: PageNodeId
-): readonly PageNode[] {
-  const path = findPathInForest(
-    nodes,
-    PAGE_TREE.getChildren,
-    (node) => node.id === nodeId
-  );
+export function getAncestors(nodes: readonly PageNode[], nodeId: PageNodeId): readonly PageNode[] {
+  const path = findPathInForest(nodes, PAGE_TREE.getChildren, (node) => node.id === nodeId);
   return path?.slice(0, -1) ?? [];
 }
 
 /** Depth-first, parents before children: the render order. */
 export function flattenNodes(nodes: readonly PageNode[]): FlatNode[] {
-  return flattenForest(nodes, PAGE_TREE.getChildren).map(
-    ({ node, parent, depth }) => ({
-      node,
-      parentId: parent?.id ?? null,
-      depth,
-    })
-  );
+  return flattenForest(nodes, PAGE_TREE.getChildren).map(({ node, parent, depth }) => ({
+    node,
+    parentId: parent?.id ?? null,
+    depth,
+  }));
 }
 
 export function countPageNodes(nodes: readonly PageNode[]): number {
-  return nodes.reduce(
-    (total, root) => total + countNodes(root, PAGE_TREE.getChildren),
-    0
-  );
+  return nodes.reduce((total, root) => total + countNodes(root, PAGE_TREE.getChildren), 0);
 }
 
 /** Distinct component types used anywhere in the forest, in first-seen render order. */
@@ -151,26 +130,20 @@ export function collectNodeTypes(nodes: readonly PageNode[]): readonly string[] 
 }
 
 /** True when `candidateId` is anywhere below `ancestor` (excluding `ancestor` itself). */
-export function isInSubtree(
-  ancestor: PageNode,
-  candidateId: PageNodeId
-): boolean {
+export function isInSubtree(ancestor: PageNode, candidateId: PageNodeId): boolean {
   return ancestor.children.some(
-    (child) => child.id === candidateId || isInSubtree(child, candidateId)
+    (child) => child.id === candidateId || isInSubtree(child, candidateId),
   );
 }
 
 function updateNodes(
   nodes: readonly PageNode[],
-  transform: (node: PageNode) => PageNode
+  transform: (node: PageNode) => PageNode,
 ): readonly PageNode[] {
   return updateForest(nodes, PAGE_TREE, transform);
 }
 
-function removeSubtree(
-  nodes: readonly PageNode[],
-  nodeId: PageNodeId
-): readonly PageNode[] {
+function removeSubtree(nodes: readonly PageNode[], nodeId: PageNodeId): readonly PageNode[] {
   return removeFromForest(nodes, PAGE_TREE, (node) => node.id === nodeId);
 }
 
@@ -178,7 +151,7 @@ function removeSubtree(
 function insertAt(
   nodes: readonly PageNode[],
   node: PageNode,
-  placement: Placement
+  placement: Placement,
 ): readonly PageNode[] {
   if (placement.parentId === null) {
     return insertItem(nodes, placement.index, node);
@@ -189,13 +162,13 @@ function insertAt(
           ...current,
           children: insertItem(current.children, placement.index, node),
         }
-      : current
+      : current,
   );
 }
 
 function requireLocation(
   nodes: readonly PageNode[],
-  nodeId: PageNodeId
+  nodeId: PageNodeId,
 ): AppResult<NodeLocation, NotFoundAppError> {
   const location = locateNode(nodes, nodeId);
   return location === null ? err(pageNodeNotFound()) : ok(location);
@@ -203,25 +176,24 @@ function requireLocation(
 
 function resolveParent(
   nodes: readonly PageNode[],
-  parentId: PageNodeId | null
+  parentId: PageNodeId | null,
 ): AppResult<PageNode | null, NotFoundAppError> {
-  if (parentId === null) {return ok(null);}
+  if (parentId === null) {
+    return ok(null);
+  }
   const parent = findNode(nodes, parentId);
   return parent === null ? err(pageNodeNotFound()) : ok(parent);
 }
 
 /** True when any id in `candidate`'s subtree already exists in `nodes`. */
-function collidesWithIds(
-  nodes: readonly PageNode[],
-  candidate: PageNode
-): boolean {
+function collidesWithIds(nodes: readonly PageNode[], candidate: PageNode): boolean {
   const existing = new Set(flattenNodes(nodes).map((entry) => entry.node.id));
   return flattenNodes([candidate]).some((entry) => existing.has(entry.node.id));
 }
 
 /** The editor refuses what a save would reject, so the user finds out immediately. */
 function checkTreeLimits(
-  tree: readonly PageNode[]
+  tree: readonly PageNode[],
 ): AppResult<readonly PageNode[], ValidationAppError> {
   const flat = flattenNodes(tree);
   if (!isWithinNodeLimit(flat.length)) {
@@ -242,30 +214,22 @@ function createOrdinalCounter(): () => number {
 }
 
 /** Assigns ids in pre-order (see `deriveNodeId`), so a node's id never depends on its descendants. */
-function withDerivedIds(
-  source: NodeBlueprint,
-  seed: string,
-  nextOrdinal: () => number
-): PageNode {
+function withDerivedIds(source: NodeBlueprint, seed: string, nextOrdinal: () => number): PageNode {
   const id = deriveNodeId(source.type, seed, nextOrdinal());
   return {
     id,
     type: source.type,
     props: source.props,
-    children: source.children.map((child) =>
-      withDerivedIds(child, seed, nextOrdinal)
-    ),
+    children: source.children.map((child) => withDerivedIds(child, seed, nextOrdinal)),
   };
 }
 
 /** Instantiates a component's default blueprint with fresh, seed-derived ids. */
 export function createNodeFromBlueprint(
   blueprint: NodeBlueprint,
-  idSeed: string
+  idSeed: string,
 ): AppResult<PageNode, ValidationAppError> {
-  return parseIdSeed(idSeed).map((seed) =>
-    withDerivedIds(blueprint, seed, createOrdinalCounter())
-  );
+  return parseIdSeed(idSeed).map((seed) => withDerivedIds(blueprint, seed, createOrdinalCounter()));
 }
 
 /**
@@ -274,18 +238,18 @@ export function createNodeFromBlueprint(
  */
 export function insertNode(
   nodes: readonly PageNode[],
-  newNode: PageNode,
-  placement: Placement,
-  policy: NestingPolicy
+  { node: newNode, placement }: { readonly node: PageNode; readonly placement: Placement },
+  policy: NestingPolicy,
 ): AppResult<readonly PageNode[], NodeOperationError> {
   return resolveParent(nodes, placement.parentId).andThen(
     (parent): AppResult<readonly PageNode[], NodeOperationError> => {
       const isRejected =
-        collidesWithIds(nodes, newNode) ||
-        !policy.canNest(parent?.type ?? null, newNode.type);
-      if (isRejected) {return err(placementRejected());}
+        collidesWithIds(nodes, newNode) || !policy.canNest(parent?.type ?? null, newNode.type);
+      if (isRejected) {
+        return err(placementRejected());
+      }
       return checkTreeLimits(insertAt(nodes, newNode, placement));
-    }
+    },
   );
 }
 
@@ -314,28 +278,27 @@ export function insertNewComponent(input: {
   }
   return createNodeFromBlueprint(descriptor.blueprint, idSeed).andThen(
     (node): AppResult<InsertedComponent, NodeOperationError> =>
-      insertNode(nodes, node, placement, catalog).map((tree) => ({
+      insertNode(nodes, { node, placement }, catalog).map((tree) => ({
         tree,
         newNodeId: node.id,
-      }))
+      })),
   );
 }
 
 /** Removes a node and its subtree. */
 export function removeNode(
   nodes: readonly PageNode[],
-  nodeId: PageNodeId
+  nodeId: PageNodeId,
 ): AppResult<readonly PageNode[], NotFoundAppError> {
   return requireLocation(nodes, nodeId).map(() => removeSubtree(nodes, nodeId));
 }
 
-function mergeProps(
-  current: PageNodeProps,
-  patch: PageNodePropsPatch
-): PageNodeProps {
+function mergeProps(current: PageNodeProps, patch: PageNodePropsPatch): PageNodeProps {
   const merged: Record<string, JsonValue> = {};
   for (const [key, value] of Object.entries({ ...current, ...patch })) {
-    if (isDefined(value)) {merged[key] = value;}
+    if (isDefined(value)) {
+      merged[key] = value;
+    }
   }
   return merged;
 }
@@ -344,14 +307,12 @@ function mergeProps(
 export function updateNodeProps(
   nodes: readonly PageNode[],
   nodeId: PageNodeId,
-  patch: PageNodePropsPatch
+  patch: PageNodePropsPatch,
 ): AppResult<readonly PageNode[], NotFoundAppError> {
   return requireLocation(nodes, nodeId).map(() =>
     updateNodes(nodes, (node) =>
-      node.id === nodeId
-        ? { ...node, props: mergeProps(node.props, patch) }
-        : node
-    )
+      node.id === nodeId ? { ...node, props: mergeProps(node.props, patch) } : node,
+    ),
   );
 }
 
@@ -362,28 +323,21 @@ export function updateNodeProps(
  */
 export function moveNode(
   nodes: readonly PageNode[],
-  nodeId: PageNodeId,
-  placement: Placement,
-  policy: NestingPolicy
+  { nodeId, placement }: { readonly nodeId: PageNodeId; readonly placement: Placement },
+  policy: NestingPolicy,
 ): AppResult<readonly PageNode[], NodeOperationError> {
   return requireLocation(nodes, nodeId).andThen(
     (location): AppResult<readonly PageNode[], NodeOperationError> =>
       resolveParent(nodes, placement.parentId).andThen(
         (parent): AppResult<readonly PageNode[], NodeOperationError> => {
           const isCycle =
-            parent !== null &&
-            (parent.id === nodeId || isInSubtree(location.node, parent.id));
-          if (
-            isCycle ||
-            !policy.canNest(parent?.type ?? null, location.node.type)
-          ) {
+            parent !== null && (parent.id === nodeId || isInSubtree(location.node, parent.id));
+          if (isCycle || !policy.canNest(parent?.type ?? null, location.node.type)) {
             return err(placementRejected());
           }
-          return checkTreeLimits(
-            insertAt(removeSubtree(nodes, nodeId), location.node, placement)
-          );
-        }
-      )
+          return checkTreeLimits(insertAt(removeSubtree(nodes, nodeId), location.node, placement));
+        },
+      ),
   );
 }
 
@@ -395,30 +349,24 @@ export function moveNode(
 export function duplicateNode(
   nodes: readonly PageNode[],
   nodeId: PageNodeId,
-  idSeed: string
+  idSeed: string,
 ): AppResult<DuplicatedNode, NodeOperationError> {
   return requireLocation(nodes, nodeId).andThen(
     (location): AppResult<DuplicatedNode, NodeOperationError> =>
-      parseIdSeed(idSeed).andThen(
-        (seed): AppResult<DuplicatedNode, NodeOperationError> => {
-          const clone = withDerivedIds(
-            location.node,
-            seed,
-            createOrdinalCounter()
-          );
-          if (collidesWithIds(nodes, clone)) {
-            return err(fieldValidationFailed('idSeed', CODES.idSeedReused));
-          }
-          const tree = insertAt(nodes, clone, {
-            parentId: location.parentId,
-            index: location.index + 1,
-          });
-          return checkTreeLimits(tree).map((checked) => ({
-            tree: checked,
-            newNodeId: clone.id,
-          }));
+      parseIdSeed(idSeed).andThen((seed): AppResult<DuplicatedNode, NodeOperationError> => {
+        const clone = withDerivedIds(location.node, seed, createOrdinalCounter());
+        if (collidesWithIds(nodes, clone)) {
+          return err(fieldValidationFailed('idSeed', CODES.idSeedReused));
         }
-      )
+        const tree = insertAt(nodes, clone, {
+          parentId: location.parentId,
+          index: location.index + 1,
+        });
+        return checkTreeLimits(tree).map((checked) => ({
+          tree: checked,
+          newNodeId: clone.id,
+        }));
+      }),
   );
 }
 
@@ -430,11 +378,15 @@ export function duplicateNode(
 export function nextSelectionAfterRemoval(
   nodes: readonly PageNode[],
   removedId: PageNodeId,
-  selectedId: PageNodeId | null
+  selectedId: PageNodeId | null,
 ): PageNodeId | null {
-  if (selectedId !== removedId) {return selectedId;}
+  if (selectedId !== removedId) {
+    return selectedId;
+  }
   const location = locateNode(nodes, removedId);
-  if (location === null) {return null;}
+  if (location === null) {
+    return null;
+  }
   return (
     location.siblings[location.index + 1]?.id ??
     location.siblings[location.index - 1]?.id ??

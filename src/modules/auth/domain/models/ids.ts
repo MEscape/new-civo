@@ -9,7 +9,7 @@ export type TenantId = Brand<string, 'TenantId'>;
  * infrastructure adapters call this.
  */
 export function toActorId(raw: string): ActorId {
-    return raw as ActorId; // Brand constructor: the cast is only permitted here.
+  return raw as ActorId; // Brand constructor: the cast is only permitted here.
 }
 
 /**
@@ -19,5 +19,5 @@ export function toActorId(raw: string): ActorId {
  * configuration, so no default lives in the domain.
  */
 export function toTenantId(raw: string): TenantId {
-    return raw as TenantId; // Brand constructor: the cast is only permitted here.
+  return raw as TenantId; // Brand constructor: the cast is only permitted here.
 }

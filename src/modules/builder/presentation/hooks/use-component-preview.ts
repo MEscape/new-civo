@@ -11,9 +11,7 @@ const HOVER_INTENT_MS = 300;
 /** Fixed, valid seed: a preview node's id never reaches the document. */
 const PREVIEW_ID_SEED = 'preview';
 
-type PreviewEntry =
-  | { readonly node: ReactNode }
-  | { readonly errorCode: string };
+type PreviewEntry = { readonly node: ReactNode } | { readonly errorCode: string };
 
 export interface PreviewState {
   readonly node: ReactNode;
@@ -33,21 +31,17 @@ const LOADING: PreviewState = { node: null, isLoading: true, errorCode: null };
  * short hover-intent delay stops a sweep across the list from costing
  * a request per row.
  */
-export function useComponentPreview(
-  componentType: string | null
-): PreviewState {
+export function useComponentPreview(componentType: string | null): PreviewState {
   const pageId = useBuilderSelector(selectPageId);
   const { catalog } = useBuilderSession();
-  const [entries, setEntries] = useState<ReadonlyMap<string, PreviewEntry>>(
-    new Map()
-  );
-  const cached =
-    componentType === null ? undefined : entries.get(componentType);
-  const needsFetch =
-    componentType !== null && (cached === undefined || 'errorCode' in cached);
+  const [entries, setEntries] = useState<ReadonlyMap<string, PreviewEntry>>(new Map());
+  const cached = componentType === null ? undefined : entries.get(componentType);
+  const needsFetch = componentType !== null && (cached === undefined || 'errorCode' in cached);
 
   useEffect(() => {
-    if (componentType === null || !needsFetch) {return undefined;}
+    if (componentType === null || !needsFetch) {
+      return undefined;
+    }
     let isCurrent = true;
 
     function remember(entry: PreviewEntry): void {
@@ -58,21 +52,19 @@ export function useComponentPreview(
 
     const timeout = setTimeout(() => {
       const descriptor = catalog.describe(componentType);
-      if (descriptor === null) {return;}
+      if (descriptor === null) {
+        return;
+      }
 
       createNodeFromBlueprint(descriptor.blueprint, PREVIEW_ID_SEED).match(
         (node) => {
           void requestDraftRender(pageId, [node]).then((outcome) => {
-            remember(
-              outcome.ok
-                ? { node: outcome.node }
-                : { errorCode: outcome.errorCode }
-            );
+            remember(outcome.ok ? { node: outcome.node } : { errorCode: outcome.errorCode });
           });
         },
         (error) => {
           remember({ errorCode: error.code });
-        }
+        },
       );
     }, HOVER_INTENT_MS);
 
@@ -82,8 +74,12 @@ export function useComponentPreview(
     };
   }, [componentType, needsFetch, pageId, catalog]);
 
-  if (componentType === null) {return IDLE;}
-  if (cached === undefined) {return LOADING;}
+  if (componentType === null) {
+    return IDLE;
+  }
+  if (cached === undefined) {
+    return LOADING;
+  }
   return 'errorCode' in cached
     ? { node: null, isLoading: false, errorCode: cached.errorCode }
     : { node: cached.node, isLoading: false, errorCode: null };

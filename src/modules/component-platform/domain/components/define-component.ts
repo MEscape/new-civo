@@ -43,18 +43,11 @@ export interface ComponentSpec<TType extends string, P extends PropSet> {
  * optional prop that starts unset is simply absent from the defaults.
  * (`parseProps` keeps it, so a render function still sees `undefined`.)
  */
-function withoutUndefined(
-  props: Record<string, unknown>
-): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(props).filter(([, value]) => value !== undefined)
-  );
+function withoutUndefined(props: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(props).filter(([, value]) => value !== undefined));
 }
 
-function toFieldDefinition(
-  key: string,
-  field: PropField<unknown>
-): PropFieldDefinition {
+function toFieldDefinition(key: string, field: PropField<unknown>): PropFieldDefinition {
   return {
     key,
     control: field.control,
@@ -62,6 +55,8 @@ function toFieldDefinition(
     options: field.options,
     bounds: field.bounds,
     hasPlaceholder: field.hasPlaceholder,
+    itemFields: field.itemFields,
+    datasetKind: field.datasetKind,
   };
 }
 
@@ -86,7 +81,7 @@ function restoreProps(props: PropSet, raw: unknown): Record<string, unknown> {
  * come from the same declaration.
  */
 export function defineComponent<const TType extends string, P extends PropSet>(
-  spec: ComponentSpec<TType, P>
+  spec: ComponentSpec<TType, P>,
 ): ComponentDefinition<PropsOf<P>> & { readonly type: TType } {
   const entries = Object.entries(spec.props);
   const canHaveChildren = spec.canHaveChildren ?? false;
@@ -106,11 +101,9 @@ export function defineComponent<const TType extends string, P extends PropSet>(
     version: spec.version ?? INITIAL_VERSION,
     category: spec.category,
     canHaveChildren,
-    acceptsChildTypes: canHaveChildren ? spec.acceptsChildTypes ?? null : [],
+    acceptsChildTypes: canHaveChildren ? (spec.acceptsChildTypes ?? null) : [],
     fields: entries.map(([key, field]) => toFieldDefinition(key, field)),
-    municipalFields: entries
-      .filter(([, field]) => field.municipal)
-      .map(([key]) => key),
+    municipalFields: entries.filter(([, field]) => field.municipal).map(([key]) => key),
     municipallyEditable: spec.municipallyEditable ?? false,
     dataBinding: binding === undefined ? null : { canonicalKind: binding.kind },
     dependsOnContracts,

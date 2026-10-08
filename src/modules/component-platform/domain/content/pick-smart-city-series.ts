@@ -31,12 +31,10 @@ export interface PickedDistribution {
  */
 export function pickSeries(
   observations: ReadonlyArray<ContentOf<'SmartCityObservation'>>,
-  name: string | null
+  name: string | null,
 ): PickedSeries | null {
   const wanted = name ?? observations[0]?.series;
-  const rows = observations.filter(
-    (observation) => observation.series === wanted
-  );
+  const rows = observations.filter((observation) => observation.series === wanted);
   const [first] = rows;
   if (wanted === undefined || first === undefined) {
     return null;
@@ -56,7 +54,7 @@ export function pickSeries(
  */
 export function pickDistribution(
   entries: ReadonlyArray<ContentOf<'SmartCityBreakdownEntry'>>,
-  group: string | null
+  group: string | null,
 ): PickedDistribution | null {
   const [first] = entries;
   if (first === undefined) {

@@ -1,30 +1,30 @@
-import "server-only";
-import { getAccessControl } from "@modules/auth";
+import 'server-only';
+import { getAccessControl } from '@modules/auth';
 
-import { systemClock } from "@lib/clock";
+import { systemClock } from '@lib/clock';
 
-import { CreateDataSource } from "./application/commands/create-data-source";
-import { CreateDataset } from "./application/commands/create-dataset";
-import { DeleteDataSource } from "./application/commands/delete-data-source";
-import { DeleteDataset } from "./application/commands/delete-dataset";
-import { SaveDatasetMapping } from "./application/commands/save-dataset-mapping";
-import { TestDataSourceConnection } from "./application/commands/test-data-source-connection";
-import { UpdateDataset } from "./application/commands/update-dataset";
-import { DiscoverDataset } from "./application/queries/discover-dataset";
-import { GetMappedDatasetRecords } from "./application/queries/get-mapped-dataset-records";
-import { ListCompatibleDatasets } from "./application/queries/list-compatible-datasets";
-import { ListDataSources } from "./application/queries/list-data-sources";
-import { ListDataSourcesWithDatasets } from "./application/queries/list-data-sources-with-datasets";
-import { PreviewDatasetMapping } from "./application/queries/preview-dataset-mapping";
-import { CachedDataSourceConnector } from "./infrastructure/cache/cached-data-source-reader";
-import { KindRoutingConnector } from "./infrastructure/connector/kind-routing-connector";
-import { restJsonConnector } from "./infrastructure/connector/rest-json-connector";
-import { Sha256ContentHasher } from "./infrastructure/hashing/sha256-content-hasher";
-import { LoggerDataSourceAuditLog } from "./infrastructure/logging/logger-data-source-audit-log";
-import { PrismaDataSourceRepository } from "./infrastructure/prisma/prisma-data-source.repository";
-import { PrismaDatasetRepository } from "./infrastructure/prisma/prisma-dataset.repository";
+import { CreateDataSource } from './application/commands/create-data-source';
+import { CreateDataset } from './application/commands/create-dataset';
+import { DeleteDataSource } from './application/commands/delete-data-source';
+import { DeleteDataset } from './application/commands/delete-dataset';
+import { SaveDatasetMapping } from './application/commands/save-dataset-mapping';
+import { TestDataSourceConnection } from './application/commands/test-data-source-connection';
+import { UpdateDataset } from './application/commands/update-dataset';
+import { DiscoverDataset } from './application/queries/discover-dataset';
+import { GetMappedDatasetRecords } from './application/queries/get-mapped-dataset-records';
+import { ListCompatibleDatasets } from './application/queries/list-compatible-datasets';
+import { ListDataSources } from './application/queries/list-data-sources';
+import { ListDataSourcesWithDatasets } from './application/queries/list-data-sources-with-datasets';
+import { PreviewDatasetMapping } from './application/queries/preview-dataset-mapping';
+import { CachedDataSourceConnector } from './infrastructure/cache/cached-data-source-reader';
+import { KindRoutingConnector } from './infrastructure/connector/kind-routing-connector';
+import { restJsonConnector } from './infrastructure/connector/rest-json-connector';
+import { Sha256ContentHasher } from './infrastructure/hashing/sha256-content-hasher';
+import { loggerDataSourceAuditLog } from './infrastructure/logging/logger-data-source-audit-log';
+import { PrismaDataSourceRepository } from './infrastructure/prisma/prisma-data-source.repository';
+import { PrismaDatasetRepository } from './infrastructure/prisma/prisma-dataset.repository';
 
-import type { DataSourceDependencies } from "./application/data-source-dependencies";
+import type { DataSourceDependencies } from './application/data-source-dependencies';
 
 /**
  * The module's composition root: the one file that knows both the use cases
@@ -44,7 +44,7 @@ const authorizationService = getAccessControl();
 
 const dependencies: DataSourceDependencies = {
   authorization: authorizationService,
-  audit: new LoggerDataSourceAuditLog(),
+  audit: loggerDataSourceAuditLog,
   clock: systemClock,
   dataSources,
   datasets,

@@ -13,5 +13,5 @@ import type { ComponentDescriptor } from '../models/component-descriptor';
  * Synchronous on purpose: the registry is in memory.
  */
 export interface ComponentDescriptorProvider {
-    listDescriptors(): readonly ComponentDescriptor[];
+  listDescriptors(): readonly ComponentDescriptor[];
 }

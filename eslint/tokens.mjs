@@ -9,12 +9,7 @@ import { TEST_FILES } from './shared.mjs';
 export const tokens = [
   {
     files: ['src/**/*.{ts,tsx}'],
-    ignores: [
-      'src/app/globals.css',
-      'src/modules/website/domain/**',
-      'src/data/**',
-      ...TEST_FILES,
-    ],
+    ignores: ['src/app/globals.css', 'src/modules/website/domain/**', 'src/data/**', ...TEST_FILES],
     plugins: { 'civo-tokens': civoTokens },
     rules: {
       'civo-tokens/no-raw-palette-color': 'error',

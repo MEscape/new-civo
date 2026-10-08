@@ -9,8 +9,16 @@ import localFont from 'next/font/local';
 
 export const fontSerif = localFont({
   src: [
-    { path: '../../../public/fonts/source-serif/SourceSerif4-Regular.woff2', weight: '400', style: 'normal' },
-    { path: '../../../public/fonts/source-serif/SourceSerif4-Bold.woff2', weight: '700', style: 'normal' },
+    {
+      path: '../../../public/fonts/source-serif/SourceSerif4-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/source-serif/SourceSerif4-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
   ],
   variable: '--font-serif',
   display: 'swap',

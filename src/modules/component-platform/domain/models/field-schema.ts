@@ -1,12 +1,7 @@
 import type { ValidationAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
-import {
-  isPlainObject,
-  isRelativePath,
-  isUnsafePathSegment,
-  isValidUrl,
-} from '@lib/utils';
+import { isPlainObject, isRelativePath, isUnsafePathSegment, isValidUrl } from '@lib/utils';
 
 import {
   COMPONENT_PLATFORM_VALIDATION_CODES as CODES,
@@ -64,17 +59,11 @@ function pass<T>(value: T): FieldOutcome<T> {
   return { ok: true, value };
 }
 
-function fail(
-  code: ComponentPlatformValidationCode,
-  path = ''
-): FieldOutcome<never> {
+function fail(code: ComponentPlatformValidationCode, path = ''): FieldOutcome<never> {
   return { ok: false, failures: [{ code, path }] };
 }
 
-function schema<T>(
-  parse: (raw: unknown) => FieldOutcome<T>,
-  isInstant = false
-): FieldSchema<T> {
+function schema<T>(parse: (raw: unknown) => FieldOutcome<T>, isInstant = false): FieldSchema<T> {
   return { isInstant, parse };
 }
 
@@ -144,10 +133,8 @@ export function url(options: UrlOptions): FieldSchema<string> {
 export function instant(): FieldSchema<string> {
   return schema(
     (raw) =>
-      typeof raw === 'string' && INSTANT_PATTERN.test(raw)
-        ? pass(raw)
-        : fail(CODES.instantInvalid),
-    true
+      typeof raw === 'string' && INSTANT_PATTERN.test(raw) ? pass(raw) : fail(CODES.instantInvalid),
+    true,
   );
 }
 
@@ -175,34 +162,24 @@ export function number(options: NumberOptions = {}): FieldSchema<number> {
 }
 
 export function boolean(): FieldSchema<boolean> {
-  return schema((raw) =>
-    typeof raw === 'boolean' ? pass(raw) : fail(CODES.typeInvalid)
-  );
+  return schema((raw) => (typeof raw === 'boolean' ? pass(raw) : fail(CODES.typeInvalid)));
 }
 
-export function oneOf<const V extends string | number>(
-  values: readonly V[]
-): FieldSchema<V> {
+export function oneOf<const V extends string | number>(values: readonly V[]): FieldSchema<V> {
   return schema((raw) => {
     const match = values.find((value) => value === raw);
     return match === undefined ? fail(CODES.optionUnknown) : pass(match);
   });
 }
 
-function prefixed(
-  failures: readonly FieldFailure[],
-  segment: string
-): FieldFailure[] {
+function prefixed(failures: readonly FieldFailure[], segment: string): FieldFailure[] {
   return failures.map(({ code, path }) => ({
     code,
     path: path === '' ? segment : `${segment}.${path}`,
   }));
 }
 
-export function list<T>(
-  item: FieldSchema<T>,
-  max: number
-): FieldSchema<readonly T[]> {
+export function list<T>(item: FieldSchema<T>, max: number): FieldSchema<readonly T[]> {
   return schema((raw) => {
     if (!Array.isArray(raw)) {
       return fail(CODES.typeInvalid);
@@ -236,7 +213,7 @@ export interface OpaqueRecordOptions {
  * larger than `maxNodes`" is checked here.
  */
 export function opaqueRecord(
-  options: OpaqueRecordOptions
+  options: OpaqueRecordOptions,
 ): FieldSchema<Readonly<Record<string, unknown>>> {
   return schema((raw) => {
     if (!isPlainObject(raw)) {
@@ -273,7 +250,7 @@ export interface ScalarMapOptions {
  * whole record. Not an object at all is a type error.
  */
 export function scalarMap(
-  options: ScalarMapOptions
+  options: ScalarMapOptions,
 ): FieldSchema<Readonly<Record<string, string | number | boolean>>> {
   const { maxEntries, maxKeyLength, maxTextLength } = options;
   return schema((raw) => {
@@ -301,21 +278,12 @@ export function scalarMap(
 
 /** Absent (`undefined`) is acceptable; anything else must satisfy `inner`. */
 export function optional<T>(inner: FieldSchema<T>): FieldSchema<T | undefined> {
-  return schema(
-    (raw) => (raw === undefined ? pass(undefined) : inner.parse(raw)),
-    inner.isInstant
-  );
+  return schema((raw) => (raw === undefined ? pass(undefined) : inner.parse(raw)), inner.isInstant);
 }
 
 /** Absent becomes `value`; a present but invalid value still fails. */
-export function withDefault<T>(
-  inner: FieldSchema<T>,
-  value: T
-): FieldSchema<T> {
-  return schema(
-    (raw) => (raw === undefined ? pass(value) : inner.parse(raw)),
-    inner.isInstant
-  );
+export function withDefault<T>(inner: FieldSchema<T>, value: T): FieldSchema<T> {
+  return schema((raw) => (raw === undefined ? pass(value) : inner.parse(raw)), inner.isInstant);
 }
 
 /**
@@ -323,10 +291,7 @@ export function withDefault<T>(
  * that third-party APIs spell in their own vocabulary: an unknown spelling
  * must not cost the municipality the whole record.
  */
-export function withFallback<T>(
-  inner: FieldSchema<T>,
-  value: T
-): FieldSchema<T> {
+export function withFallback<T>(inner: FieldSchema<T>, value: T): FieldSchema<T> {
   return schema((raw) => {
     const outcome = inner.parse(raw);
     return outcome.ok ? outcome : pass(value);
@@ -337,10 +302,7 @@ export function withFallback<T>(
  * Validates every field of `shape` and collects all failures in one pass.
  * Unknown keys are dropped; a missing optional key stays missing.
  */
-export function parseShape<S extends Shape>(
-  shape: S,
-  raw: unknown
-): FieldOutcome<Infer<S>> {
+export function parseShape<S extends Shape>(shape: S, raw: unknown): FieldOutcome<Infer<S>> {
   if (!isPlainObject(raw)) {
     return fail(CODES.typeInvalid);
   }
@@ -380,7 +342,7 @@ export function instantKeys(shape: Shape): readonly string[] {
 /** Validates a record and reports every failing field path with its code. */
 export function parseRecord<S extends Shape>(
   shape: S,
-  raw: unknown
+  raw: unknown,
 ): AppResult<Infer<S>, ValidationAppError> {
   const outcome = parseShape(shape, raw);
   if (outcome.ok) {

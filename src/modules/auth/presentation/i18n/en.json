@@ -63,8 +63,7 @@
       "missingToken": "The reset link is missing its token. Request a new one.",
       "requestNew": "Request a new link",
       "metadata": {
-        "title": "Set a new password",
-        "description": "Choose a new password for your account."
+        "title": "Set a new password"
       }
     },
     "emailVerification": {
@@ -76,8 +75,7 @@
       "failure": "This verification link is invalid or has expired. Sign in and we will send you a new one.",
       "signIn": "Go to sign in",
       "metadata": {
-        "title": "Verify your email",
-        "description": "Verify your email address to complete registration."
+        "title": "Verify your email"
       }
     },
     "signOut": {
@@ -102,7 +100,10 @@
       "invalidToken": "This link is invalid or has expired. Request a new one.",
       "emailNotVerified": "Your email address is not verified yet. We have sent you a new link.",
       "permissionDenied": "You do not have permission to do this.",
-      "rateLimited": "Too many attempts. Please wait a while and try again."
+      "rateLimited": "Too many attempts. Please wait a while and try again.",
+      "validation": "Please check your input.",
+      "infrastructure": "A service error occurred. Please try again later.",
+      "unexpected": "An unexpected error occurred."
     },
     "validation": {
       "emailRequired": "Please enter your email address.",

@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+/* `animate-in` / `animate-out` used by Radix-based primitives (select). */
+@import 'tw-animate-css';
 
 /*
  * Civo design tokens.
@@ -9,7 +11,7 @@
  *   2. Per-website theme tokens (--civo-color-*, --civo-font-*,
  *      --civo-radius, --civo-section-spacing) — these are set inline by
  *      the theme provider from stored Theme data (see
- *      src/domain/website/theme.ts) and have defaults here so components
+ *      src/modules/website/presentation/theme/theme-css.ts) and have defaults here so components
  *      render sensibly even before a theme loads.
  *
  * No component ever writes raw hex/px values — everything routes through
@@ -112,10 +114,18 @@
 [data-civo-theme] {
   --civo-chart-1: var(--civo-color-primary-copy);
   --civo-chart-2: var(--civo-color-accent-copy);
-  --civo-chart-3: color-mix(in oklab, var(--civo-color-primary-copy) 45%, var(--civo-color-surface));
+  --civo-chart-3: color-mix(
+    in oklab,
+    var(--civo-color-primary-copy) 45%,
+    var(--civo-color-surface)
+  );
   --civo-chart-4: color-mix(in oklab, var(--civo-color-accent-copy) 45%, var(--civo-color-surface));
   --civo-chart-5: var(--civo-color-secondary-copy);
-  --civo-chart-6: color-mix(in oklab, var(--civo-color-secondary-copy) 45%, var(--civo-color-surface));
+  --civo-chart-6: color-mix(
+    in oklab,
+    var(--civo-color-secondary-copy) 45%,
+    var(--civo-color-surface)
+  );
 }
 
 /*
@@ -195,15 +205,6 @@
   height: calc(100dvh - var(--civo-app-header-height));
 }
 
-/* Overlay + side-sheet entrances. Values are not variable references, so
-   this block is a plain (non-inline) @theme. Exits are deliberately
-   instant: fewer moving parts, and reduced-motion users get the same. */
-@theme {
-  --animate-sheet-overlay: sheet-overlay-in 150ms ease-out;
-  --animate-sheet-left: sheet-in-left 200ms ease-out;
-  --animate-sheet-right: sheet-in-right 200ms ease-out;
-}
-
 /*
  * German municipal vocabulary has very long compounds ("Bürgerbeteiligungs-
  * verfahrensordnung"). Without a wrapping rule one such word in a heading
@@ -215,7 +216,6 @@
  * still override it.
  */
 @layer base {
-
   h1,
   h2,
   h3,
@@ -244,36 +244,6 @@ h4 {
   outline-offset: 2px;
 }
 
-@keyframes sheet-overlay-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes sheet-in-left {
-  from {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes sheet-in-right {
-  from {
-    transform: translateX(100%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
-}
-
 @keyframes accordion-down {
   from {
     height: 0;
@@ -295,7 +265,6 @@ h4 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {

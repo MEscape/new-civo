@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+
+import type { MapSectionProps } from '@modules/map';
 
 import { getComponentDefinition } from '../../../application/contracts/component-platform-constraints';
 
@@ -9,9 +11,15 @@ import type {
   RenderContext,
 } from '../../../application/contracts/component-platform-constraints';
 
-/** What the page renderer hands to every component besides its own props. */
+/**
+ * What the page renderer hands to every component besides its own props.
+ * Everything another module provides arrives here from `composition.ts`, so
+ * no component reaches into another module itself.
+ */
 export interface RenderServices {
   readonly loadContent: LoadContent;
+  /** The map module's server-side map section. */
+  readonly mapSection: ComponentType<MapSectionProps>;
 }
 
 export interface ComponentRenderInput<TProps> extends RenderServices {
@@ -55,8 +63,8 @@ export function implementComponent<T extends RegisteredComponentName>(
 ): ComponentImplementation {
   const definition = getComponentDefinition(type);
   return {
-    render: ({ rawProps, context, children, loadContent }) =>
-      spec.render({ props: definition.parseProps(rawProps), context, children, loadContent }),
+    render: ({ rawProps, ...rest }) =>
+      spec.render({ ...rest, props: definition.parseProps(rawProps) }),
     skeleton: spec.skeleton ?? null,
   };
 }

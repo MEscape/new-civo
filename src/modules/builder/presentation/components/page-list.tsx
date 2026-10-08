@@ -1,9 +1,9 @@
-import { useTranslations } from 'next-intl';
-
 import { EmptyState } from '@components/layout/layout-primitives';
 import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { Link } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { HOME_PAGE_PATH } from '../../application/contracts/builder-constraints';
 import { builderRoutes } from '../routes';
@@ -21,10 +21,7 @@ export function PageList({ websiteId, pages }: PageListProps) {
 
   if (pages.length === 0) {
     return (
-      <EmptyState
-        title={t('pages.list.empty')}
-        description={t('pages.list.emptyDescription')}
-      />
+      <EmptyState title={t('pages.list.empty')} description={t('pages.list.emptyDescription')} />
     );
   }
 

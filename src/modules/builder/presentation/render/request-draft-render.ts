@@ -16,7 +16,7 @@ export type DraftRenderOutcome =
  */
 export async function requestDraftRender(
   pageId: string,
-  children: PageConfigInput['children']
+  children: PageConfigInput['children'],
 ): Promise<DraftRenderOutcome> {
   try {
     const result = await renderDraftPageAction({

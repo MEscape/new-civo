@@ -1,3 +1,6 @@
+import { toMigrationPlanDto } from './migration-plan-dto';
+
+import type { MigrationPlanDto } from './migration-plan-dto';
 import type {
   MigrationDetailView,
   MigrationStatus,
@@ -30,16 +33,14 @@ export interface MigrationSummaryDto {
  * its history/list representation.
  */
 export interface MigrationDetailDto extends MigrationSummaryDto {
-  readonly plan: import('./migration-plan-dto').MigrationPlanDto;
+  readonly plan: MigrationPlanDto;
 }
 
 /**
  * Converts an application-layer migration summary view into the JSON-safe
  * DTO exposed to the UI.
  */
-export function toMigrationSummaryDto(
-  view: MigrationSummaryView
-): MigrationSummaryDto {
+export function toMigrationSummaryDto(view: MigrationSummaryView): MigrationSummaryDto {
   return {
     id: view.id,
     websiteId: view.websiteId,
@@ -54,9 +55,7 @@ export function toMigrationSummaryDto(
  * Converts an application-layer migration detail view into the JSON-safe
  * DTO exposed to the UI.
  */
-export function toMigrationDetailDto(
-  view: MigrationDetailView
-): MigrationDetailDto {
+export function toMigrationDetailDto(view: MigrationDetailView): MigrationDetailDto {
   return {
     id: view.id,
     websiteId: view.websiteId,
@@ -64,8 +63,6 @@ export function toMigrationDetailDto(
     status: view.status,
     createdAt: view.createdAt.toISOString(),
     appliedAt: view.appliedAt?.toISOString() ?? null,
-    plan: {
-      ...view.plan,
-    },
+    plan: toMigrationPlanDto(view.plan),
   };
 }

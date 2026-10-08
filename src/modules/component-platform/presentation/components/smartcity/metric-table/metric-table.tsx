@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import {
   Table,
   TableBody,
@@ -34,11 +30,7 @@ export interface MetricTableComponentProps {
 }
 
 /** Metrics as a dense table, for pages where tiles are too sparse. */
-export async function MetricTable({
-  props,
-  context,
-  loadContent,
-}: MetricTableComponentProps) {
+export async function MetricTable({ props, context, loadContent }: MetricTableComponentProps) {
   const [t, fmt, result] = await Promise.all([
     getTranslations('componentPlatform'),
     getAppFormatters(),
@@ -82,8 +74,7 @@ export async function MetricTable({
                   {metric.unit === undefined ? '' : ` ${metric.unit}`}
                 </TableCell>
                 <TableCell>
-                  {metric.trend !== undefined &&
-                  metric.changePercent !== undefined ? (
+                  {metric.trend !== undefined && metric.changePercent !== undefined ? (
                     <TrendIndicator
                       trend={metric.trend}
                       changePercent={metric.changePercent}

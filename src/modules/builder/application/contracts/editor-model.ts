@@ -19,24 +19,14 @@ export {
   undoEdit,
   updatePropsInPlace,
 } from '../../domain/history/document-history';
-export type {
-  DocumentHistory,
-  EditorSnapshot,
-} from '../../domain/history/document-history';
+export type { DocumentHistory, EditorSnapshot } from '../../domain/history/document-history';
 export { createComponentCatalog } from '../../domain/models/component-catalog';
-export type {
-  ComponentCatalog,
-  NestingPolicy,
-} from '../../domain/models/component-catalog';
+export type { ComponentCatalog, NestingPolicy } from '../../domain/models/component-catalog';
 export { hasCapability } from '../../domain/models/editor-capabilities';
 export { parsePageNodeId } from '../../domain/models/ids';
 export type { PageNodeId } from '../../domain/models/ids';
 export type { PageConfig } from '../../domain/models/page-config';
-export type {
-  PageNode,
-  PageNodeProps,
-  PageNodePropsPatch,
-} from '../../domain/models/page-node';
+export type { PageNode, PageNodeProps, PageNodePropsPatch } from '../../domain/models/page-node';
 export {
   resolveDropTargetAtCanvasEnd,
   resolveDropTargetForNode,
@@ -45,6 +35,7 @@ export {
 } from '../../domain/tree/drop-placement';
 export type {
   ActiveDrag,
+  DropContext,
   DropPosition,
   DropTarget,
   Rect,

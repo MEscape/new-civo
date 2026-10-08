@@ -2,13 +2,7 @@ import { Input } from '@components/ui/input';
 
 import type { ControlProps } from './control-props';
 
-export function NumberControl({
-  id,
-  field,
-  value,
-  onChange,
-  onCommit,
-}: ControlProps) {
+export function NumberControl({ id, field, value, onChange, onCommit }: ControlProps) {
   return (
     <Input
       id={id}

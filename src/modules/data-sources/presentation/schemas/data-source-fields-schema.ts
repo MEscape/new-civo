@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 import {
   CANONICAL_KINDS,
@@ -6,7 +6,7 @@ import {
   DATA_SOURCE_LIMITS,
   DATA_SOURCE_VALIDATION_CODES as CODES,
   DATA_SOURCE_ID_MAX_LENGTH,
-} from "../../application/contracts/data-source-constraints";
+} from '../../application/contracts/data-source-constraints';
 
 /**
  * Field schemas shared by the forms and the action envelopes. Messages are

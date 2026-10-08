@@ -32,8 +32,7 @@ export const INITIAL_PAGE_VERSION = 1;
 export const PAGE_REVISION_LIMIT = 50;
 
 /** Paths become URL segments: lowercase, digits, single hyphens, `/` between segments. */
-export const PAGE_PATH_PATTERN =
-  /^[a-z0-9]+(-[a-z0-9]+)*(\/[a-z0-9]+(-[a-z0-9]+)*)*$/;
+export const PAGE_PATH_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(\/[a-z0-9]+(-[a-z0-9]+)*)*$/;
 
 /** What a list needs; carries no config, so lists never load page JSON. */
 export interface PageSummary {
@@ -106,10 +105,7 @@ function checkPath(path: string, bag: FieldErrorBag): void {
   }
 }
 
-function checkFields(
-  input: PageDraftInput,
-  bag: FieldErrorBag
-): PageFields | null {
+function checkFields(input: PageDraftInput, bag: FieldErrorBag): PageFields | null {
   const title = input.title.trim();
   const path = input.path.trim();
   const isWebsiteIdValid = isValidEntityId(input.websiteId);
@@ -127,9 +123,7 @@ function checkFields(
 }
 
 /** A new, empty page. Reports every invalid field. */
-export function createPageDraft(
-  input: PageDraftInput
-): AppResult<PageDraft, ValidationAppError> {
+export function createPageDraft(input: PageDraftInput): AppResult<PageDraft, ValidationAppError> {
   const bag = createBuilderErrorBag();
   const fields = checkFields(input, bag);
   if (fields === null) {
@@ -140,7 +134,7 @@ export function createPageDraft(
 
 /** A page seeded with a configuration. Page fields and the tree are reported in one pass. */
 export function createSystemPageDraft(
-  input: SystemPageDraftInput
+  input: SystemPageDraftInput,
 ): AppResult<PageDraft, ValidationAppError> {
   const bag = createBuilderErrorBag();
   const fields = checkFields(input, bag);
@@ -152,9 +146,7 @@ export function createSystemPageDraft(
 }
 
 /** The revision an editor claims to have loaded; untrusted until checked. */
-export function parsePageVersion(
-  raw: number
-): AppResult<number, ValidationAppError> {
+export function parsePageVersion(raw: number): AppResult<number, ValidationAppError> {
   return Number.isSafeInteger(raw) && raw >= INITIAL_PAGE_VERSION
     ? ok(raw)
     : err(fieldValidationFailed('expectedVersion', CODES.versionInvalid));

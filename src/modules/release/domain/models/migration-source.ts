@@ -23,10 +23,7 @@ export interface MigrationSource {
  * passed in because reading them out of the opaque stored page
  * configuration is the builder's job (see `PageTreeReader`).
  */
-export function toMigrationSource(
-  release: Release,
-  pages: readonly PageTree[]
-): MigrationSource {
+export function toMigrationSource(release: Release, pages: readonly PageTree[]): MigrationSource {
   return {
     releaseId: release.id,
     pages,

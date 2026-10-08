@@ -33,7 +33,15 @@ function groupsFor(config: Partial<MapConfig>, input = parkingLayer()) {
   if (style === undefined) {
     throw new Error('expected one style');
   }
-  return { style, groups: buildLayerGroups(input.id, `src-${input.id}`, style, PALETTE) };
+  return {
+    style,
+    groups: buildLayerGroups({
+      layerId: input.id,
+      sourceId: `src-${input.id}`,
+      style,
+      palette: PALETTE,
+    }),
+  };
 }
 
 describe('the Mapbox translation uses the same encoding the legend is built from', () => {

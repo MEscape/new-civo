@@ -1,4 +1,4 @@
-import { stringifyJson } from "@lib/utils";
+import { stringifyJson } from '@lib/utils';
 
 import type {
   CanonicalKind,
@@ -9,7 +9,7 @@ import type {
   DiscoveredFieldView,
   DiscoveryView,
   MappingPreviewView,
-} from "../../application/contracts/data-source-views";
+} from '../../application/contracts/data-source-views';
 
 export interface DatasetDto {
   readonly id: string;
@@ -62,8 +62,6 @@ export interface MappingPreviewDto {
 
 const PREVIEW_INDENT = 2;
 
-export function toMappingPreviewDto(
-  view: MappingPreviewView,
-): MappingPreviewDto {
+export function toMappingPreviewDto(view: MappingPreviewView): MappingPreviewDto {
   return { json: stringifyJson(view.values, PREVIEW_INDENT) };
 }

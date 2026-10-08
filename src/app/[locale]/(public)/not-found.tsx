@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
-import { useTranslations } from 'next-intl';
-
 import { NotFoundPanel } from '@components/shared/not-found-panel';
+
+import { useTranslations } from '@i18n/client';
 
 /*
  * A 404 is never indexed. Its metadata is static on purpose: a not-found page
@@ -12,13 +12,13 @@ import { NotFoundPanel } from '@components/shared/not-found-panel';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function NotFound() {
-    const t = useTranslations('errors');
+  const t = useTranslations('app');
 
-    return (
-        <NotFoundPanel
-            title={t('page.notFoundTitle')}
-            description={t('page.notFoundDescription')}
-            returnLabel={t('page.returnHome')}
-        />
-    );
+  return (
+    <NotFoundPanel
+      title={t('notFound.title')}
+      description={t('notFound.description')}
+      returnLabel={t('notFound.returnHome')}
+    />
+  );
 }

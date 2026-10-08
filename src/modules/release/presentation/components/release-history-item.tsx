@@ -1,21 +1,16 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
-
 import { Badge } from '@components/ui/badge';
 import { Button } from '@components/ui/button';
 import { Check, Undo2, AlertTriangle } from '@components/ui/icons';
 
-import { useAppFormatters } from '@i18n';
+import { useTranslations, useAppFormatters } from '@i18n/client';
 
 import { cn } from '@lib/utils';
 
 import { ReleaseStatusBadge } from './release-status-badge';
 
 import type { ReleaseSummaryDto } from '../dto/release-dto';
-
-
 
 export interface ReleaseHistoryItemProps {
   readonly release: ReleaseSummaryDto;
@@ -28,11 +23,7 @@ export interface ReleaseHistoryItemProps {
  * One release. Whether it can be restored was decided by the server
  * (`canRollback`); this component only renders that answer.
  */
-export function ReleaseHistoryItem({
-  release,
-  isBusy,
-  onRollback,
-}: ReleaseHistoryItemProps) {
+export function ReleaseHistoryItem({ release, isBusy, onRollback }: ReleaseHistoryItemProps) {
   const t = useTranslations('release');
   const format = useAppFormatters();
   const number = release.releaseNumber;
@@ -42,9 +33,7 @@ export function ReleaseHistoryItem({
       aria-current={release.isActive ? 'true' : undefined}
       className={cn(
         'flex flex-col gap-2 rounded-token border p-4 sm:flex-row sm:items-center sm:justify-between',
-        release.isActive
-          ? 'border-accent'
-          : 'border-border bg-surface'
+        release.isActive ? 'border-accent' : 'border-border bg-surface',
       )}
     >
       <div className="flex min-w-0 flex-col gap-1">
@@ -80,7 +69,9 @@ export function ReleaseHistoryItem({
           className="shrink-0"
           disabled={isBusy}
           aria-label={t('history.rollbackLabel', { number })}
-          onClick={() => { onRollback(release.id); }}
+          onClick={() => {
+            onRollback(release.id);
+          }}
         >
           <Undo2 className="size-3.5" aria-hidden="true" />
           <span className="ml-1.5">{t('history.rollback')}</span>

@@ -1,37 +1,33 @@
-"use client";
+'use client';
 
-import { useId, useState, useTransition } from "react";
+import { useId, useState, useTransition } from 'react';
 
-import { useRouter } from "next/navigation";
+import { FieldMessage } from '@components/shared/field-message';
+import { Button } from '@components/ui/button';
 
-import { useTranslations } from "next-intl";
+import { useRouter } from '@i18n';
 
-import { FieldMessage } from "@components/shared/field-message";
-import { Button } from "@components/ui/button";
+import { useTranslations } from '@i18n/client';
 
-import type { SerializedActionError } from "@lib/result";
-import { omit } from "@lib/utils";
+import type { SerializedActionError } from '@lib/result';
+import { omit } from '@lib/utils';
 
 import {
   CANONICAL_TARGET_FIELDS,
   DATA_SOURCE_VALIDATION_CODES,
-} from "../../application/contracts/data-source-constraints";
-import { discoverDatasetAction } from "../actions/discover-dataset-action";
-import { previewDatasetMappingAction } from "../actions/preview-dataset-mapping-action";
-import { saveDatasetMappingAction } from "../actions/save-dataset-mapping-action";
-import {
-  MESSAGE_PARAMS,
-  messageKeyForCode,
-  targetFieldMessageKey,
-} from "../messages/message-keys";
+} from '../../application/contracts/data-source-constraints';
+import { discoverDatasetAction } from '../actions/discover-dataset-action';
+import { previewDatasetMappingAction } from '../actions/preview-dataset-mapping-action';
+import { saveDatasetMappingAction } from '../actions/save-dataset-mapping-action';
+import { MESSAGE_PARAMS, messageKeyForCode, targetFieldMessageKey } from '../messages/message-keys';
 
-import { DataSourceMappingTable } from "./data-source-mapping-table";
+import { DataSourceMappingTable } from './data-source-mapping-table';
 
 import type {
   CanonicalKind,
   DatasetMappingView,
   DiscoveredFieldView,
-} from "../../application/contracts/data-source-views";
+} from '../../application/contracts/data-source-views';
 
 export interface DataSourceMappingPanelProps {
   readonly datasetId: string;
@@ -45,25 +41,21 @@ export interface DataSourceMappingPanelProps {
  * flags that were mutually exclusive in practice anyway.
  */
 type PanelStatus =
-  | { readonly kind: "idle" }
-  | { readonly kind: "failed"; readonly error: SerializedActionError }
-  | { readonly kind: "previewed"; readonly json: string }
-  | { readonly kind: "saved" };
+  | { readonly kind: 'idle' }
+  | { readonly kind: 'failed'; readonly error: SerializedActionError }
+  | { readonly kind: 'previewed'; readonly json: string }
+  | { readonly kind: 'saved' };
 
 const FIELD_ROW_KEY = /^fields\.(\d+)\./;
 
 /** Used when the user asks for a preview or save with nothing assigned: the server rule, said early. */
 const NOTHING_ASSIGNED: SerializedActionError = {
   code: DATA_SOURCE_VALIDATION_CODES.mappingFieldCountInvalid,
-  message: "",
+  message: '',
 };
 
-function assignmentsFrom(
-  mapping: DatasetMappingView | null,
-): Record<string, string> {
-  return Object.fromEntries(
-    (mapping?.fields ?? []).map((f) => [f.sourcePath, f.targetPath]),
-  );
+function assignmentsFrom(mapping: DatasetMappingView | null): Record<string, string> {
+  return Object.fromEntries((mapping?.fields ?? []).map((f) => [f.sourcePath, f.targetPath]));
 }
 
 /**
@@ -80,16 +72,14 @@ export function DataSourceMappingPanel({
   canonicalKind,
   existingMapping,
 }: DataSourceMappingPanelProps) {
-  const t = useTranslations("dataSources");
+  const t = useTranslations('dataSources');
 
   const router = useRouter();
   const id = useId();
   const [isPending, startTransition] = useTransition();
   const [fields, setFields] = useState<readonly DiscoveredFieldView[] | null>(null);
-  const [assignments, setAssignments] = useState(() =>
-    assignmentsFrom(existingMapping),
-  );
-  const [status, setStatus] = useState<PanelStatus>({ kind: "idle" });
+  const [assignments, setAssignments] = useState(() => assignmentsFrom(existingMapping));
+  const [status, setStatus] = useState<PanelStatus>({ kind: 'idle' });
 
   const targets = CANONICAL_TARGET_FIELDS[canonicalKind];
 
@@ -103,7 +93,7 @@ export function DataSourceMappingPanel({
     const row = FIELD_ROW_KEY.exec(key);
     return row?.[1] === undefined
       ? targetLabel(key)
-      : t("mapping.fieldRow", { row: Number(row[1]) + 1 });
+      : t('mapping.fieldRow', { row: Number(row[1]) + 1 });
   }
 
   function targetsUsedElsewhere(sourcePath: string): Set<string> {
@@ -117,19 +107,18 @@ export function DataSourceMappingPanel({
   function buildFields() {
     return Object.entries(assignments).map(([sourcePath, targetPath]) => {
       const kept = existingMapping?.fields.find(
-        (field) =>
-          field.sourcePath === sourcePath && field.targetPath === targetPath,
+        (field) => field.sourcePath === sourcePath && field.targetPath === targetPath,
       )?.transform;
       return { sourcePath, targetPath, ...(kept ? { transform: kept } : {}) };
     });
   }
 
   function handleDiscover() {
-    setStatus({ kind: "idle" });
+    setStatus({ kind: 'idle' });
     startTransition(async () => {
       const result = await discoverDatasetAction(datasetId);
       if (!result.ok) {
-        setStatus({ kind: "failed", error: result.error });
+        setStatus({ kind: 'failed', error: result.error });
         return;
       }
       setFields(result.data.fields);
@@ -139,15 +128,15 @@ export function DataSourceMappingPanel({
   function handleAssign(sourcePath: string, targetPath: string) {
     setAssignments((previous) => {
       const rest = omit(previous, [sourcePath]);
-      return targetPath === "" ? rest : { ...rest, [sourcePath]: targetPath };
+      return targetPath === '' ? rest : { ...rest, [sourcePath]: targetPath };
     });
-    setStatus({ kind: "idle" });
+    setStatus({ kind: 'idle' });
   }
 
   function handlePreview() {
     const mappingFields = buildFields();
     if (mappingFields.length === 0) {
-      setStatus({ kind: "failed", error: NOTHING_ASSIGNED });
+      setStatus({ kind: 'failed', error: NOTHING_ASSIGNED });
       return;
     }
     startTransition(async () => {
@@ -157,8 +146,8 @@ export function DataSourceMappingPanel({
       });
       setStatus(
         result.ok
-          ? { kind: "previewed", json: result.data.json }
-          : { kind: "failed", error: result.error },
+          ? { kind: 'previewed', json: result.data.json }
+          : { kind: 'failed', error: result.error },
       );
     });
   }
@@ -166,7 +155,7 @@ export function DataSourceMappingPanel({
   function handleSave() {
     const mappingFields = buildFields();
     if (mappingFields.length === 0) {
-      setStatus({ kind: "failed", error: NOTHING_ASSIGNED });
+      setStatus({ kind: 'failed', error: NOTHING_ASSIGNED });
       return;
     }
     startTransition(async () => {
@@ -175,26 +164,21 @@ export function DataSourceMappingPanel({
         mapping: { fields: mappingFields },
       });
       if (!result.ok) {
-        setStatus({ kind: "failed", error: result.error });
+        setStatus({ kind: 'failed', error: result.error });
         return;
       }
-      setStatus({ kind: "saved" });
+      setStatus({ kind: 'saved' });
       router.refresh();
     });
   }
 
-  const failure = status.kind === "failed" ? status.error : null;
+  const failure = status.kind === 'failed' ? status.error : null;
   const failureDetails = Object.entries(failure?.fieldErrors ?? {});
 
   return (
-    <div
-      className="space-y-3 border-t border-border pt-4"
-      aria-busy={isPending}
-    >
+    <div className="space-y-3 border-t border-border pt-4" aria-busy={isPending}>
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-copy">
-          {t("mapping.title")}
-        </h4>
+        <h4 className="text-sm font-medium text-copy">{t('mapping.title')}</h4>
         <Button
           type="button"
           variant="outline"
@@ -202,7 +186,7 @@ export function DataSourceMappingPanel({
           onClick={handleDiscover}
           disabled={isPending}
         >
-          {isPending ? t("mapping.loading") : t("mapping.load")}
+          {isPending ? t('mapping.loading') : t('mapping.load')}
         </Button>
       </div>
 
@@ -217,10 +201,8 @@ export function DataSourceMappingPanel({
             <ul className="list-disc pl-5 text-xs">
               {failureDetails.map(([key, codes]) => (
                 <li key={key}>
-                  {describeKey(key)}:{" "}
-                  {t(messageKeyForCode(codes[0] ?? failure.code),
-                    MESSAGE_PARAMS,
-                  )}
+                  {describeKey(key)}:{' '}
+                  {t(messageKeyForCode(codes[0] ?? failure.code), MESSAGE_PARAMS)}
                 </li>
               ))}
             </ul>
@@ -247,32 +229,25 @@ export function DataSourceMappingPanel({
               onClick={handlePreview}
               disabled={isPending}
             >
-              {t("mapping.preview")}
+              {t('mapping.preview')}
             </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleSave}
-              disabled={isPending}
-            >
-              {isPending ? t("mapping.saving") : t("mapping.save")}
+            <Button type="button" size="sm" onClick={handleSave} disabled={isPending}>
+              {isPending ? t('mapping.saving') : t('mapping.save')}
             </Button>
           </div>
 
-          {status.kind === "saved" && (
+          {status.kind === 'saved' && (
             <p role="status" className="text-sm text-success">
-              {t("mapping.saved")}
+              {t('mapping.saved')}
             </p>
           )}
 
-          {status.kind === "previewed" && (
+          {status.kind === 'previewed' && (
             <div className="rounded-token border border-border bg-surface p-3">
               <p className="mb-1.5 text-xs font-medium text-copy-muted">
-                {t("mapping.previewTitle")}
+                {t('mapping.previewTitle')}
               </p>
-              <pre className="overflow-x-auto text-xs text-copy">
-                {status.json}
-              </pre>
+              <pre className="overflow-x-auto text-xs text-copy">{status.json}</pre>
             </div>
           )}
         </div>

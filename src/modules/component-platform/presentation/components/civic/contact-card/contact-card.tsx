@@ -1,24 +1,15 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { Mail, Phone } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
 
 import { trimToNull } from '@lib/utils';
 
-import { columnsForCount } from '../../shared/grid-columns';
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
+import { columnsForCount } from '../../shared/grid-columns';
 
 import type {
   ComponentProps,
@@ -35,11 +26,7 @@ export interface ContactCardComponentProps {
 }
 
 /** Contact persons of a bound dataset. */
-export async function ContactCard({
-  props,
-  context,
-  loadContent,
-}: ContactCardComponentProps) {
+export async function ContactCard({ props, context, loadContent }: ContactCardComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -70,27 +57,25 @@ export async function ContactCard({
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle>{contact.name}</CardTitle>
-                  {contact.role !== undefined && (
-                    <CardDescription>{contact.role}</CardDescription>
-                  )}
+                  {contact.role !== undefined && <CardDescription>{contact.role}</CardDescription>}
                   <div className="mt-3 flex flex-col gap-1.5 text-sm">
                     {contact.email !== undefined && (
-                      <a
+                      <ContentLink
                         href={`mailto:${contact.email}`}
-                        className="flex items-center gap-2 text-primary hover:underline"
+                        className="flex items-center gap-2 text-primary-copy hover:underline"
                       >
                         <Mail className="h-4 w-4" aria-hidden="true" />
                         {contact.email}
-                      </a>
+                      </ContentLink>
                     )}
                     {contact.phone !== undefined && (
-                      <a
+                      <ContentLink
                         href={`tel:${contact.phone.replace(/\s+/g, '')}`}
                         className="flex items-center gap-2 text-copy-muted hover:underline"
                       >
                         <Phone className="h-4 w-4" aria-hidden="true" />
                         {contact.phone}
-                      </a>
+                      </ContentLink>
                     )}
                   </div>
                 </CardHeader>

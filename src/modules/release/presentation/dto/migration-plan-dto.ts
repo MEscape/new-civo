@@ -41,9 +41,7 @@ export function toMigrationPlanDto(view: MigrationPlanView): MigrationPlanDto {
  * Converts the application-layer migration proposal into the JSON-safe
  * contract returned by the proposal Server Action.
  */
-export function toMigrationProposalDto(
-  view: MigrationProposalView
-): MigrationProposalDto {
+export function toMigrationProposalDto(view: MigrationProposalView): MigrationProposalDto {
   return {
     migrationId: view.migrationId,
     sourceReleaseId: view.sourceReleaseId,

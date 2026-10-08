@@ -24,18 +24,17 @@ export const SHARED_LIB_ALLOW = {
   domain: ['errors', 'result', 'utils'],
   application: ['errors', 'result', 'utils'],
   infrastructure: ['errors', 'result', 'utils', 'logger', 'db', 'config'],
-  presentation: [
-    'errors',
-    'result',
-    'utils',
-    'actions',
-    'seo',
-    'config',
-    'fonts',
-  ],
+  presentation: ['errors', 'result', 'utils', 'actions', 'seo', 'config', 'fonts'],
   // composition.ts, index.ts and module-root files: everything.
   root: null,
 };
+
+/**
+ * Shared libraries that define a PORT shared by every module (`Clock`). Any layer may
+ * `import type` the port; the implementation (`systemClock`) is runtime state and is
+ * wired by composition.ts only, so a runtime import from a layer is still reported.
+ */
+export const SHARED_PORT_LIBS = ['clock'];
 
 /** Packages that may never appear in a layer, regardless of how they are imported. */
 export const FORBIDDEN_PACKAGES = {
@@ -76,16 +75,7 @@ export const LAYER_DIRS = {
   // `services` holds logic shared by several use cases (gate helpers, pure decisions); never I/O, never business rules.
   application: ['commands', 'queries', 'contracts', 'services'],
   infrastructure: ['audit', 'logging', 'prisma', 'provisioner'],
-  presentation: [
-    'actions',
-    'cache',
-    'components',
-    'dto',
-    'guards',
-    'i18n',
-    'messages',
-    'schemas',
-  ],
+  presentation: ['actions', 'cache', 'components', 'dto', 'guards', 'i18n', 'messages', 'schemas'],
 };
 
 /**
@@ -144,9 +134,7 @@ export const DIR_FILE_PATTERNS = {
   // What a contract holds: validation limits, read shapes, request shapes, the editor/session model, a stored snapshot
   // and the cache tags that name what a read depends on. One file per kind, named `<name>-<kind>.ts`.
   'application/contracts': [
-    new RegExp(
-      `^${KEBAB}-(?:constraints|views|inputs|model|snapshot|tags)\\.ts$`
-    ),
+    new RegExp(`^${KEBAB}-(?:constraints|views|inputs|model|snapshot|tags)\\.ts$`),
   ],
   'infrastructure/prisma': [
     new RegExp(`^${KEBAB}\\.repository\\.ts$`),
@@ -285,7 +273,7 @@ export const MODULE_OVERRIDES = {
 };
 
 /**
- * Modules that are mid-refactor and do not follow the module layout yet. Listing one SUSPENDS only the structure family
+ * Modules that are mid-refactor and do not follow the module layout yet. Empty today. Listing one SUSPENDS only the structure family
  * for it (folder/file-name shape, the public-API source check, "index.ts only re-exports") and switches off the listed
  * `relax` rules for its folder; every dependency rule (layers, deep imports, forbidden packages, Prisma and
  * client/server containment) still applies. Each entry needs a reason, and a test fails when an entry is no longer needed,
@@ -293,24 +281,7 @@ export const MODULE_OVERRIDES = {
  *
  * @type {Record<string, { reason: string, relax?: string[] }>}
  */
-export const LEGACY_MODULES = {
-  'component-platform': {
-    reason:
-      'Registry and renderer of the component catalog, mid-refactor (TODO.md): index.ts re-exports domain and ' +
-      'infrastructure files directly, there is no application layer, and the registry still holds stubs that throw.',
-    relax: ['architecture/no-throw-in-core-layers'],
-  },
-  integrations: {
-    reason:
-      'Provider adapters (civic, smartcity) organised by provider instead of by layer and without a public API yet. ' +
-      'Their provider interfaces still use `any` for the domains that are not mapped, and the mock providers are async ' +
-      'only to satisfy those interfaces.',
-    relax: [
-      '@typescript-eslint/no-explicit-any',
-      '@typescript-eslint/require-await',
-    ],
-  },
-};
+export const LEGACY_MODULES = {};
 
 /**
  * Module cycles that exist today, identified by the SET of modules on the cycle. A cycle not listed here fails the

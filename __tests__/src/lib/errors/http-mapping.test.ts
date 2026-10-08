@@ -8,14 +8,14 @@ const createError = (
   kind: AppError['kind'],
   code: string,
   message: string,
-  extra?: Partial<AppError>
+  extra?: Partial<AppError>,
 ): AppError =>
-({
-  kind,
-  code,
-  message,
-  ...extra,
-} as AppError);
+  ({
+    kind,
+    code,
+    message,
+    ...extra,
+  }) as AppError;
 
 describe('httpStatusForError', () => {
   it('maps validation errors to 422 Unprocessable Entity', () => {
@@ -41,14 +41,9 @@ describe('httpStatusForError', () => {
 
 describe('toErrorResponseBody', () => {
   it('maps standard errors to a payload containing only code and message', () => {
-    const error = createError(
-      'not_found',
-      'USER_NOT_FOUND',
-      'User does not exist',
-      {
-        cause: new Error('Hidden internal cause'),
-      }
-    );
+    const error = createError('not_found', 'USER_NOT_FOUND', 'User does not exist', {
+      cause: new Error('Hidden internal cause'),
+    });
 
     const body = toErrorResponseBody(error);
 
@@ -61,17 +56,12 @@ describe('toErrorResponseBody', () => {
   });
 
   it('includes fieldErrors exclusively for validation errors', () => {
-    const error = createError(
-      'validation',
-      'INVALID_INPUT',
-      'Validation failed',
-      {
-        fieldErrors: {
-          email: ['Must be a valid email'],
-          age: ['Must be over 18'],
-        },
-      }
-    );
+    const error = createError('validation', 'INVALID_INPUT', 'Validation failed', {
+      fieldErrors: {
+        email: ['Must be a valid email'],
+        age: ['Must be over 18'],
+      },
+    });
 
     const body = toErrorResponseBody(error);
 

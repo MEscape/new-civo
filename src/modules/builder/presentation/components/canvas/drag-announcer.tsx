@@ -1,9 +1,9 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { findNode } from '../../../application/contracts/editor-model';
+import { useComponentText } from '../../hooks/use-component-text';
 import { useBuilderSelector } from '../../state/builder-hooks';
 import { selectChildren } from '../../state/builder-selectors';
-import { useComponentText } from '../../hooks/use-component-text';
 
 import type { PageNodeId } from '../../../application/contracts/editor-model';
 import type { CanvasDnd } from '../../hooks/use-canvas-dnd';
@@ -29,13 +29,20 @@ export function DragAnnouncer({ dnd }: DragAnnouncerProps) {
   }
 
   function message(): string {
-    if (session === null || !isKeyboard) {return '';}
-    if (target === null) {return t('drag.pickedUp', { label: session.label });}
-    if (target.kind === 'root') {return t('drag.root', { label: session.label });}
+    if (session === null || !isKeyboard) {
+      return '';
+    }
+    if (target === null) {
+      return t('drag.pickedUp', { label: session.label });
+    }
+    if (target.kind === 'root') {
+      return t('drag.root', { label: session.label });
+    }
 
     const targetLabel = labelOfNode(target.targetNodeId);
-    if (target.kind === 'inside')
-      {return t('drag.inside', { label: session.label, target: targetLabel });}
+    if (target.kind === 'inside') {
+      return t('drag.inside', { label: session.label, target: targetLabel });
+    }
     return target.position === 'before'
       ? t('drag.before', { label: session.label, target: targetLabel })
       : t('drag.after', { label: session.label, target: targetLabel });

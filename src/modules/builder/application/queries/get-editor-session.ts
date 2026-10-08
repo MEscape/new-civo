@@ -2,7 +2,7 @@ import type { AppResultAsync } from '@lib/result';
 
 import { loadAuthorizedPage } from '../load-authorized-page';
 import { toEditorSessionView } from '../page-view-mappers';
-import { resolveEditorMode } from '../resolve-editor-mode';
+import { resolveEditorMode } from '../services/resolve-editor-mode';
 
 import type { EditorSessionView } from '../contracts/page-views';
 import type { LoadPageError } from '../load-authorized-page';
@@ -18,13 +18,12 @@ export class GetEditorSession {
   constructor(private readonly deps: PageDependencies) {}
 
   execute(pageId: string): AppResultAsync<EditorSessionView, LoadPageError> {
-    return loadAuthorizedPage(this.deps, pageId, 'page.update').map(
-      ({ actor, page }) =>
-        toEditorSessionView({
-          page,
-          editorMode: resolveEditorMode(actor),
-          catalog: this.deps.components,
-        })
+    return loadAuthorizedPage(this.deps, pageId, 'page.update').map(({ actor, page }) =>
+      toEditorSessionView({
+        page,
+        editorMode: resolveEditorMode(actor),
+        catalog: this.deps.components,
+      }),
     );
   }
 }

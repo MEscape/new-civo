@@ -22,12 +22,11 @@ import type { ApplyMigrationResultDto } from '../dto/migration-result-dto';
  * written some pages, so any successful result revalidates.
  */
 export async function applyMigrationAction(
-  input: unknown
+  input: unknown,
 ): Promise<ActionResult<ApplyMigrationResultDto>> {
-  const result = await parseReleaseInput(
-    applyMigrationSchema,
-    input
-  ).asyncAndThen((command) => releaseCommands.applyMigration.execute(command));
+  const result = await parseReleaseInput(applyMigrationSchema, input).asyncAndThen((command) =>
+    releaseCommands.applyMigration.execute(command),
+  );
 
   if (result.isOk()) {
     revalidatePath(builderRoutes.pages(result.value.websiteId));

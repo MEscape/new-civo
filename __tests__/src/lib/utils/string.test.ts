@@ -12,9 +12,7 @@ import {
 
 describe('slugify', () => {
   it('transliterates German characters', () => {
-    expect(slugify('Bürgerbüro Größe Äpfel')).toBe(
-      'buergerbuero-groesse-aepfel'
-    );
+    expect(slugify('Bürgerbüro Größe Äpfel')).toBe('buergerbuero-groesse-aepfel');
   });
 
   it('strips other accents', () => {
@@ -73,7 +71,7 @@ describe('stripHtml', () => {
 describe('escapeHtml', () => {
   it('escapes significant characters', () => {
     expect(escapeHtml(`<a href="x">'&'</a>`)).toBe(
-      '&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;'
+      '&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;',
     );
   });
 });

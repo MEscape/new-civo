@@ -10,7 +10,17 @@ import {
 } from '../../../architecture-policy/policy.mjs';
 import { classifyContext, defineRule, report } from '../util.mjs';
 
-const describe = (patterns) => patterns.map((p) => (p instanceof RegExp ? p.source.replace(/\\\./g, '.').replace(/\[a-z0-9\]\+\(\?:-\[a-z0-9\]\+\)\*/g, '<name>').replace(/^\^|\$$/g, '') : p)).join(' | ');
+const describe = (patterns) =>
+  patterns
+    .map((p) =>
+      p instanceof RegExp
+        ? p.source
+            .replace(/\\\./g, '.')
+            .replace(/\[a-z0-9\]\+\(\?:-\[a-z0-9\]\+\)\*/g, '<name>')
+            .replace(/^\^|\$$/g, '')
+        : p,
+    )
+    .join(' | ');
 
 /**
  * Path-only structure check: every file sits in an approved place with an
@@ -19,7 +29,8 @@ const describe = (patterns) => patterns.map((p) => (p instanceof RegExp ? p.sour
  * Modules are never asked to create files they do not need.
  */
 export const moduleStructure = defineRule({
-  description: 'Every module file lives in an approved layer folder with an approved file-name shape.',
+  description:
+    'Every module file lives in an approved layer folder with an approved file-name shape.',
   create(context) {
     const { file } = classifyContext(context);
     if (file.area !== 'module') return {};
@@ -41,7 +52,9 @@ export const moduleStructure = defineRule({
       }
       if (below.length === 1) {
         const allowed = [...MODULE_ROOT_FILES];
-        return allowed.includes(below[0]) ? null : `'${below[0]}' is not allowed at the module root. Module root files: ${allowed.join(', ')}. Everything else belongs in domain/, application/, infrastructure/ or presentation/.`;
+        return allowed.includes(below[0])
+          ? null
+          : `'${below[0]}' is not allowed at the module root. Module root files: ${allowed.join(', ')}. Everything else belongs in domain/, application/, infrastructure/ or presentation/.`;
       }
       const [layer, second, ...rest] = below;
       if (!LAYERS.includes(layer)) {
@@ -52,7 +65,9 @@ export const moduleStructure = defineRule({
       }
       if (rest.length === 0) {
         const rootFiles = [...LAYER_ROOT_FILES[layer], ...(policy.extraRootFiles[layer] ?? [])];
-        const ok = rootFiles.some((entry) => (entry instanceof RegExp ? entry.test(second) : entry === second));
+        const ok = rootFiles.some((entry) =>
+          entry instanceof RegExp ? entry.test(second) : entry === second,
+        );
         return ok
           ? null
           : `'${second}' cannot sit directly in ${layer}/.${rootFiles.length > 0 ? ` Allowed here: ${describe(rootFiles)}.` : ''} Place it in one of: ${[...LAYER_DIRS[layer], ...(policy.extraDirs[layer] ?? [])].join(', ')}${OPEN_LAYERS.includes(layer) ? ' (or a folder named for what it holds)' : ''}.`;
@@ -60,14 +75,16 @@ export const moduleStructure = defineRule({
       const dirs = [...LAYER_DIRS[layer], ...(policy.extraDirs[layer] ?? [])];
       if (!dirs.includes(second)) {
         const open = OPEN_LAYERS.includes(layer);
-        if (open && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(second) && !GENERIC_NAMES.includes(second)) return null;
+        if (open && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(second) && !GENERIC_NAMES.includes(second))
+          return null;
         return open
           ? `'${layer}/${second}/' is not a valid folder name. Use kebab-case and name it for what it holds (not ${GENERIC_NAMES.join(', ')}).`
           : `'${layer}/${second}/' is not an approved folder. ${layer}/ contains: ${dirs.join(', ')}.`;
       }
       const patterns = DIR_FILE_PATTERNS[`${layer}/${second}`];
       if (patterns === undefined || patterns === null) return null;
-      if (rest.length > 1) return `${layer}/${second}/ is flat; '${rest.join('/')}' must not be nested.`;
+      if (rest.length > 1)
+        return `${layer}/${second}/ is flat; '${rest.join('/')}' must not be nested.`;
       return patterns.some((p) => p.test(rest[0]))
         ? null
         : `'${rest[0]}' does not follow the ${layer}/${second}/ naming convention. Expected: ${describe(patterns)}.`;

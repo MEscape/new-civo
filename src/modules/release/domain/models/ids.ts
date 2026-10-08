@@ -1,10 +1,7 @@
 import { createIdParser } from '@lib/result';
 import type { Brand } from '@lib/utils';
 
-import {
-  RELEASE_VALIDATION_CODES,
-  fieldValidationFailed,
-} from '../errors/release-errors';
+import { RELEASE_VALIDATION_CODES, fieldValidationFailed } from '../errors/release-errors';
 
 /** Opaque identity of a release. */
 export type ReleaseId = Brand<string, 'ReleaseId'>;

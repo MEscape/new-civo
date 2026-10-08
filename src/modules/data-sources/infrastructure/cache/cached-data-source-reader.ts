@@ -10,17 +10,19 @@ import { SourceReadFailure, readCachedRestBody } from './cached-rest-body';
 
 import type { DataSource } from '../../domain/models/data-source';
 import type {
-    ConnectorError,
-    DataSourceConnector,
+  ConnectorError,
+  DataSourceConnector,
 } from '../../domain/ports/data-source-connector.port';
 
 const log = logger.withContext({ module: 'data-source.cache' });
 
 function toConnectorError(thrown: unknown): ConnectorError {
-    if (thrown instanceof SourceReadFailure) {return thrown.error;}
-    // Anything else crossed the cache boundary unexpectedly: report it once, as unreachable.
-    log.error('Cached source read failed unexpectedly', thrown);
-    return connectionFailed(thrown);
+  if (thrown instanceof SourceReadFailure) {
+    return thrown.error;
+  }
+  // Anything else crossed the cache boundary unexpectedly: report it once, as unreachable.
+  log.error('Cached source read failed unexpectedly', thrown);
+  return connectionFailed(thrown);
 }
 
 /**
@@ -35,17 +37,19 @@ function toConnectorError(thrown: unknown): ConnectorError {
  * live connector wrapped here should route REST to that same instance.
  */
 export class CachedDataSourceConnector implements DataSourceConnector {
-    constructor(private readonly live: DataSourceConnector) {}
+  constructor(private readonly live: DataSourceConnector) {}
 
-    test(source: DataSource): AppResultAsync<void, ConnectorError> {
-        return this.live.test(source);
-    }
+  test(source: DataSource): AppResultAsync<void, ConnectorError> {
+    return this.live.test(source);
+  }
 
-    fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError> {
-        if (source.kind !== 'REST') {return this.live.fetchBody(source);}
-        return fromThrowableAsync(
-            () => readCachedRestBody(source.tenantId, source.id, source.config),
-            toConnectorError
-        );
+  fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError> {
+    if (source.kind !== 'REST') {
+      return this.live.fetchBody(source);
     }
+    return fromThrowableAsync(
+      () => readCachedRestBody(source.tenantId, source.id, source.config),
+      toConnectorError,
+    );
+  }
 }

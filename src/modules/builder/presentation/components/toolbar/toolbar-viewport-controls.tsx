@@ -1,15 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { Monitor, Smartphone, Tablet } from '@components/ui/icons';
+
+import { useTranslations } from '@i18n/client';
 
 import { VIEWPORT_MESSAGE_KEYS } from '../../messages/message-keys';
 import { viewportChanged } from '../../state/builder-actions';
-import {
-  useBuilderDispatch,
-  useBuilderSelector,
-} from '../../state/builder-hooks';
+import { useBuilderDispatch, useBuilderSelector } from '../../state/builder-hooks';
 import { selectMode, selectViewport } from '../../state/builder-selectors';
 import { VIEWPORTS } from '../../state/ui-state';
 
@@ -29,7 +26,9 @@ export function ToolbarViewportControls() {
   const dispatch = useBuilderDispatch();
   const mode = useBuilderSelector(selectMode);
   const viewport = useBuilderSelector(selectViewport);
-  if (mode !== 'select') {return null;}
+  if (mode !== 'select') {
+    return null;
+  }
 
   return (
     <div

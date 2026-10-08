@@ -1,17 +1,9 @@
-import {
-  isUniqueConstraintViolation,
-  SqlConnectionError,
-} from '@prisma/orm-family-sql/errors';
+import { isUniqueConstraintViolation, SqlConnectionError } from '@prisma/orm-family-sql/errors';
 
-import {
-  conflictError,
-  infrastructureError,
-  type AppError,
-} from '@lib/errors';
+import { conflictError, infrastructureError, type AppError } from '@lib/errors';
 import { logger } from '@lib/logger';
 
 const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
-
 
 /**
  * Returns the thrown value and its direct cause. The runtime may hand a
@@ -20,9 +12,7 @@ const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
  * chain.
  */
 function withCause(thrown: unknown): readonly unknown[] {
-  return thrown instanceof Error && thrown.cause !== undefined
-    ? [thrown, thrown.cause]
-    : [thrown];
+  return thrown instanceof Error && thrown.cause !== undefined ? [thrown, thrown.cause] : [thrown];
 }
 
 /**
@@ -45,8 +35,10 @@ function withCause(thrown: unknown): readonly unknown[] {
  *   documents as the way to classify one without knowing any
  *   target-specific error shape.
  * - ORM errors are structured envelopes carrying a dotted `NAMESPACE.CODE`
- *   on `error.code`, recognized by `isStructuredError`
- *   (https://www.prisma.io/docs/orm/v8/reference/error-reference).
+ *   (https://www.prisma.io/docs/orm/v8/reference/error-reference). None of
+ *   them is an expected outcome: a single-row write that matches nothing
+ *   resolves to `null` and is handled by `requireRow` in
+ *   `persistence-failures.ts`, so every ORM error is an infrastructure failure.
  *
  * Only unique violations become `conflictError`. Foreign-key, not-null
  * and check violations are deliberately not mapped to a conflict: they
@@ -59,7 +51,7 @@ function withCause(thrown: unknown): readonly unknown[] {
  */
 export function mapPrismaError(
   thrown: unknown,
-  context: { code: string; message: string }
+  context: { code: string; message: string },
 ): AppError {
   if (typeof thrown === 'object' && thrown !== null && 'kind' in thrown) {
     return thrown as AppError;

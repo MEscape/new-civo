@@ -4,7 +4,6 @@ import { err, ok } from './app-result';
 
 import type { AppResult } from './app-result';
 
-
 export interface IdParserConfig<T, E extends AppError> {
   readonly isValid: (raw: string) => boolean;
   readonly brand: (raw: string) => T;

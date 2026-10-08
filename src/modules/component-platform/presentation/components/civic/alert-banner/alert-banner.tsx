@@ -1,4 +1,5 @@
 import { Container } from '@components/layout/layout-primitives';
+import { ContentLink } from '@components/ui/content-link';
 import { AlertOctagon, AlertTriangle, Info } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
@@ -22,12 +23,12 @@ const SEVERITY_ICONS = {
   urgent: AlertOctagon,
 } as const satisfies Record<AlertSeverity, typeof Info>;
 
-// Deliberately not theme tokens: severity is a fixed semantic signal that
+// Status tokens, not brand tokens: severity is a fixed semantic signal that
 // must stay legible whatever a municipality's brand palette is.
 const SEVERITY_CLASSES = {
-  info: 'border-blue-200 bg-blue-50 text-blue-900',
-  warning: 'border-amber-200 bg-amber-50 text-amber-900',
-  urgent: 'border-red-200 bg-red-50 text-red-900',
+  info: 'border-info-border bg-info-subtle text-info',
+  warning: 'border-warning-border bg-warning-subtle text-warning',
+  urgent: 'border-danger-border bg-danger-subtle text-danger',
 } as const satisfies Record<AlertSeverity, string>;
 
 export interface AlertBannerComponentProps {
@@ -40,11 +41,7 @@ export interface AlertBannerComponentProps {
  * Official notices. Site-level notices read as part of the page frame, so
  * an empty result renders nothing instead of an "empty" state.
  */
-export async function AlertBanner({
-  props,
-  context,
-  loadContent,
-}: AlertBannerComponentProps) {
+export async function AlertBanner({ props, context, loadContent }: AlertBannerComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -58,12 +55,7 @@ export async function AlertBanner({
   const heading = trimToNull(props.heading);
 
   if (result.isErr()) {
-    return (
-      <ContentState
-        kind="error"
-        heading={heading ?? t('alertBanner.defaultHeading')}
-      />
-    );
+    return <ContentState kind="error" heading={heading ?? t('alertBanner.defaultHeading')} />;
   }
   const { items, origin } = result.value;
   if (items.length === 0) {
@@ -74,9 +66,7 @@ export async function AlertBanner({
     <div className="relative py-4">
       <ContentOriginBadge origin={origin} />
       <Container className="flex flex-col gap-3">
-        {heading !== null && (
-          <h2 className="font-heading text-lg text-copy">{heading}</h2>
-        )}
+        {heading !== null && <h2 className="font-heading text-lg text-copy">{heading}</h2>}
         {items.map((alert) => {
           const Icon = SEVERITY_ICONS[alert.severity];
 
@@ -92,9 +82,9 @@ export async function AlertBanner({
               <div>
                 <p className="font-medium">
                   {alert.href !== undefined ? (
-                    <a href={alert.href} className="hover:underline">
+                    <ContentLink href={alert.href} className="hover:underline">
                       {alert.title}
-                    </a>
+                    </ContentLink>
                   ) : (
                     alert.title
                   )}

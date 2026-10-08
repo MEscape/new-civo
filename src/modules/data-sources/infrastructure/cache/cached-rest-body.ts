@@ -49,7 +49,7 @@ const FRESHNESS = { stale: 60, revalidate: 120, expire: 900 } as const;
 export async function readCachedRestBody(
   tenantId: string,
   dataSourceId: string,
-  rawConfig: unknown
+  rawConfig: unknown,
 ): Promise<unknown> {
   'use cache';
   cacheTag(dataSourceCacheTag(dataSourceId));

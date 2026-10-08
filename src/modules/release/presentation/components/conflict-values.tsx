@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { stringifyJson, truncate } from '@lib/utils';
 import type { JsonValue } from '@lib/utils';
@@ -24,9 +24,7 @@ function ValueLine({ label, value, absentLabel }: ValueLineProps) {
         {value === undefined ? (
           <span className="text-copy-muted">{absentLabel}</span>
         ) : (
-          <code>
-            {truncate(stringifyJson(value), MAX_DISPLAYED_VALUE_LENGTH)}
-          </code>
+          <code>{truncate(stringifyJson(value), MAX_DISPLAYED_VALUE_LENGTH)}</code>
         )}
       </dd>
     </div>
@@ -47,22 +45,10 @@ export function ConflictValues({ conflict }: ConflictValuesProps) {
 
   return (
     <dl className="space-y-1 text-xs">
-      <ValueLine
-        label={t('original')}
-        value={conflict.base}
-        absentLabel={absentLabel}
-      />
-      <ValueLine
-        label={t('yours')}
-        value={conflict.local}
-        absentLabel={absentLabel}
-      />
+      <ValueLine label={t('original')} value={conflict.base} absentLabel={absentLabel} />
+      <ValueLine label={t('yours')} value={conflict.local} absentLabel={absentLabel} />
       {conflict.kind === 'both_changed' && (
-        <ValueLine
-          label={t('incoming')}
-          value={conflict.incoming}
-          absentLabel={absentLabel}
-        />
+        <ValueLine label={t('incoming')} value={conflict.incoming} absentLabel={absentLabel} />
       )}
     </dl>
   );

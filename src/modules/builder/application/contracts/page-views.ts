@@ -3,10 +3,7 @@ import type { TenantId } from '@modules/auth';
 import type { ComponentDescriptor } from '../../domain/models/component-descriptor';
 import type { EditorMode } from '../../domain/models/editor-capabilities';
 import type { PageDraftInput } from '../../domain/models/page';
-import type {
-  PageConfig,
-  PageConfigJson,
-} from '../../domain/models/page-config';
+import type { PageConfig, PageConfigJson } from '../../domain/models/page-config';
 
 /** The page content as consumers see it. Plain, serializable, fully validated. */
 export type PageConfigView = PageConfig;
@@ -109,4 +106,3 @@ export interface ListPagesInput {
   readonly websiteId: string;
   readonly limit?: number;
 }
-

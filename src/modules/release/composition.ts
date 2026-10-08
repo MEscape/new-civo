@@ -1,10 +1,6 @@
 import 'server-only';
 import { getAccessControl } from '@modules/auth';
-import {
-  listPagesForRelease,
-  restoreStoredPageConfig,
-  savePageDraft,
-} from '@modules/builder';
+import { listPagesForRelease, restoreStoredPageConfig, savePageDraft } from '@modules/builder';
 import { componentPlatformQueries } from '@modules/component-platform';
 import { websiteQueries } from '@modules/website';
 
@@ -20,7 +16,7 @@ import { GetPublishedSnapshot } from './application/queries/get-published-snapsh
 import { ListMigrations } from './application/queries/list-migrations';
 import { ListReleases } from './application/queries/list-releases';
 import { ComponentPlatformCatalog } from './infrastructure/component-platform/component-platform-catalog';
-import { LoggerReleaseAuditLog } from './infrastructure/logging/logger-release-audit-log';
+import { loggerReleaseAuditLog } from './infrastructure/logging/logger-release-audit-log';
 import { PrismaMigrationRepository } from './infrastructure/prisma/prisma-migration.repository';
 import { PrismaReleaseRepository } from './infrastructure/prisma/prisma-release.repository';
 import { BuilderPageSource } from './infrastructure/source/builder-page-source';
@@ -42,11 +38,9 @@ const releases = new PrismaReleaseRepository();
 
 const dependencies = {
   authorization: getAccessControl(),
-  websites: new WebsiteModuleSource((id) =>
-    websiteQueries.getWebsiteById.execute(id)
-  ),
+  websites: new WebsiteModuleSource((id) => websiteQueries.getWebsiteById.execute(id)),
   releases,
-  audit: new LoggerReleaseAuditLog(),
+  audit: loggerReleaseAuditLog,
 };
 
 const migrationDependencies = {
@@ -54,16 +48,11 @@ const migrationDependencies = {
   migrations: new PrismaMigrationRepository(),
 };
 
-const pages = new BuilderPageSource(
-  listPagesForRelease,
-  restoreStoredPageConfig,
-  savePageDraft
-);
+const pages = new BuilderPageSource(listPagesForRelease, restoreStoredPageConfig, savePageDraft);
 
 const components = new ComponentPlatformCatalog(
   (type) => componentPlatformQueries.getComponentReleaseInfo.execute(type),
-  (type, version) =>
-    componentPlatformQueries.getComponentDefaultProps.execute({ type, version })
+  (type, version) => componentPlatformQueries.getComponentDefaultProps.execute({ type, version }),
 );
 
 const clock = systemClock;

@@ -4,12 +4,26 @@ import { describeEntryPoints } from '../../eslint/architecture-policy/checks-beh
 import { checkPublicApi } from '../../eslint/architecture-policy/checks-dependencies.mjs';
 import { checkModuleStructure } from '../../eslint/architecture-policy/checks-structure.mjs';
 import { CHECKS, loadProject } from '../../eslint/architecture-policy/index.mjs';
-import { KNOWN_MODULE_CYCLES, LEGACY_MODULES, MODULE_OVERRIDES } from '../../eslint/architecture-policy/policy.mjs';
+import {
+  KNOWN_MODULE_CYCLES,
+  LEGACY_MODULES,
+  MODULE_OVERRIDES,
+} from '../../eslint/architecture-policy/policy.mjs';
 import plugin from '../../eslint/plugins/architecture/index.mjs';
 
 import { describeViolations } from './fixture-tree';
 
 import type { Violation } from './fixture-tree';
+
+/** The policy shapes this test reads; the policy is untyped ESM (see eslint/shims.d.ts). */
+interface ModuleOverride {
+  readonly reason: string;
+  readonly extraRootFiles?: Readonly<Record<string, readonly string[]>>;
+}
+interface LegacyModule {
+  readonly reason: string;
+  readonly relax?: readonly string[];
+}
 
 const ROOT = process.cwd();
 const project = loadProject(ROOT);
@@ -28,24 +42,40 @@ describe('architecture of this repository', () => {
   }
 
   it('gives every externally reachable entry point an explicit authorization category', () => {
-    const entries = describeEntryPoints(project) as Array<{ kind: string; name: string; category: string; ok: boolean }>;
+    const entries = describeEntryPoints(project) as Array<{
+      kind: string;
+      name: string;
+      category: string;
+      ok: boolean;
+    }>;
     expect(entries.length).toBeGreaterThan(0);
-    expect(entries.filter((e) => !e.ok).map((e) => `${e.kind}:${e.name}=${e.category}`)).toEqual([]);
+    expect(entries.filter((e) => !e.ok).map((e) => `${e.kind}:${e.name}=${e.category}`)).toEqual(
+      [],
+    );
     // `protected` is the default and needs no review; every way AROUND authorization is listed here on purpose, so adding
     // a public or system entry point is a visible change in review (it also needs an `@authorization` tag with a reason).
-    const exceptions = entries.filter((e) => e.category !== 'protected').map((e) => `${e.kind}:${e.name}=${e.category}`).sort();
+    const exceptions = entries
+      .filter((e) => e.category !== 'protected')
+      .map((e) => `${e.kind}:${e.name}=${e.category}`)
+      .sort();
     expect(exceptions).toEqual([
       'action:requestPasswordResetAction=public',
       'action:resetPasswordAction=public',
       'action:signInAction=public',
       'action:signOutAction=public',
       'action:signUpAction=public',
+      'route-handler:GET src/app/api/health/route.ts=none',
+      'use-case:BuildMapModel=public',
+      'use-case:CanNestComponent=public',
       'use-case:CreateSystemPage=system',
+      'use-case:GetComponentDefaultProps=public',
+      'use-case:GetComponentReleaseInfo=public',
       'use-case:GetCurrentActor=public',
       'use-case:GetMappedDatasetRecords=public',
-      'use-case:GetPublicPage=public',
       'use-case:GetPublicWebsiteBySlug=public',
       'use-case:GetPublishedSnapshot=public',
+      'use-case:ListComponentCatalog=public',
+      'use-case:ListContent=public',
       'use-case:ListPagesForRelease=system',
       'use-case:RequestPasswordReset=public',
       'use-case:ResetPassword=public',
@@ -57,34 +87,48 @@ describe('architecture of this repository', () => {
 
   it('keeps the policy exceptions small, explicit and justified', () => {
     // the one exception to the module layout: auth's single authorization service file in application/
-    const extraRootFiles = Object.entries(MODULE_OVERRIDES).flatMap(([module, override]) =>
-      Object.entries(override.extraRootFiles ?? {}).map(([layer, files]) => `${module}/${layer}/${files.join(',')}`)
+    const extraRootFiles = Object.entries<ModuleOverride>(MODULE_OVERRIDES).flatMap(
+      ([module, override]) =>
+        Object.entries(override.extraRootFiles ?? {}).map(
+          ([layer, files]) => `${module}/${layer}/${files.join(',')}`,
+        ),
     );
     expect(extraRootFiles).toEqual(['auth/application/authorization-service.ts']);
     expect(Object.keys(MODULE_OVERRIDES)).toEqual(['auth']);
-    for (const [name, override] of Object.entries(MODULE_OVERRIDES)) {
+    for (const [name, override] of Object.entries<ModuleOverride>(MODULE_OVERRIDES)) {
       expect(override.reason.length, `${name} needs a reason`).toBeGreaterThan(40);
     }
-    const authFiles = project.moduleFiles('auth').filter((f: { local: string }) => f.local === 'application/authorization-service.ts');
+    const authFiles = project
+      .moduleFiles('auth')
+      .filter((f: { local: string }) => f.local === 'application/authorization-service.ts');
     expect(authFiles).toHaveLength(1);
   });
 
   it('lists a legacy module only while it still needs the exemption (the list can only shrink)', () => {
-    expect(Object.keys(LEGACY_MODULES).sort()).toEqual(['component-platform', 'integrations']);
-    for (const [name, legacy] of Object.entries(LEGACY_MODULES)) {
+    expect(Object.keys(LEGACY_MODULES).sort()).toEqual([]);
+    for (const [name, legacy] of Object.entries<LegacyModule>(LEGACY_MODULES)) {
       expect(legacy.reason.length, `${name} needs a reason`).toBeGreaterThan(40);
-      expect(project.modules, `${name} no longer exists: remove it from LEGACY_MODULES`).toContain(name);
+      expect(project.modules, `${name} no longer exists: remove it from LEGACY_MODULES`).toContain(
+        name,
+      );
       for (const rule of legacy.relax ?? []) {
         if (rule.startsWith('architecture/')) {
-          expect(Object.keys(plugin.rules), `${rule} is not an architecture rule`).toContain(rule.slice('architecture/'.length));
+          expect(Object.keys(plugin.rules), `${rule} is not an architecture rule`).toContain(
+            rule.slice('architecture/'.length),
+          );
         }
       }
       // lift the exemption: the structure family must find something to report, otherwise the entry is stale
       const saved = LEGACY_MODULES[name];
       delete (LEGACY_MODULES as Record<string, unknown>)[name];
       try {
-        const own = [...checkModuleStructure(project), ...checkPublicApi(project)].filter((v: Violation) => v.file.startsWith(`src/modules/${name}/`));
-        expect(own.length, `${name} follows the module layout now: remove it from LEGACY_MODULES`).toBeGreaterThan(0);
+        const own = [...checkModuleStructure(project), ...checkPublicApi(project)].filter(
+          (v: Violation) => v.file?.startsWith(`src/modules/${name}/`) === true,
+        );
+        expect(
+          own.length,
+          `${name} follows the module layout now: remove it from LEGACY_MODULES`,
+        ).toBeGreaterThan(0);
       } finally {
         (LEGACY_MODULES as Record<string, unknown>)[name] = saved;
       }

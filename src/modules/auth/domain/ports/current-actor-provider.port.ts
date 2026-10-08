@@ -17,5 +17,5 @@ export type CurrentActorError = UnauthorizedAppError | InfrastructureAppError;
  * into: identity is derived, never accepted from a caller.
  */
 export interface CurrentActorProvider {
-    getCurrentActor(): AppResultAsync<Actor, CurrentActorError>;
+  getCurrentActor(): AppResultAsync<Actor, CurrentActorError>;
 }

@@ -276,27 +276,16 @@ export class PrismaItemRepository implements ItemRepository {
   }
 }
 `,
-    [`${M}/infrastructure/audit/logger-inventory-audit-log.ts`]: `import { logger } from '@lib/logger';
+    [`${M}/infrastructure/audit/logger-inventory-audit-log.ts`]: `import { createAuditLog } from '@lib/logger';
 
 import type { InventoryAuditLog, InventoryEvent } from '../../domain/ports/inventory-audit-log.port';
-
-const auditLogger = logger.withContext({ module: 'inventory.audit' });
 
 const LEVEL_BY_EVENT = {
   'inventory.item_created': 'info',
   'inventory.item_failed': 'warn',
 } as const satisfies Record<InventoryEvent['type'], 'info' | 'warn'>;
 
-export class LoggerInventoryAuditLog implements InventoryAuditLog {
-  record(event: InventoryEvent): void {
-    const { type, ...details } = event;
-    try {
-      auditLogger[LEVEL_BY_EVENT[type]](type, details);
-    } catch {
-      // Auditing must never fail the request it describes.
-    }
-  }
-}
+export const loggerInventoryAuditLog: InventoryAuditLog = createAuditLog('inventory.audit', LEVEL_BY_EVENT);
 `,
     // ------------------------------------------------------ composition / API
     [`${M}/composition.ts`]: `import 'server-only';
@@ -307,12 +296,11 @@ import { CreateItem } from './application/commands/create-item';
 import { GetItemById } from './application/queries/get-item-by-id';
 import { GetPublicItem } from './application/queries/get-public-item';
 import { ListItems } from './application/queries/list-items';
-import { LoggerInventoryAuditLog } from './infrastructure/audit/logger-inventory-audit-log';
+import { loggerInventoryAuditLog } from './infrastructure/audit/logger-inventory-audit-log';
 import { PrismaItemRepository } from './infrastructure/prisma/prisma-item.repository';
 
 const items = new PrismaItemRepository();
-const audit = new LoggerInventoryAuditLog();
-const dependencies = { authorization: getAccessControl(), items, audit };
+const dependencies = { authorization: getAccessControl(), items, audit: loggerInventoryAuditLog };
 
 export const inventoryCommands = { createItem: new CreateItem(dependencies) } as const;
 
@@ -393,8 +381,16 @@ export function messageKeyForCode(code: string): string {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code) ? MESSAGE_KEY_BY_CODE[code as keyof typeof MESSAGE_KEY_BY_CODE] : GENERIC_ERROR_MESSAGE_KEY;
 }
 `,
-    [`${M}/presentation/i18n/en.json`]: JSON.stringify(catalog('Not found', 'Something went wrong', 'Name is required'), null, 2),
-    [`${M}/presentation/i18n/de.json`]: JSON.stringify(catalog('Nicht gefunden', 'Etwas ist schiefgelaufen', 'Name ist erforderlich'), null, 2),
+    [`${M}/presentation/i18n/en.json`]: JSON.stringify(
+      catalog('Not found', 'Something went wrong', 'Name is required'),
+      null,
+      2,
+    ),
+    [`${M}/presentation/i18n/de.json`]: JSON.stringify(
+      catalog('Nicht gefunden', 'Etwas ist schiefgelaufen', 'Name ist erforderlich'),
+      null,
+      2,
+    ),
     [`${M}/presentation/i18n/catalog.ts`]: `import de from './de.json';
 import en from './en.json';
 

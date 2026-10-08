@@ -5,10 +5,6 @@
  * business rule, so it lives here and not in the provider adapter; the
  * clock is passed in because the domain never reads it.
  */
-export function hasExceededMaxLifetime(
-    createdAt: Date,
-    now: Date,
-    maxLifetimeMs: number
-): boolean {
-    return now.getTime() - createdAt.getTime() >= maxLifetimeMs;
+export function hasExceededMaxLifetime(createdAt: Date, now: Date, maxLifetimeMs: number): boolean {
+  return now.getTime() - createdAt.getTime() >= maxLifetimeMs;
 }

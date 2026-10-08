@@ -8,8 +8,7 @@ import { websiteRoutes } from '@modules/website/client';
  */
 export const releaseRoutes = {
   /** The migrations panel is a sub-page of the website's own page. */
-  migrations: (websiteId: string) =>
-    `${websiteRoutes.detail(websiteId)}/migrations`,
+  migrations: (websiteId: string) => `${websiteRoutes.detail(websiteId)}/migrations`,
   /** A published site, keyed by its (globally unique) slug. */
   publicSite: (siteSlug: string) => `/s/${siteSlug}`,
 } as const;

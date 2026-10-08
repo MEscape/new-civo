@@ -24,14 +24,27 @@ export const style = [
       'no-else-return': ['error', { allowElseIf: false }],
       'no-nested-ternary': 'error',
       'no-console': ['error', { allow: ['warn', 'error'] }],
-      'no-magic-numbers': ['warn', { ignore: [-1, 0, 1, 2], ignoreArrayIndexes: true, ignoreDefaultValues: true, enforceConst: true, detectObjects: false }],
+      'no-magic-numbers': [
+        'warn',
+        {
+          ignore: [-1, 0, 1, 2],
+          ignoreArrayIndexes: true,
+          ignoreDefaultValues: true,
+          enforceConst: true,
+          detectObjects: false,
+        },
+      ],
       complexity: ['warn', 12],
       'max-params': ['warn', 3],
     },
   },
   // Redux Toolkit slices mutate state through Immer.
   {
-    files: ['src/**/store/**/*-slice.ts', 'src/**/store/**/*-reducer.ts', 'src/**/store/**/*-thunks.ts'],
+    files: [
+      'src/**/store/**/*-slice.ts',
+      'src/**/store/**/*-reducer.ts',
+      'src/**/store/**/*-thunks.ts',
+    ],
     rules: { 'no-param-reassign': 'off' },
   },
   // Pure math/date helpers read better with literals.

@@ -16,7 +16,7 @@ export const tabsDefinition = defineComponent({
         body: text({ min: 1, max: PROP_LIMITS.longText }),
       },
       MAX_TABS,
-      { group: 'content', municipal: true },
+      { group: 'content', municipal: true, multiline: ['body'] },
     ),
   },
 });

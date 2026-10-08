@@ -17,29 +17,34 @@ export interface DragOverlayCursorProps {
  * the prop changes, and the prop never does, so it does not undo this.
  * Hidden from assistive technology: `DragAnnouncer` speaks for keyboard drags.
  */
-export function DragOverlayCursor({
-  session,
-  isKeyboard,
-}: DragOverlayCursorProps) {
+export function DragOverlayCursor({ session, isKeyboard }: DragOverlayCursorProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const isFollowingPointer = session !== null && !isKeyboard;
 
   useEffect(() => {
-    if (!isFollowingPointer) {return undefined;}
+    if (!isFollowingPointer) {
+      return undefined;
+    }
 
     function handlePointerMove(event: PointerEvent): void {
       const overlay = overlayRef.current;
-      if (overlay === null) {return;}
+      if (overlay === null) {
+        return;
+      }
       overlay.style.transform = `translate(${
         event.clientX + CURSOR_OFFSET_PX
       }px, ${event.clientY + CURSOR_OFFSET_PX}px)`;
     }
 
     window.addEventListener('pointermove', handlePointerMove);
-    return () => { window.removeEventListener('pointermove', handlePointerMove); };
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+    };
   }, [isFollowingPointer]);
 
-  if (session === null || isKeyboard) {return null;}
+  if (session === null || isKeyboard) {
+    return null;
+  }
   return (
     <div
       ref={overlayRef}

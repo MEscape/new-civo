@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { useCanvasRender } from '../../hooks/use-canvas-render';
 import { useBuilderSelector } from '../../state/builder-hooks';
@@ -35,23 +35,15 @@ export function PreviewCanvas({ themeStyle }: PreviewCanvasProps) {
 
   return (
     <ViewportFrame viewport={viewport}>
-      <CanvasThemeScope
-        themeStyle={themeStyle}
-        className="min-h-dvh shadow-2xl ring-1 ring-border"
-      >
+      <CanvasThemeScope themeStyle={themeStyle} className="min-h-dvh shadow-2xl ring-1 ring-border">
         {node}
       </CanvasThemeScope>
       {isRendering && node === null && (
-        <p
-          role="status"
-          className="mt-4 text-center text-sm text-copy-muted"
-        >
+        <p role="status" className="mt-4 text-center text-sm text-copy-muted">
           {t('preview.rendering')}
         </p>
       )}
-      {errorCode !== null && (
-        <ErrorMessage code={errorCode} className="mt-4 text-center text-sm" />
-      )}
+      {errorCode !== null && <ErrorMessage code={errorCode} className="mt-4 text-center text-sm" />}
     </ViewportFrame>
   );
 }

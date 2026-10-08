@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f7fd28cc716d91eb63f784d86f0ad0e8dbc39c4f9134e82b4c1c5a4fdc9a5c1a'>;
+  StorageHashBase<'c7c52e3229880c553d3655940f128f9ac431dbc469c0a3e8aef493807391b6cc'>;
 export type ExecutionHash =
-  ExecutionHashBase<'74c7d985cfcbc5d63a1c12ce5a2c43510f289d84f022e23a0ae9a8f2d4a188df'>;
+  ExecutionHashBase<'c733ba88b92a6fd782da42b6819289902373315a84680a48d232212f62b67f56'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -311,6 +311,18 @@ export type FieldOutputTypes = {
       readonly tenantId: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly WebsiteMigration: {
+      readonly appliedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+      readonly appliedBy: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly plan: CodecTypes['pg/json@1']['output'];
+      readonly proposedBy: CodecTypes['pg/text@1']['output'];
+      readonly resolutions: CodecTypes['pg/json@1']['output'] | null;
+      readonly sourceReleaseId: CodecTypes['pg/text@1']['output'];
+      readonly status: 'PROPOSED' | 'APPLIED';
+      readonly websiteId: CodecTypes['pg/text@1']['output'];
+    };
     readonly WebsiteRelease: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
@@ -396,6 +408,18 @@ export type FieldInputTypes = {
       readonly templateKey: CodecTypes['pg/text@1']['input'];
       readonly tenantId: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly WebsiteMigration: {
+      readonly appliedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
+      readonly appliedBy: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly plan: CodecTypes['pg/json@1']['input'];
+      readonly proposedBy: CodecTypes['pg/text@1']['input'];
+      readonly resolutions: CodecTypes['pg/json@1']['input'] | null;
+      readonly sourceReleaseId: CodecTypes['pg/text@1']['input'];
+      readonly status: 'PROPOSED' | 'APPLIED';
+      readonly websiteId: CodecTypes['pg/text@1']['input'];
     };
     readonly WebsiteRelease: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -483,6 +507,18 @@ export type StorageColumnTypes = {
       readonly tenantId: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
+    readonly WebsiteMigration: {
+      readonly appliedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+      readonly appliedBy: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly plan: CodecTypes['pg/json@1']['output'];
+      readonly proposedBy: CodecTypes['pg/text@1']['output'];
+      readonly resolutions: CodecTypes['pg/json@1']['output'] | null;
+      readonly sourceReleaseId: CodecTypes['pg/text@1']['output'];
+      readonly status: 'PROPOSED' | 'APPLIED';
+      readonly websiteId: CodecTypes['pg/text@1']['output'];
+    };
     readonly WebsiteRelease: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly id: CodecTypes['pg/text@1']['output'];
@@ -568,6 +604,18 @@ export type StorageColumnInputTypes = {
       readonly templateKey: CodecTypes['pg/text@1']['input'];
       readonly tenantId: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+    };
+    readonly WebsiteMigration: {
+      readonly appliedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
+      readonly appliedBy: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly plan: CodecTypes['pg/json@1']['input'];
+      readonly proposedBy: CodecTypes['pg/text@1']['input'];
+      readonly resolutions: CodecTypes['pg/json@1']['input'] | null;
+      readonly sourceReleaseId: CodecTypes['pg/text@1']['input'];
+      readonly status: 'PROPOSED' | 'APPLIED';
+      readonly websiteId: CodecTypes['pg/text@1']['input'];
     };
     readonly WebsiteRelease: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
@@ -666,11 +714,28 @@ export namespace Models {
     tenantId: CodecTypes['pg/text@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     dataSources: public_DataSource[];
+    migrations: public_WebsiteMigration[];
     pages: public_Page[];
     publishedRelease: public_WebsiteRelease | null;
     releases: public_WebsiteRelease[];
     theme: public_WebsiteTheme | null;
-    readonly [RelationKeys]?: 'dataSources' | 'pages' | 'publishedRelease' | 'releases' | 'theme';
+    readonly [RelationKeys]?:
+      'dataSources' | 'migrations' | 'pages' | 'publishedRelease' | 'releases' | 'theme';
+  };
+  export type public_WebsiteMigration = {
+    appliedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
+    appliedBy: CodecTypes['pg/text@1']['output'] | null;
+    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    id: CodecTypes['pg/text@1']['output'];
+    plan: CodecTypes['pg/json@1']['output'];
+    proposedBy: CodecTypes['pg/text@1']['output'];
+    resolutions: CodecTypes['pg/json@1']['output'] | null;
+    sourceReleaseId: CodecTypes['pg/text@1']['output'];
+    status: 'PROPOSED' | 'APPLIED';
+    websiteId: CodecTypes['pg/text@1']['output'];
+    sourceRelease: public_WebsiteRelease;
+    website: public_Website;
+    readonly [RelationKeys]?: 'sourceRelease' | 'website';
   };
   export type public_WebsiteRelease = {
     createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
@@ -682,8 +747,9 @@ export namespace Models {
     status: 'DRAFT' | 'PUBLISHED' | 'FAILED' | 'ROLLED_BACK';
     websiteId: CodecTypes['pg/text@1']['output'];
     activeWebsites: public_Website[];
+    migrations: public_WebsiteMigration[];
     website: public_Website;
-    readonly [RelationKeys]?: 'activeWebsites' | 'website';
+    readonly [RelationKeys]?: 'activeWebsites' | 'migrations' | 'website';
   };
   export type public_WebsiteTheme = {
     accentColor: CodecTypes['pg/text@1']['output'];
@@ -708,6 +774,7 @@ export declare const models: {
     Page: Models.public_Page;
     PageConfig: Models.public_PageConfig;
     Website: Models.public_Website;
+    WebsiteMigration: Models.public_WebsiteMigration;
     WebsiteRelease: Models.public_WebsiteRelease;
     WebsiteTheme: Models.public_WebsiteTheme;
   };
@@ -1152,6 +1219,113 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly WebsiteMigration: {
+              columns: {
+                readonly appliedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
+                };
+                readonly appliedBy: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                };
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly plan: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: false;
+                };
+                readonly proposedBy: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly resolutions: {
+                  readonly nativeType: 'json';
+                  readonly codecId: 'pg/json@1';
+                  readonly nullable: true;
+                };
+                readonly sourceReleaseId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly status: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/text@1', 'PROPOSED'>;
+                  };
+                };
+                readonly websiteId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'WebsiteMigration_sourceReleaseId_idx_7dff7977';
+                  readonly prefix: 'WebsiteMigration_sourceReleaseId_idx';
+                  readonly columns: readonly ['sourceReleaseId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WebsiteMigration_websiteId_createdAt_idx_5579a8b3';
+                  readonly prefix: 'WebsiteMigration_websiteId_createdAt_idx';
+                  readonly columns: readonly ['websiteId', 'createdAt'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'WebsiteMigration_websiteId_idx_aa7167ce';
+                  readonly prefix: 'WebsiteMigration_websiteId_idx';
+                  readonly columns: readonly ['websiteId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WebsiteMigration';
+                    readonly columns: readonly ['websiteId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Website';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WebsiteMigration';
+                    readonly columns: readonly ['sourceReleaseId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'WebsiteRelease';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly WebsiteRelease: {
               columns: {
                 readonly createdAt: {
@@ -1333,6 +1507,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['UNKNOWN', 'OK', 'ERROR'];
             };
+            readonly MigrationStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['PROPOSED', 'APPLIED'];
+            };
             readonly PageConfigStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['DRAFT', 'PUBLISHED'];
@@ -1367,6 +1545,10 @@ type ContractBase = Omit<
       readonly model: 'PageConfig';
     };
     readonly Website: { readonly namespace: 'public' & NamespaceId; readonly model: 'Website' };
+    readonly WebsiteMigration: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'WebsiteMigration';
+    };
     readonly WebsiteRelease: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'WebsiteRelease';
@@ -1796,6 +1978,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['websiteId'];
                 };
               };
+              readonly migrations: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WebsiteMigration';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['websiteId'];
+                };
+              };
               readonly pages: {
                 readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Page' };
                 readonly cardinality: '1:N';
@@ -1856,6 +2049,98 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly WebsiteMigration: {
+            readonly fields: {
+              readonly appliedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly appliedBy: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly plan: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly proposedBy: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly resolutions: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
+              };
+              readonly sourceReleaseId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly websiteId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly sourceRelease: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WebsiteRelease';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['sourceReleaseId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly website: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Website';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['websiteId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'WebsiteMigration';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly appliedAt: { readonly column: 'appliedAt' };
+                readonly appliedBy: { readonly column: 'appliedBy' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly plan: { readonly column: 'plan' };
+                readonly proposedBy: { readonly column: 'proposedBy' };
+                readonly resolutions: { readonly column: 'resolutions' };
+                readonly sourceReleaseId: { readonly column: 'sourceReleaseId' };
+                readonly status: { readonly column: 'status' };
+                readonly websiteId: { readonly column: 'websiteId' };
+              };
+            };
+          };
           readonly WebsiteRelease: {
             readonly fields: {
               readonly createdAt: {
@@ -1907,6 +2192,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['id'];
                   readonly targetFields: readonly ['publishedReleaseId'];
+                };
+              };
+              readonly migrations: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'WebsiteMigration';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['sourceReleaseId'];
                 };
               };
               readonly website: {
@@ -2031,6 +2327,13 @@ type ContractBase = Omit<
               { readonly name: 'ERROR'; readonly value: 'ERROR' },
             ];
           };
+          readonly MigrationStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'PROPOSED'; readonly value: 'PROPOSED' },
+              { readonly name: 'APPLIED'; readonly value: 'APPLIED' },
+            ];
+          };
           readonly PageConfigStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -2079,65 +2382,73 @@ type ContractBase = Omit<
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'DataSource';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'Dataset';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'Dataset';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'DataSource';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'Membership';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'Membership';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'Page';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'Page';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'PageConfig';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'PageConfig';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'Website';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'Website';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'WebsiteRelease';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'WebsiteMigration';
           };
         },
         {
           readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
           readonly ref: {
-            readonly entry: 'WebsiteTheme';
-            readonly field: 'id';
+            readonly column: 'id';
             readonly namespace: 'public';
+            readonly table: 'WebsiteRelease';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv4'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly column: 'id';
+            readonly namespace: 'public';
+            readonly table: 'WebsiteTheme';
           };
         },
       ];

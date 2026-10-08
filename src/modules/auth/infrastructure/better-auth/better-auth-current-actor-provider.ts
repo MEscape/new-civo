@@ -14,10 +14,7 @@ import { hasExceededMaxLifetime } from '../../domain/models/session-policy';
 
 import { mapBetterAuthError } from './map-better-auth-error';
 
-import type {
-  SessionSnapshot,
-  SessionSource,
-} from './better-auth-session-source';
+import type { SessionSnapshot, SessionSource } from './better-auth-session-source';
 import type { Actor } from '../../domain/models/actor';
 import type { TenantId } from '../../domain/models/ids';
 import type {
@@ -50,16 +47,11 @@ export class BetterAuthCurrentActorProvider implements CurrentActorProvider {
         this.deps.sessions.getSession({
           headers: await this.deps.getHeaders(),
         }),
-      (thrown) =>
-        narrowSessionLookupError(
-          mapBetterAuthError(thrown, sessionLookupFailed)
-        )
+      (thrown) => narrowSessionLookupError(mapBetterAuthError(thrown, sessionLookupFailed)),
     ).andThen((session) => this.resolveActor(session));
   }
 
-  private resolveActor(
-    session: SessionSnapshot | null
-  ): AppResultAsync<Actor, CurrentActorError> {
+  private resolveActor(session: SessionSnapshot | null): AppResultAsync<Actor, CurrentActorError> {
     // No session is the normal "not signed in" outcome, not a failure of the provider.
     if (session === null) {
       return errAsync(unauthenticated());
@@ -68,7 +60,7 @@ export class BetterAuthCurrentActorProvider implements CurrentActorProvider {
     const isTooOld = hasExceededMaxLifetime(
       session.session.createdAt,
       this.deps.clock.now(),
-      this.deps.sessionMaxLifetimeMs
+      this.deps.sessionMaxLifetimeMs,
     );
     if (isTooOld) {
       return errAsync(sessionExpired());
@@ -94,8 +86,7 @@ export class BetterAuthCurrentActorProvider implements CurrentActorProvider {
  * match forces a decision if `AppError` ever gains a kind.
  */
 function narrowSessionLookupError(error: AppError): CurrentActorError {
-  const failClosed = (cause: AppError): CurrentActorError =>
-    sessionLookupFailed(cause);
+  const failClosed = (cause: AppError): CurrentActorError => sessionLookupFailed(cause);
 
   return matchAppError<CurrentActorError>(error, {
     unauthorized: (allowed) => allowed,

@@ -1,15 +1,6 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 
 import { trimToNull } from '@lib/utils';
 
@@ -37,9 +28,9 @@ export function CardGrid({ props }: CardGridComponentProps) {
                 <CardHeader>
                   <CardTitle>
                     {card.href !== undefined ? (
-                      <a href={card.href} className="hover:text-primary">
+                      <ContentLink href={card.href} className="hover:text-primary-copy">
                         {card.title}
-                      </a>
+                      </ContentLink>
                     ) : (
                       card.title
                     )}

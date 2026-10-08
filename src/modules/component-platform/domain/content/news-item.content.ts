@@ -2,14 +2,7 @@ import { instant } from '../models/field-schema';
 
 import { defineContent } from './define-content';
 import { sampleInstant } from './sample-instant';
-import {
-  compareText,
-  imageUrl,
-  label,
-  recordId,
-  shortText,
-  title,
-} from './shared-fields';
+import { compareText, imageUrl, label, recordId, shortText, title } from './shared-fields';
 
 /** A news article of the municipality, newest first. */
 export const newsItemContent = defineContent({
@@ -22,16 +15,14 @@ export const newsItemContent = defineContent({
     publishedAt: instant(),
   },
   rule: {
-    compare: (first, second) =>
-      compareText(second.publishedAt, first.publishedAt),
+    compare: (first, second) => compareText(second.publishedAt, first.publishedAt),
     categoryOf: (item) => item.category,
   },
 }).withSample((now) => [
   {
     id: 'sample-news-1',
     title: 'Neuer Radweg entlang der Hauptstraße eröffnet',
-    excerpt:
-      'Der Radweg verbindet jetzt Innenstadt und Bahnhof auf direktem Weg.',
+    excerpt: 'Der Radweg verbindet jetzt Innenstadt und Bahnhof auf direktem Weg.',
     category: 'Mobilität',
     publishedAt: sampleInstant(now, { days: -1, hour: 9 }),
   },

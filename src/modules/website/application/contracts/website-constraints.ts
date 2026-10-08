@@ -4,10 +4,7 @@
  * the domain, so they are re-exported here as part of the application's
  * contract. Nothing in this file is defined twice.
  */
-export {
-  WEBSITE_ERROR_CODES,
-  WEBSITE_VALIDATION_CODES,
-} from '../../domain/errors/website-errors';
+export { WEBSITE_ERROR_CODES, WEBSITE_VALIDATION_CODES } from '../../domain/errors/website-errors';
 export type { WebsiteCode } from '../../domain/errors/website-errors';
 export { WEBSITE_ID_MAX_LENGTH } from '../../domain/models/ids';
 export { SLUG_PATTERN, WEBSITE_LIMITS } from '../../domain/models/website';

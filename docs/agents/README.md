@@ -64,7 +64,7 @@ The agents should complement each other rather than duplicate each other's respo
 
 ## Goal Checker Agent
 
-**Specification:** [docs/agents/goal-checker-agent.md](docs/agents/goal-checker-agent.md)
+**Specification:** [docs/agents/goal-checker-agent.md](goal-checker-agent.md)
 
 ### Purpose
 
@@ -96,7 +96,7 @@ Run for every feature or significant change where completion must be verified ag
 
 ## Designer Agent
 
-**Specification:** [docs/agents/designer-agent.md](docs/agents/designer-agent.md)
+**Specification:** [docs/agents/designer-agent.md](designer-agent.md)
 
 ### Purpose
 
@@ -134,7 +134,7 @@ Run for user-facing changes, frontend features, workflows, and changes that affe
 
 ## Architecture Agent
 
-**Specification:** [docs/agents/architecture-agent.md](docs/agents/architecture-agent.md)
+**Specification:** [docs/agents/architecture-agent.md](architecture-agent.md)
 
 ### Purpose
 
@@ -172,7 +172,7 @@ Run for major features, backend changes, new modules, shared components, archite
 
 ## Security Agent
 
-**Specification:** [docs/agents/security-agent.md](docs/agents/security-agent.md)
+**Specification:** [docs/agents/security-agent.md](security-agent.md)
 
 ### Purpose
 
@@ -212,7 +212,7 @@ Run for security-sensitive features, externally accessible functionality, authen
 
 ## Bug Bounty Agent
 
-**Specification:** [docs/agents/bug-bounty-agent.md](docs/agents/bug-bounty-agent.md)
+**Specification:** [docs/agents/bug-bounty-agent.md](bug-bounty-agent.md)
 
 ### Purpose
 
@@ -251,7 +251,7 @@ Testing must only be performed against systems and environments where the operat
 
 ## Test Agent
 
-**Specification:** [docs/agents/test-agent.md](docs/agents/test-agent.md)
+**Specification:** [docs/agents/test-agent.md](test-agent.md)
 
 ### Purpose
 
@@ -288,7 +288,7 @@ Run for every feature and significant code change.
 
 ## Production Blocker Agent
 
-**Specification:** [docs/agents/production-blocker-agent.md](docs/agents/production-blocker-agent.md)
+**Specification:** [docs/agents/production-blocker-agent.md](production-blocker-agent.md)
 
 ### Purpose
 

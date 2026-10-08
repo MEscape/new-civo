@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 import {
   DATA_SOURCE_KINDS,
   DATA_SOURCE_VALIDATION_CODES as CODES,
-} from "../../application/contracts/data-source-constraints";
+} from '../../application/contracts/data-source-constraints';
 
-import { dataSourceNameSchema, idSchema } from "./data-source-fields-schema";
+import { dataSourceNameSchema, idSchema } from './data-source-fields-schema';
 
 /**
  * The action ENVELOPE. The config is kind-specific and its rules (including

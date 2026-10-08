@@ -18,11 +18,13 @@
 - Use `proxy.ts` only for request-level concerns.
 - Do not put business authorization rules in `proxy.ts`. See [`security.md`](security.md).
 - Use `loading.tsx` for meaningful route loading states.
-- Use `error.tsx` for unexpected route-level failures.
+- Use `error.tsx` for unexpected route-level failures. It shows translated generic text, never `error.message`; the shared `RouteErrorPanel` and `NotFoundPanel` render the bodies. `global-error.tsx` covers failures of the locale layout.
 - Use `not-found.tsx` or `notFound()` for missing resources.
 - Use Suspense boundaries for independently streamable UI. See [`performance.md`](performance.md).
 - Use async request APIs such as `params`, `searchParams`, `cookies`, and `headers`.
 - Use Next.js navigation primitives instead of raw equivalents where applicable.
-- Use route metadata APIs for page metadata.
+- Use route metadata APIs for page metadata, through the builders in `@lib/seo`: localized pages declare canonical and language alternates, untranslated content one canonical URL, and private or single-use-link pages `noindex`.
+- `robots.ts`, `sitemap.ts` and `manifest.ts` are the only sources of those files; private areas are excluded in `robots.ts` and marked `noindex`.
+- With `cacheComponents`, route segment options such as `dynamic` are rejected; make a handler per-request with `connection()`.
 - Keep Node-only dependencies out of Edge-compatible code.
 - Declare runtime requirements explicitly when they matter, except where the framework forbids it: with `cacheComponents` the `runtime` segment option is rejected and every route runs on Node.js.

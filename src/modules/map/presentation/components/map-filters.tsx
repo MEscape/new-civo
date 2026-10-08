@@ -8,7 +8,6 @@ import { Input, Label } from '@components/ui/input';
 import { useTranslations } from '@i18n/client';
 
 import { countActiveFilters } from '../../application/contracts/map-constraints';
-
 import { useAttributeFormat } from '../hooks/use-attribute-format';
 import { useFieldLabel } from '../hooks/use-field-label';
 
@@ -50,25 +49,15 @@ function SelectGroup({
   const selected = current?.kind === 'select' ? current.selected : [];
 
   function handleToggle(value: string, isChecked: boolean): void {
-    const next = isChecked
-      ? [...selected, value]
-      : selected.filter((entry) => entry !== value);
-    onChange(
-      definition.field,
-      next.length === 0 ? null : { kind: 'select', selected: next }
-    );
+    const next = isChecked ? [...selected, value] : selected.filter((entry) => entry !== value);
+    onChange(definition.field, next.length === 0 ? null : { kind: 'select', selected: next });
   }
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-copy">
-        {label(definition.field)}
-      </legend>
+      <legend className="text-sm font-medium text-copy">{label(definition.field)}</legend>
       {definition.options.map((option) => (
-        <label
-          key={option.value}
-          className="flex items-center gap-2 text-sm text-copy"
-        >
+        <label key={option.value} className="flex items-center gap-2 text-sm text-copy">
           <input
             type="checkbox"
             className="size-4 accent-primary"
@@ -104,23 +93,16 @@ function NumberRange({
   const id = useId();
   const current = state[definition.field];
   const range =
-    current?.kind === 'range'
-      ? current
-      : { kind: 'range' as const, min: null, max: null };
+    current?.kind === 'range' ? current : { kind: 'range' as const, min: null, max: null };
 
   function handleChange(part: 'min' | 'max', raw: string): void {
     const next = { ...range, [part]: toNumber(raw) };
-    onChange(
-      definition.field,
-      next.min === null && next.max === null ? null : next
-    );
+    onChange(definition.field, next.min === null && next.max === null ? null : next);
   }
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-copy">
-        {label(definition.field)}
-      </legend>
+      <legend className="text-sm font-medium text-copy">{label(definition.field)}</legend>
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <Label htmlFor={`${id}-min`}>{t('filters.minimum')}</Label>
@@ -171,23 +153,16 @@ function DateRange({
   const id = useId();
   const current = state[definition.field];
   const range =
-    current?.kind === 'dateRange'
-      ? current
-      : { kind: 'dateRange' as const, from: null, to: null };
+    current?.kind === 'dateRange' ? current : { kind: 'dateRange' as const, from: null, to: null };
 
   function handleChange(part: 'from' | 'to', raw: string): void {
     const next = { ...range, [part]: raw === '' ? null : raw };
-    onChange(
-      definition.field,
-      next.from === null && next.to === null ? null : next
-    );
+    onChange(definition.field, next.from === null && next.to === null ? null : next);
   }
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-copy">
-        {label(definition.field)}
-      </legend>
+      <legend className="text-sm font-medium text-copy">{label(definition.field)}</legend>
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <Label htmlFor={`${id}-from`}>{t('filters.from')}</Label>
@@ -224,12 +199,7 @@ function DateRange({
  * Filters derived from the data itself. Collapsed by default on small
  * screens (native `details`), always reachable by keyboard.
  */
-export function MapFilters({
-  definitions,
-  state,
-  onChange,
-  onReset,
-}: MapFiltersProps) {
+export function MapFilters({ definitions, state, onChange, onReset }: MapFiltersProps) {
   const t = useTranslations('map');
   const activeCount = countActiveFilters(state);
 
@@ -238,10 +208,7 @@ export function MapFilters({
   }
 
   return (
-    <details
-      className="group rounded-token border border-border bg-surface"
-      open
-    >
+    <details className="group rounded-token border border-border bg-surface" open>
       <summary className="flex cursor-pointer items-center justify-between gap-2 px-4 py-3 text-sm font-medium text-copy">
         <span>{t('filters.title')}</span>
         {activeCount > 0 && (

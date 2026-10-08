@@ -1,5 +1,3 @@
-import { useTranslations } from 'next-intl';
-
 import {
   Select,
   SelectContent,
@@ -7,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@components/ui/select';
+
+import { useTranslations } from '@i18n/client';
 
 import { useBuilderSession } from '../../builder-session-context';
 
@@ -23,13 +23,7 @@ const NO_OPTIONS: readonly DatasetOptionDto[] = [];
  * no client-supplied website to trust. "No dataset" clears the prop and
  * the component falls back to sample data.
  */
-export function DatasetControl({
-  id,
-  field,
-  value,
-  onChange,
-  onCommit,
-}: ControlProps) {
+export function DatasetControl({ id, field, value, onChange, onCommit }: ControlProps) {
   const t = useTranslations('builder');
   const { datasetOptions } = useBuilderSession();
   const type = field.canonicalKind;
@@ -60,9 +54,7 @@ export function DatasetControl({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={NO_DATASET_VALUE}>
-          {t('properties.dataset.placeholder')}
-        </SelectItem>
+        <SelectItem value={NO_DATASET_VALUE}>{t('properties.dataset.placeholder')}</SelectItem>
         {options.map((option) => (
           <SelectItem key={option.id} value={option.id}>
             {t('properties.dataset.option', {

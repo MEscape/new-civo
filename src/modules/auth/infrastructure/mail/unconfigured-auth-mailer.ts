@@ -7,7 +7,7 @@ import { mailerNotConfigured } from '../../domain/errors/auth-errors';
 import type { AuthMailer } from '../../domain/ports/auth-mailer.port';
 
 function notConfigured(): AppResultAsync<void, InfrastructureAppError> {
-    return errAsync(mailerNotConfigured());
+  return errAsync(mailerNotConfigured());
 }
 
 /**
@@ -18,7 +18,7 @@ function notConfigured(): AppResultAsync<void, InfrastructureAppError> {
  * carries a single-use token.
  */
 export class UnconfiguredAuthMailer implements AuthMailer {
-    sendVerification = notConfigured;
-    sendPasswordReset = notConfigured;
-    sendExistingAccountNotice = notConfigured;
+  sendVerification = notConfigured;
+  sendPasswordReset = notConfigured;
+  sendExistingAccountNotice = notConfigured;
 }

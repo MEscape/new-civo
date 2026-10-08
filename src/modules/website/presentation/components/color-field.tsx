@@ -2,15 +2,15 @@
 
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
 import { useController } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { Input, Label } from '@components/ui/input';
 
+import { useTranslations } from '@i18n/client';
+
 import { HEX_COLOR_PATTERN } from '../../application/contracts/website-constraints';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
-
 
 import type { ThemeSettings } from '../schemas/theme-settings-schema';
 import type { Control } from 'react-hook-form';
@@ -41,11 +41,7 @@ export function ColorField({ control, name, label }: ColorFieldProps) {
           type="color"
           aria-label={t('themeSettings.colorPicker', { color: label })}
           className="h-9 w-12 cursor-pointer p-1"
-          value={
-            HEX_COLOR_PATTERN.test(field.value)
-              ? field.value
-              : NEUTRAL_PICKER_COLOR
-          }
+          value={HEX_COLOR_PATTERN.test(field.value) ? field.value : NEUTRAL_PICKER_COLOR}
           onChange={field.onChange}
         />
         <Input
@@ -60,7 +56,10 @@ export function ColorField({ control, name, label }: ColorFieldProps) {
           aria-describedby={errorCode ? errorId : undefined}
         />
       </div>
-      <FieldMessage id={errorId} message={errorCode ? t(messageKeyForCode(errorCode), MESSAGE_PARAMS) : undefined} />
+      <FieldMessage
+        id={errorId}
+        message={errorCode ? t(messageKeyForCode(errorCode), MESSAGE_PARAMS) : undefined}
+      />
     </div>
   );
 }

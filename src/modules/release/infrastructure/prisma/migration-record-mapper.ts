@@ -7,11 +7,7 @@ import { literalGuard } from '@lib/utils';
 import { toMigrationId, toReleaseId, toWebsiteId } from '../../domain/models/ids';
 import { restoreMigrationPlan } from '../../domain/models/stored-migration-plan';
 
-import type {
-  Migration,
-  MigrationStatus,
-  MigrationSummary,
-} from '../../domain/models/migration';
+import type { Migration, MigrationStatus, MigrationSummary } from '../../domain/models/migration';
 
 /**
  * Persistence shapes. They mirror the columns the module reads and
@@ -59,9 +55,7 @@ function toMigrationStatus(raw: string): MigrationStatus {
   return isProposedRecord(raw) ? 'proposed' : 'applied';
 }
 
-export function toMigrationSummary(
-  record: MigrationSummaryRecord
-): MigrationSummary {
+export function toMigrationSummary(record: MigrationSummaryRecord): MigrationSummary {
   return {
     id: toMigrationId(record.id),
     websiteId: toWebsiteId(record.websiteId),
@@ -73,9 +67,7 @@ export function toMigrationSummary(
 }
 
 /** The stored plan goes through the domain's own reader before it reaches a use case. */
-export function toMigration(
-  record: MigrationRecord
-): AppResult<Migration, UnexpectedAppError> {
+export function toMigration(record: MigrationRecord): AppResult<Migration, UnexpectedAppError> {
   return restoreMigrationPlan(record.plan).map((plan) => ({
     ...toMigrationSummary(record),
     plan,

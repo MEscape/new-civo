@@ -1,4 +1,4 @@
-import type { ValidationAppError , FieldErrorBag } from '@lib/errors';
+import type { ValidationAppError, FieldErrorBag } from '@lib/errors';
 import { fieldPath } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
@@ -14,12 +14,7 @@ const CODES = WEBSITE_VALIDATION_CODES;
  * matching loaded font and a CSS stack in presentation (`theme-css.ts`,
  * which is typed `Record<ThemeFontFamily, ...>` so a gap fails to compile).
  */
-export const THEME_FONT_FAMILIES = [
-  'Source Serif 4',
-  'Inter',
-  'DM Sans',
-  'Geist',
-] as const;
+export const THEME_FONT_FAMILIES = ['Source Serif 4', 'Inter', 'DM Sans', 'Geist'] as const;
 export type ThemeFontFamily = (typeof THEME_FONT_FAMILIES)[number];
 
 /** Body copy excludes the serif display face. */
@@ -33,11 +28,7 @@ export type BodyFontFamily = (typeof BODY_FONT_FAMILIES)[number];
 export const THEME_RADII = ['none', 'sm', 'md', 'lg'] as const;
 export type ThemeRadius = (typeof THEME_RADII)[number];
 
-export const THEME_SPACING_SCALES = [
-  'compact',
-  'comfortable',
-  'spacious',
-] as const;
+export const THEME_SPACING_SCALES = ['compact', 'comfortable', 'spacious'] as const;
 export type ThemeSpacingScale = (typeof THEME_SPACING_SCALES)[number];
 
 export const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
@@ -103,24 +94,29 @@ export const isBodyFontFamily = literalGuard(BODY_FONT_FAMILIES);
 export const isThemeRadius = literalGuard(THEME_RADII);
 export const isThemeSpacingScale = literalGuard(THEME_SPACING_SCALES);
 
+/** Where a rejected value is reported. */
+interface Rejection {
+  readonly path: string;
+  readonly code: string;
+  readonly bag: FieldErrorBag;
+}
+
 function narrow<T extends string>(
   value: string,
   guard: (candidate: string) => candidate is T,
-  path: string,
-  code: string,
-  bag: FieldErrorBag
+  { path, code, bag }: Rejection,
 ): T | null {
-  if (guard(value)) {return value;}
+  if (guard(value)) {
+    return value;
+  }
   bag.add(path, code);
   return null;
 }
 
-function checkColor(
-  value: string,
-  path: string,
-  bag: FieldErrorBag
-): string | null {
-  if (HEX_COLOR_PATTERN.test(value)) {return value;}
+function checkColor(value: string, path: string, bag: FieldErrorBag): string | null {
+  if (HEX_COLOR_PATTERN.test(value)) {
+    return value;
+  }
   bag.add(path, CODES.colorInvalid);
   return null;
 }
@@ -130,41 +126,33 @@ function checkColor(
  * This is the only way new theme values enter the system.
  */
 export function createWebsiteTheme(
-  input: WebsiteThemeInput
+  input: WebsiteThemeInput,
 ): AppResult<WebsiteTheme, ValidationAppError> {
   const bag = createWebsiteErrorBag();
 
   const primary = checkColor(input.colors.primary, fieldPath('colors', 'primary'), bag);
   const secondary = checkColor(input.colors.secondary, fieldPath('colors', 'secondary'), bag);
   const accent = checkColor(input.colors.accent, fieldPath('colors', 'accent'), bag);
-  const headingFont = narrow(
-    input.typography.headingFont,
-    isThemeFontFamily,
-    fieldPath('typography', 'headingFont'),
-    CODES.fontUnsupported,
-    bag
-  );
-  const bodyFont = narrow(
-    input.typography.bodyFont,
-    isBodyFontFamily,
-    fieldPath('typography', 'bodyFont'),
-    CODES.fontUnsupported,
-    bag
-  );
-  const radius = narrow(
-    input.radius,
-    isThemeRadius,
-    'radius',
-    CODES.radiusUnsupported,
-    bag
-  );
-  const spacingScale = narrow(
-    input.spacingScale,
-    isThemeSpacingScale,
-    'spacingScale',
-    CODES.spacingUnsupported,
-    bag
-  );
+  const headingFont = narrow(input.typography.headingFont, isThemeFontFamily, {
+    path: fieldPath('typography', 'headingFont'),
+    code: CODES.fontUnsupported,
+    bag,
+  });
+  const bodyFont = narrow(input.typography.bodyFont, isBodyFontFamily, {
+    path: fieldPath('typography', 'bodyFont'),
+    code: CODES.fontUnsupported,
+    bag,
+  });
+  const radius = narrow(input.radius, isThemeRadius, {
+    path: 'radius',
+    code: CODES.radiusUnsupported,
+    bag,
+  });
+  const spacingScale = narrow(input.spacingScale, isThemeSpacingScale, {
+    path: 'spacingScale',
+    code: CODES.spacingUnsupported,
+    bag,
+  });
 
   if (
     bag.hasErrors ||
@@ -194,7 +182,7 @@ function colorOr(value: string | null | undefined, fallback: string): string {
 function valueOr<T extends string>(
   value: string | null | undefined,
   guard: (candidate: string) => candidate is T,
-  fallback: T
+  fallback: T,
 ): T {
   return isDefined(value) && guard(value) ? value : fallback;
 }
@@ -204,33 +192,24 @@ function valueOr<T extends string>(
  * field. Unlike `createWebsiteTheme` this never fails: a row saved before
  * a font was removed from the curated list must still render.
  */
-export function restoreWebsiteTheme(
-  stored: StoredWebsiteTheme | null | undefined
-): WebsiteTheme {
+export function restoreWebsiteTheme(stored: StoredWebsiteTheme | null | undefined): WebsiteTheme {
   const fallback = DEFAULT_WEBSITE_THEME;
+  const { colors = {}, typography = {}, radius, spacingScale } = stored ?? {};
   return {
     colors: {
-      primary: colorOr(stored?.colors?.primary, fallback.colors.primary),
-      secondary: colorOr(stored?.colors?.secondary, fallback.colors.secondary),
-      accent: colorOr(stored?.colors?.accent, fallback.colors.accent),
+      primary: colorOr(colors.primary, fallback.colors.primary),
+      secondary: colorOr(colors.secondary, fallback.colors.secondary),
+      accent: colorOr(colors.accent, fallback.colors.accent),
     },
     typography: {
       headingFont: valueOr(
-        stored?.typography?.headingFont,
+        typography.headingFont,
         isThemeFontFamily,
-        fallback.typography.headingFont
+        fallback.typography.headingFont,
       ),
-      bodyFont: valueOr(
-        stored?.typography?.bodyFont,
-        isBodyFontFamily,
-        fallback.typography.bodyFont
-      ),
+      bodyFont: valueOr(typography.bodyFont, isBodyFontFamily, fallback.typography.bodyFont),
     },
-    radius: valueOr(stored?.radius, isThemeRadius, fallback.radius),
-    spacingScale: valueOr(
-      stored?.spacingScale,
-      isThemeSpacingScale,
-      fallback.spacingScale
-    ),
+    radius: valueOr(radius, isThemeRadius, fallback.radius),
+    spacingScale: valueOr(spacingScale, isThemeSpacingScale, fallback.spacingScale),
   };
 }

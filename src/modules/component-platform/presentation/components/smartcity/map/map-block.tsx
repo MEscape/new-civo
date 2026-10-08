@@ -1,5 +1,6 @@
-import { MapSection } from '@modules/map';
-import type { MapLayerInput } from '@modules/map';
+import type { ComponentType } from 'react';
+
+import type { MapLayerInput, MapSectionProps } from '@modules/map';
 
 import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 
@@ -26,6 +27,8 @@ export interface MapBlockProps {
   readonly props: ComponentProps<'map'>;
   readonly context: RenderContext;
   readonly loadContent: LoadContent;
+  /** The map module's section, handed in by `composition.ts`. */
+  readonly mapSection: ComponentType<MapSectionProps>;
 }
 
 /** A map shows every feature of its datasets; the data-sources mapping already caps a dataset at this size. */
@@ -74,7 +77,12 @@ async function loadSlot(
  * canvas shows labelled sample features and a published page shows an empty
  * map, never invented data.
  */
-export async function MapBlock({ props, context, loadContent }: MapBlockProps) {
+export async function MapBlock({
+  props,
+  context,
+  loadContent,
+  mapSection: MapSection,
+}: MapBlockProps) {
   const t = await getTranslations('componentPlatform');
   const heading = trimToNull(props.heading) ?? t('map.defaultHeading');
 

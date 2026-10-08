@@ -21,6 +21,8 @@ export interface GetComponentDefaultPropsInput {
  * a component is retained for now, and a consumer must report an older one
  * as unresolvable instead of guessing. An unregistered type is an error the
  * caller decides how to treat.
+ *
+ * @authorization public Reads the component catalog, which is code and contains nothing per tenant.
  */
 export class GetComponentDefaultProps {
   constructor(private readonly deps: PublicComponentPlatformDependencies) {}

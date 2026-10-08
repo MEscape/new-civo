@@ -21,13 +21,14 @@ import type { SavedRevisionDto } from '../dto/page-dto';
  * and the public site is served from release snapshots, not from drafts.
  */
 export async function savePageConfigAction(
-  input: unknown
+  input: unknown,
 ): Promise<ActionResult<SavedRevisionDto>> {
-  const result = await parseBuilderInput(
-    savePageConfigSchema,
-    input
-  ).asyncAndThen((command) => builderCommands.savePageConfig.execute(command));
+  const result = await parseBuilderInput(savePageConfigSchema, input).asyncAndThen((command) =>
+    builderCommands.savePageConfig.execute(command),
+  );
 
-  if (result.isOk()) {revalidatePath(builderRoutes.pages(result.value.websiteId));}
+  if (result.isOk()) {
+    revalidatePath(builderRoutes.pages(result.value.websiteId));
+  }
   return toActionResult(result.map(toSavedRevisionDto));
 }

@@ -12,7 +12,7 @@ export class GetWebsiteById {
 
   execute(id: string): AppResultAsync<WebsiteView, LoadWebsiteError> {
     return loadAuthorizedWebsite(this.deps, id, 'website.read').map(({ website }) =>
-      toWebsiteView(website)
+      toWebsiteView(website),
     );
   }
 }

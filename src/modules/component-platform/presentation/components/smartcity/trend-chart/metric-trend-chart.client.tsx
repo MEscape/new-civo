@@ -73,9 +73,7 @@ export function MetricTrendChartClient({ data, unit }: MetricTrendChartClientPro
           />
           <Tooltip
             formatter={(value) => [formatValue(value), '']}
-            labelFormatter={(value) =>
-              typeof value === 'string' ? formatInstant(value) : String(value)
-            }
+            labelFormatter={(value) => (typeof value === 'string' ? formatInstant(value) : value)}
             contentStyle={TOOLTIP_STYLE}
           />
           <Area

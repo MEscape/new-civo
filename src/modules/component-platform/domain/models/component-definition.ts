@@ -1,12 +1,7 @@
-import type { PropBounds, PropControl, PropGroup } from './prop-field';
+import type { PropBounds, PropControl, PropGroup, PropItemField } from './prop-field';
 import type { ContentKind } from '../content/content-definitions';
 
-export const COMPONENT_CATEGORIES = [
-  'layout',
-  'content',
-  'civic',
-  'smartcity',
-] as const;
+export const COMPONENT_CATEGORIES = ['layout', 'content', 'civic', 'smartcity'] as const;
 export type ComponentCategory = (typeof COMPONENT_CATEGORIES)[number];
 
 /** The oldest contract version a component's rendering code understands. */
@@ -23,6 +18,9 @@ export interface PropFieldDefinition {
   readonly options: ReadonlyArray<string | number>;
   readonly bounds: PropBounds | null;
   readonly hasPlaceholder: boolean;
+  readonly itemFields: readonly PropItemField[];
+  /** `null`: a `dataset` prop takes the component's own data binding. */
+  readonly datasetKind: ContentKind | null;
 }
 
 /**

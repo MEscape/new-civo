@@ -1,18 +1,9 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
-import { getLocale, getTimeZone, getTranslations } from '@i18n/server';
+import { getAppFormatters, getTranslations } from '@i18n/server';
 
-import { formatDate, trimToNull } from '@lib/utils';
+import { trimToNull } from '@lib/utils';
 
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
@@ -41,10 +32,9 @@ export async function NewsAndEventsSplit({
   context,
   loadContent,
 }: NewsAndEventsSplitComponentProps) {
-  const [t, locale, timeZone, newsResult, eventsResult] = await Promise.all([
+  const [t, format, newsResult, eventsResult] = await Promise.all([
     getTranslations('componentPlatform'),
-    getLocale(),
-    getTimeZone(),
+    getAppFormatters(),
     loadContent({
       kind: 'NewsItem',
       mode: context.mode,
@@ -60,8 +50,7 @@ export async function NewsAndEventsSplit({
       limit: props.eventsLimit,
     }),
   ]);
-  const heading =
-    trimToNull(props.heading) ?? t('newsAndEventsSplit.defaultHeading');
+  const heading = trimToNull(props.heading) ?? t('newsAndEventsSplit.defaultHeading');
 
   if (newsResult.isErr() && eventsResult.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -82,9 +71,7 @@ export async function NewsAndEventsSplit({
               {t('newsAndEventsSplit.newsHeading')}
             </h3>
             {newsResult.isErr() ? (
-              <p className="text-sm text-copy-muted">
-                {t('render.sectionUnavailable')}
-              </p>
+              <p className="text-sm text-copy-muted">{t('render.sectionUnavailable')}</p>
             ) : (
               <>
                 <ContentOriginBadge origin={newsResult.value.origin} />
@@ -94,9 +81,7 @@ export async function NewsAndEventsSplit({
                       <Card>
                         <CardHeader>
                           {item.category !== undefined && (
-                            <p className="text-xs font-medium text-accent">
-                              {item.category}
-                            </p>
+                            <p className="text-xs font-medium text-accent-copy">{item.category}</p>
                           )}
                           <CardTitle>{item.title}</CardTitle>
                           {item.excerpt !== undefined && (
@@ -116,9 +101,7 @@ export async function NewsAndEventsSplit({
               {t('newsAndEventsSplit.eventsHeading')}
             </h3>
             {eventsResult.isErr() ? (
-              <p className="text-sm text-copy-muted">
-                {t('render.sectionUnavailable')}
-              </p>
+              <p className="text-sm text-copy-muted">{t('render.sectionUnavailable')}</p>
             ) : (
               <>
                 <ContentOriginBadge origin={eventsResult.value.origin} />
@@ -132,19 +115,12 @@ export async function NewsAndEventsSplit({
                               dateTime={event.startDate}
                               className="flex shrink-0 flex-col items-center rounded-token-sm border border-border px-3 py-1.5 text-center text-xs uppercase text-copy-muted"
                             >
-                              {formatDate(
-                                event.startDate,
-                                locale,
-                                timeZone,
-                                DAY_FORMAT
-                              )}
+                              {format.date(event.startDate, DAY_FORMAT)}
                             </time>
                             <div>
                               <CardTitle>{event.title}</CardTitle>
                               {event.location !== undefined && (
-                                <p className="mt-1 text-xs text-copy-muted">
-                                  {event.location}
-                                </p>
+                                <p className="mt-1 text-xs text-copy-muted">{event.location}</p>
                               )}
                             </div>
                           </div>

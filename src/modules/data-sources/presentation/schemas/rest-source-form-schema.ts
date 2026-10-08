@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 import {
   AUTH_MODES,
   DATA_SOURCE_VALIDATION_CODES as CODES,
-} from "../../application/contracts/data-source-constraints";
+} from '../../application/contracts/data-source-constraints';
 
-import { dataSourceNameSchema } from "./data-source-fields-schema";
+import { dataSourceNameSchema } from './data-source-fields-schema';
 
 /**
  * The create form for a REST source. It only gives instant feedback on

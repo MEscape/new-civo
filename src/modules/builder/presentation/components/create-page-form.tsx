@@ -3,22 +3,23 @@
 import { useId, useState, useTransition } from 'react';
 import type { ChangeEvent } from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { TextField } from '@components/shared/text-field';
 import { Button } from '@components/ui/button';
 
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
+
 import { applyActionError } from '@lib/actions';
 
-import { BUILDER_ERROR_CODES } from '../../domain/errors/builder-errors';
+import { BUILDER_ERROR_CODES } from '../../application/contracts/builder-constraints';
 import { createPageAction } from '../actions/create-page-action';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
-import { normalizePagePath } from '../page-path';
+import { normalizePagePath } from '../navigation/page-path';
 import { builderRoutes } from '../routes';
 import { newPageSchema } from '../schemas/new-page-schema';
 
@@ -75,14 +76,10 @@ export function CreatePageForm({ websiteId }: CreatePageFormProps) {
     startTransition(async () => {
       const result = await createPageAction(values);
       if (result.ok) {
-        router.push(
-          builderRoutes.editor(result.data.websiteId, result.data.id)
-        );
+        router.push(builderRoutes.editor(result.data.websiteId, result.data.id));
         return;
       }
-      setFormErrorCode(
-        applyActionError(result.error, form.setError, CODE_FIELDS)
-      );
+      setFormErrorCode(applyActionError(result.error, form.setError, CODE_FIELDS));
     });
   }
 
@@ -129,9 +126,7 @@ export function CreatePageForm({ websiteId }: CreatePageFormProps) {
       )}
 
       <Button type="submit" disabled={isPending}>
-        {isPending
-          ? t('pages.createForm.submitting')
-          : t('pages.createForm.submit')}
+        {isPending ? t('pages.createForm.submitting') : t('pages.createForm.submit')}
       </Button>
     </form>
   );

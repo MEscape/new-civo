@@ -3,12 +3,14 @@
 import { useState } from 'react';
 
 import { Badge } from '@components/ui/badge';
+import { Button } from '@components/ui/button';
 import { Card, CardContent } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { DynamicIcon } from '@components/ui/dynamic-icon';
 import { Search } from '@components/ui/icons';
 import { Input } from '@components/ui/input';
 
-const FALLBACK_ICON = 'arrow-right' as const;
+const FALLBACK_ICON = 'arrowRight' as const;
 
 export interface ServiceFinderItem {
   readonly id: string;
@@ -34,11 +36,7 @@ export interface ServiceFinderClientProps {
   readonly labels: ServiceFinderLabels;
 }
 
-function matches(
-  service: ServiceFinderItem,
-  query: string,
-  category: string
-): boolean {
+function matches(service: ServiceFinderItem, query: string, category: string): boolean {
   if (category !== '' && service.category !== category) {
     return false;
   }
@@ -48,10 +46,7 @@ function matches(
   return (
     service.title.toLowerCase().includes(query) ||
     (service.description?.toLowerCase().includes(query) ?? false) ||
-    (service.keywords?.some((keyword) =>
-      keyword.toLowerCase().includes(query)
-    ) ??
-      false)
+    (service.keywords?.some((keyword) => keyword.toLowerCase().includes(query)) ?? false)
   );
 }
 
@@ -63,18 +58,16 @@ interface CategoryChipProps {
 
 function CategoryChip({ label, active, onSelect }: CategoryChipProps) {
   return (
-    <button
+    <Button
       type="button"
+      size="sm"
+      variant={active ? 'default' : 'ghost'}
       onClick={onSelect}
       aria-pressed={active}
-      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-        active
-          ? 'bg-primary text-white'
-          : 'bg-surface text-copy-muted hover:text-copy'
-      }`}
+      className="rounded-full"
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -91,13 +84,11 @@ export function ServiceFinderClient({
     new Set(
       services
         .map((service) => service.category)
-        .filter((value): value is string => value !== undefined && value !== '')
-    )
+        .filter((value): value is string => value !== undefined && value !== ''),
+    ),
   );
   const normalizedQuery = query.trim().toLowerCase();
-  const filtered = services.filter((service) =>
-    matches(service, normalizedQuery, category)
-  );
+  const filtered = services.filter((service) => matches(service, normalizedQuery, category));
 
   return (
     <div className="flex flex-col gap-6">
@@ -147,7 +138,7 @@ export function ServiceFinderClient({
         <ul className="flex flex-col divide-y divide-border">
           {filtered.map((service) => (
             <li key={service.id}>
-              <a
+              <ContentLink
                 href={service.href}
                 className="group flex items-start gap-4 py-4 hover:bg-surface"
               >
@@ -155,18 +146,16 @@ export function ServiceFinderClient({
                   <DynamicIcon
                     name={service.icon}
                     fallback={FALLBACK_ICON}
-                    className="h-5 w-5 text-primary"
+                    className="h-5 w-5 text-primary-copy"
                     aria-hidden="true"
                   />
                 </Card>
                 <CardContent className="flex-1 p-0">
-                  <p className="text-sm font-medium text-copy group-hover:text-primary">
+                  <p className="text-sm font-medium text-copy group-hover:text-primary-copy">
                     {service.title}
                   </p>
                   {service.description !== undefined && (
-                    <p className="mt-0.5 text-sm text-copy-muted">
-                      {service.description}
-                    </p>
+                    <p className="mt-0.5 text-sm text-copy-muted">{service.description}</p>
                   )}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {service.department !== undefined && (
@@ -177,7 +166,7 @@ export function ServiceFinderClient({
                     )}
                   </div>
                 </CardContent>
-              </a>
+              </ContentLink>
             </li>
           ))}
         </ul>

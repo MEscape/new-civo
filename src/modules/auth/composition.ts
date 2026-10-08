@@ -4,9 +4,9 @@ import { cache } from 'react';
 import { headers } from 'next/headers';
 
 import { systemClock } from '@lib/clock';
-import { publicEnv, serverEnv } from '@lib/config';
+import { APP_IDENTITY, publicEnv, serverEnv } from '@lib/config';
 import type { ServerEnv } from '@lib/config';
-import { invariant, isDefined, once } from '@lib/utils';
+import { assertNever, invariant, isDefined, once } from '@lib/utils';
 
 import { createAuthorizationService } from './application/authorization-service';
 import { RequestPasswordReset } from './application/commands/request-password-reset';
@@ -24,7 +24,7 @@ import { sessionSourceFrom } from './infrastructure/better-auth/better-auth-sess
 import { createAuth } from './infrastructure/better-auth/create-auth';
 import { createAuthRouteHandlers } from './infrastructure/better-auth/create-auth-route-handlers';
 import { DevCurrentActorProvider } from './infrastructure/dev/dev-current-actor-provider';
-import { LoggerSecurityAuditLog } from './infrastructure/logging/logger-security-audit-log';
+import { loggerSecurityAuditLog } from './infrastructure/logging/logger-security-audit-log';
 import { ResendMailTransport } from './infrastructure/mail/resend-mail-transport';
 import { SmtpMailTransport } from './infrastructure/mail/smtp-mail-transport';
 import { TransactionalAuthMailer } from './infrastructure/mail/transactional-auth-mailer';
@@ -40,11 +40,7 @@ import type { Role } from './domain/models/role';
 import type { AuthMailer } from './domain/ports/auth-mailer.port';
 import type { CurrentActorProvider } from './domain/ports/current-actor-provider.port';
 import type { MembershipRepository } from './domain/ports/membership.repository';
-import type { SecurityAuditLog } from './domain/ports/security-audit-log.port';
-import type {
-  AuthSettings,
-  BetterAuthInstance,
-} from './infrastructure/better-auth/create-auth';
+import type { AuthSettings, BetterAuthInstance } from './infrastructure/better-auth/create-auth';
 import type { MailTransport } from './infrastructure/mail/mail-transport';
 
 /**
@@ -59,7 +55,6 @@ import type { MailTransport } from './infrastructure/mail/mail-transport';
  * build error.
  */
 
-const APP_NAME = 'Civo';
 const MILLISECONDS_PER_SECOND = 1000;
 
 /**
@@ -79,7 +74,7 @@ function requireAuthCredentials(env: ServerEnv): {
   // type and fails fast if that guarantee is ever removed.
   invariant(
     isDefined(secret) && isDefined(databaseUrl),
-    'AUTH_SECRET and AUTH_DATABASE_URL are required when AUTH_ENABLED=true.'
+    'AUTH_SECRET and AUTH_DATABASE_URL are required when AUTH_ENABLED=true.',
   );
   return { secret, databaseUrl };
 }
@@ -109,11 +104,11 @@ function resolveDevActorRole(raw: string): Role {
 function buildMailer(env: ServerEnv): AuthMailer {
   invariant(
     !(env.NODE_ENV === 'production' && env.AUTH_MAIL_PROVIDER !== 'resend'),
-    'AUTH_MAIL_PROVIDER must be "resend" in production.'
+    'AUTH_MAIL_PROVIDER must be "resend" in production.',
   );
   invariant(
     !(env.NODE_ENV !== 'production' && env.AUTH_MAIL_PROVIDER === 'resend'),
-    'AUTH_MAIL_PROVIDER must be "none" or "smtp" in development.'
+    'AUTH_MAIL_PROVIDER must be "none" or "smtp" in development.',
   );
 
   if (env.AUTH_MAIL_PROVIDER === 'none') {
@@ -121,10 +116,7 @@ function buildMailer(env: ServerEnv): AuthMailer {
   }
 
   const { AUTH_MAIL_FROM: from } = env;
-  invariant(
-    isDefined(from),
-    'AUTH_MAIL_FROM is required when AUTH_MAIL_PROVIDER is set.'
-  );
+  invariant(isDefined(from), 'AUTH_MAIL_FROM is required when AUTH_MAIL_PROVIDER is set.');
 
   let transport: MailTransport;
 
@@ -137,11 +129,11 @@ function buildMailer(env: ServerEnv): AuthMailer {
       } = env;
       invariant(
         isDefined(host),
-        'AUTH_MAIL_SMTP_HOST is required when AUTH_MAIL_PROVIDER is "smtp".'
+        'AUTH_MAIL_SMTP_HOST is required when AUTH_MAIL_PROVIDER is "smtp".',
       );
       transport = new SmtpMailTransport({
         host,
-        port: port ?? 1025,
+        port,
         secure,
         from,
       });
@@ -151,40 +143,34 @@ function buildMailer(env: ServerEnv): AuthMailer {
       const { AUTH_MAIL_API_KEY: apiKey, AUTH_MAIL_API_URL: apiUrl } = env;
       invariant(
         isDefined(apiKey),
-        'AUTH_MAIL_API_KEY is required when AUTH_MAIL_PROVIDER is "resend".'
+        'AUTH_MAIL_API_KEY is required when AUTH_MAIL_PROVIDER is "resend".',
       );
       transport = new ResendMailTransport({
         apiKey,
         from,
-        apiUrl: apiUrl ?? 'https://api.resend.com/emails',
+        apiUrl,
       });
       break;
     }
     default:
-      throw new Error(
-        `Unsupported AUTH_MAIL_PROVIDER: ${env.AUTH_MAIL_PROVIDER}`
-      );
+      return assertNever(env.AUTH_MAIL_PROVIDER, 'Unsupported AUTH_MAIL_PROVIDER.');
   }
 
   return new TransactionalAuthMailer(transport, {
-    appName: APP_NAME,
+    appName: APP_IDENTITY.name,
   });
 }
 
-const getAudit = once<SecurityAuditLog>(() => new LoggerSecurityAuditLog());
-
 const getMailer = once<AuthMailer>(() => buildMailer(serverEnv));
 
-const getMemberships = once<MembershipRepository>(
-  () => new PrismaMembershipRepository()
-);
+const getMemberships = once<MembershipRepository>(() => new PrismaMembershipRepository());
 
 const getPool = once(() =>
   getAuthPool({
     databaseUrl: requireAuthCredentials(serverEnv).databaseUrl,
     maxConnections: serverEnv.AUTH_DATABASE_POOL_SIZE,
     reuseAcrossReloads: serverEnv.NODE_ENV !== 'production',
-  })
+  }),
 );
 
 /** Whether real authentication runs. Pages for sign-in and sign-up use it to answer 404 when it does not. */
@@ -201,7 +187,7 @@ const getAuth = once<BetterAuthInstance>(() => {
   return createAuth(toAuthSettings(serverEnv), {
     pool: getPool(),
     mailer: getMailer(),
-    audit: getAudit(),
+    audit: loggerSecurityAuditLog,
   });
 });
 
@@ -212,9 +198,7 @@ const getAuth = once<BetterAuthInstance>(() => {
  * visible on the next request. Do not swap it for a longer-lived cache
  * (caching.md: authorization decisions need an explicit identity boundary).
  */
-function memoizePerRequest(
-  provider: CurrentActorProvider
-): CurrentActorProvider {
+function memoizePerRequest(provider: CurrentActorProvider): CurrentActorProvider {
   const resolve = cache(() => provider.getCurrentActor());
   return { getCurrentActor: () => resolve() };
 }
@@ -232,24 +216,21 @@ function buildCurrentActorProvider(): CurrentActorProvider {
     sessions: sessionSourceFrom(getAuth()),
     memberships: getMemberships(),
     getHeaders: () => headers(),
-    sessionMaxLifetimeMs:
-      serverEnv.AUTH_SESSION_MAX_LIFETIME_SECONDS * MILLISECONDS_PER_SECOND,
+    sessionMaxLifetimeMs: serverEnv.AUTH_SESSION_MAX_LIFETIME_SECONDS * MILLISECONDS_PER_SECOND,
     clock: systemClock,
     tenantId: DEFAULT_TENANT_ID,
   });
 }
 
 /** One memoized provider per process, shared by authorization and the actor query. */
-const getCurrentActorProvider = once(() =>
-  memoizePerRequest(buildCurrentActorProvider())
-);
+const getCurrentActorProvider = once(() => memoizePerRequest(buildCurrentActorProvider()));
 
 /** What use cases of other modules receive. Per-request state lives in `headers()`. */
 export const getAccessControl = once<AuthorizationService>(() =>
   createAuthorizationService({
     currentActor: getCurrentActorProvider(),
-    audit: getAudit(),
-  })
+    audit: loggerSecurityAuditLog,
+  }),
 );
 
 export const getAuthQueries = once(
@@ -258,7 +239,7 @@ export const getAuthQueries = once(
       getCurrentActor: new GetCurrentActor({
         currentActor: getCurrentActorProvider(),
       }),
-    } as const)
+    }) as const,
 );
 
 /**
@@ -276,11 +257,8 @@ export const getAuthCommands = once(() => {
         passwordReset: authRoutes.resetPassword(),
       },
     }),
-    rateLimiter: new PgAuthRateLimiter(
-      getPool(),
-      requireAuthCredentials(serverEnv).secret
-    ),
-    audit: getAudit(),
+    rateLimiter: new PgAuthRateLimiter(getPool(), requireAuthCredentials(serverEnv).secret),
+    audit: loggerSecurityAuditLog,
   };
 
   return {

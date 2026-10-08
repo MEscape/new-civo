@@ -8,10 +8,7 @@ import type { AppError } from '@lib/errors';
  * ResultAsync for asynchronous operations that can fail predictably.
  */
 export type AppResult<T, E extends AppError = AppError> = Result<T, E>;
-export type AppResultAsync<T, E extends AppError = AppError> = ResultAsync<
-  T,
-  E
->;
+export type AppResultAsync<T, E extends AppError = AppError> = ResultAsync<T, E>;
 
 export { err, errAsync, ok, okAsync, Result, ResultAsync };
 
@@ -23,7 +20,7 @@ export { err, errAsync, ok, okAsync, Result, ResultAsync };
  */
 export function fromThrowable<T, E extends AppError>(
   fn: () => T,
-  onError: (thrown: unknown) => E
+  onError: (thrown: unknown) => E,
 ): AppResult<T, E> {
   try {
     return ok(fn());
@@ -41,7 +38,7 @@ export function fromThrowable<T, E extends AppError>(
  */
 export function fromThrowableAsync<T, E extends AppError>(
   fn: () => Promise<T>,
-  onError: (thrown: unknown) => E
+  onError: (thrown: unknown) => E,
 ): AppResultAsync<T, E> {
   try {
     return ResultAsync.fromPromise(fn(), onError);

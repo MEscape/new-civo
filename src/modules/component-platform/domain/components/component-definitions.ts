@@ -82,11 +82,9 @@ export type ComponentProps<T extends RegisteredComponentName> = ReturnType<
  * entry; this is the one place that says so.
  */
 export function getComponentDefinition<T extends RegisteredComponentName>(
-  type: T
+  type: T,
 ): ComponentDefinition<ComponentProps<T>> {
-  const definition = COMPONENT_DEFINITIONS.find(
-    (candidate) => candidate.type === type
-  );
+  const definition = COMPONENT_DEFINITIONS.find((candidate) => candidate.type === type);
   invariant(definition !== undefined, `Component "${type}" is not registered.`);
 
   return definition as unknown as ComponentDefinition<ComponentProps<T>>;

@@ -1,11 +1,6 @@
-import { logger } from '@lib/logger';
+import { createAuditLog } from '@lib/logger';
 
-import type {
-  BuilderAuditLog,
-  BuilderEvent,
-} from '../../domain/ports/builder-audit-log.port';
-
-const auditLogger = logger.withContext({ module: 'builder.audit' });
+import type { BuilderAuditLog, BuilderEvent } from '../../domain/ports/builder-audit-log.port';
 
 /**
  * Scope violations are `warn` so alerting can key on them: a municipal
@@ -19,13 +14,8 @@ const LEVEL_BY_EVENT = {
   'page.edit_scope_violation': 'warn',
 } as const satisfies Record<BuilderEvent['type'], 'info' | 'warn'>;
 
-export class LoggerBuilderAuditLog implements BuilderAuditLog {
-  record(event: BuilderEvent): void {
-    const { type, ...details } = event;
-    try {
-      auditLogger[LEVEL_BY_EVENT[type]](type, details);
-    } catch {
-      // Auditing must never fail the request it describes.
-    }
-  }
-}
+/** One structured log line per event under `builder.audit`; never throws. */
+export const loggerBuilderAuditLog: BuilderAuditLog = createAuditLog(
+  'builder.audit',
+  LEVEL_BY_EVENT,
+);

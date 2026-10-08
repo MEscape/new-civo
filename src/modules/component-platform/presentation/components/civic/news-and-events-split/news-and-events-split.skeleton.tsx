@@ -1,9 +1,6 @@
 import { Skeleton } from '@components/ui/skeleton';
 
-import {
-  CardGridSkeleton,
-  SectionSkeleton,
-} from '../../shared/skeleton-blocks';
+import { CardGridSkeleton, SectionSkeleton } from '../../shared/skeleton-blocks';
 
 export function NewsAndEventsSplitSkeleton() {
   return (

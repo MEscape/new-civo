@@ -16,7 +16,8 @@
       "propsNotPermitted": "Sie dürfen diese Eigenschaften nicht ändern.",
       "pageCorrupted": "Die gespeicherte Seite ist beschädigt und kann nicht geöffnet werden.",
       "persistenceFailed": "Die Seite konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
-      "pageLimitExceeded": "Diese Website hat mehr Seiten, als auf einmal verarbeitet werden können."
+      "pageLimitExceeded": "Diese Website hat mehr Seiten, als auf einmal verarbeitet werden können.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
     },
     "validation": {
       "contentInvalid": "Der Seiteninhalt ist ungültig.",
@@ -117,6 +118,13 @@
         "placeholder": "Beispieldaten (kein Datensatz)",
         "unavailable": "Kontext fehlt.",
         "option": "{name} ({source})"
+      },
+      "items": {
+        "empty": "Noch keine Einträge.",
+        "entry": "Eintrag {number}",
+        "add": "Eintrag hinzufügen",
+        "remove": "Eintrag {number} entfernen",
+        "limit": "Diese Liste umfasst höchstens {max} Einträge."
       }
     },
     "pages": {

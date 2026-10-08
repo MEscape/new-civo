@@ -4,7 +4,7 @@ import {
   notFoundError,
   unexpectedError,
   validationError,
-  FieldErrorBag
+  FieldErrorBag,
 } from '@lib/errors';
 import type {
   ConflictAppError,
@@ -63,41 +63,31 @@ export const RELEASE_VALIDATION_CODES = {
   resolutionValueInvalid: 'release.validation.resolution_value_invalid',
 } as const;
 
-export type ReleaseErrorCode =
-  (typeof RELEASE_ERROR_CODES)[keyof typeof RELEASE_ERROR_CODES];
+export type ReleaseErrorCode = (typeof RELEASE_ERROR_CODES)[keyof typeof RELEASE_ERROR_CODES];
 export type ReleaseValidationCode =
   (typeof RELEASE_VALIDATION_CODES)[keyof typeof RELEASE_VALIDATION_CODES];
 export type ReleaseCode = ReleaseErrorCode | ReleaseValidationCode;
 
 /** Also covers another website's release: see `RELEASE_ERROR_CODES`. */
 export function releaseNotFound(): NotFoundAppError {
-  return notFoundError(
-    RELEASE_ERROR_CODES.notFound,
-    'The release was not found.'
-  );
+  return notFoundError(RELEASE_ERROR_CODES.notFound, 'The release was not found.');
 }
 
 /** Also covers a foreign tenant's website: see `RELEASE_ERROR_CODES`. */
 export function releaseWebsiteNotFound(): NotFoundAppError {
-  return notFoundError(
-    RELEASE_ERROR_CODES.websiteNotFound,
-    'The website was not found.'
-  );
+  return notFoundError(RELEASE_ERROR_CODES.websiteNotFound, 'The website was not found.');
 }
 
 /** The public site fails closed: it never falls back to draft content. */
 export function releaseNotPublished(): NotFoundAppError {
-  return notFoundError(
-    RELEASE_ERROR_CODES.notPublished,
-    'The website has no published release.'
-  );
+  return notFoundError(RELEASE_ERROR_CODES.notPublished, 'The website has no published release.');
 }
 
 /** Only a release that was once fully built may go live again. */
 export function releaseNotRestorable(): ConflictAppError {
   return conflictError(
     RELEASE_ERROR_CODES.notRestorable,
-    'The release was never published successfully and cannot be restored.'
+    'The release was never published successfully and cannot be restored.',
   );
 }
 
@@ -105,23 +95,21 @@ export function releaseNotRestorable(): ConflictAppError {
 export function releaseNumberConflict(): ConflictAppError {
   return conflictError(
     RELEASE_ERROR_CODES.numberConflict,
-    'Another release was published at the same time.'
+    'Another release was published at the same time.',
   );
 }
 
-export function releaseValidationFailed(
-  fieldErrors: Record<string, string[]>
-): ValidationAppError {
+export function releaseValidationFailed(fieldErrors: Record<string, string[]>): ValidationAppError {
   return validationError(
     RELEASE_ERROR_CODES.validationFailed,
     'The release input is invalid.',
-    fieldErrors
+    fieldErrors,
   );
 }
 
 export function fieldValidationFailed(
   field: string,
-  code: ReleaseValidationCode
+  code: ReleaseValidationCode,
 ): ValidationAppError {
   return releaseValidationFailed({ [field]: [code] });
 }
@@ -132,13 +120,11 @@ export function createReleaseValidationBag(): FieldErrorBag {
 }
 
 /** The website cannot be published as it is; `fieldErrors` names every offending page. */
-export function releasePublishBlocked(
-  fieldErrors: Record<string, string[]>
-): ValidationAppError {
+export function releasePublishBlocked(fieldErrors: Record<string, string[]>): ValidationAppError {
   return validationError(
     RELEASE_ERROR_CODES.publishBlocked,
     'The website cannot be published.',
-    fieldErrors
+    fieldErrors,
   );
 }
 
@@ -151,7 +137,7 @@ export function releaseSourceFailed(cause: unknown): InfrastructureAppError {
   return infrastructureError(
     RELEASE_ERROR_CODES.sourceFailed,
     'The release input could not be loaded.',
-    cause
+    cause,
   );
 }
 
@@ -163,23 +149,20 @@ export function releaseSnapshotCorrupted(cause: unknown): UnexpectedAppError {
   return unexpectedError(
     RELEASE_ERROR_CODES.snapshotCorrupted,
     'The stored release snapshot is invalid.',
-    cause
+    cause,
   );
 }
 
 /** Also covers another website's migration: see `RELEASE_ERROR_CODES`. */
 export function releaseMigrationNotFound(): NotFoundAppError {
-  return notFoundError(
-    RELEASE_ERROR_CODES.migrationNotFound,
-    'The migration was not found.'
-  );
+  return notFoundError(RELEASE_ERROR_CODES.migrationNotFound, 'The migration was not found.');
 }
 
 /** A reviewed plan is applied once; applying it again would write its drafts a second time. */
 export function releaseMigrationAlreadyApplied(): ConflictAppError {
   return conflictError(
     RELEASE_ERROR_CODES.migrationAlreadyApplied,
-    'The migration was already applied.'
+    'The migration was already applied.',
   );
 }
 
@@ -191,7 +174,7 @@ export function releaseMigrationAlreadyApplied(): ConflictAppError {
 export function releaseMigrationStale(): ConflictAppError {
   return conflictError(
     RELEASE_ERROR_CODES.migrationStale,
-    'The website was published again after this migration was proposed.'
+    'The website was published again after this migration was proposed.',
   );
 }
 
@@ -199,12 +182,10 @@ export function releaseMigrationStale(): ConflictAppError {
  * A stored plan no longer matches its stored format: data corruption, or a
  * `schemaVersion` this build does not understand. Never apply it partially.
  */
-export function releaseMigrationPlanCorrupted(
-  cause: unknown
-): UnexpectedAppError {
+export function releaseMigrationPlanCorrupted(cause: unknown): UnexpectedAppError {
   return unexpectedError(
     RELEASE_ERROR_CODES.migrationPlanCorrupted,
     'The stored migration plan is invalid.',
-    cause
+    cause,
   );
 }

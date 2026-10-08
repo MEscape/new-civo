@@ -1,9 +1,9 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from 'react';
 
-import { Label } from "@components/ui/input";
-import { Select, SelectTrigger } from "@components/ui/select";
+import { Label } from '@components/ui/input';
+import { Select, SelectTrigger } from '@components/ui/select';
 
-import { FieldMessage } from "./field-message";
+import { FieldMessage } from './field-message';
 
 export interface SelectFieldProps extends ComponentProps<typeof Select> {
   readonly id: string;

@@ -9,8 +9,10 @@ import { getAuthCommands } from '../../composition';
 import { ROOT_LAYOUT_PATH } from '../routes';
 
 export async function signOutAction(): Promise<ActionResult<void>> {
-    const result = await getAuthCommands().signOut.execute();
+  const result = await getAuthCommands().signOut.execute();
 
-    if (result.isOk()) {revalidatePath(ROOT_LAYOUT_PATH, 'layout');}
-    return toActionResult(result);
+  if (result.isOk()) {
+    revalidatePath(ROOT_LAYOUT_PATH, 'layout');
+  }
+  return toActionResult(result);
 }

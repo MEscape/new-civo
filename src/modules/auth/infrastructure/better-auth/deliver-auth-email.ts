@@ -6,7 +6,6 @@ import type { InfrastructureAppError } from '@lib/errors';
 import { logger } from '@lib/logger';
 import type { AppResultAsync } from '@lib/result';
 
-
 import type { MailLocale } from '../../domain/ports/auth-mailer.port';
 import type { AuthEmailKind } from '../mail/auth-email-templates';
 
@@ -26,15 +25,15 @@ const mailLogger = logger.withContext({ module: 'auth.mail' });
  * (e.g. in a cron job or a background task) or if the locale is unsupported.
  */
 export async function resolveMailLocale(): Promise<MailLocale> {
-    try {
-        const raw = await getLocale();
-        if (raw && (I18N_CONFIG.locales as readonly string[]).includes(raw)) {
-            return raw;
-        }
-    } catch {
-        // getLocale() throws if called outside a Next.js request context.
+  try {
+    const raw = await getLocale();
+    if ((I18N_CONFIG.locales as readonly string[]).includes(raw)) {
+      return raw;
     }
-    return I18N_CONFIG.defaultLocale;
+  } catch {
+    // getLocale() throws if called outside a Next.js request context.
+  }
+  return I18N_CONFIG.defaultLocale;
 }
 
 /**
@@ -46,11 +45,11 @@ export async function resolveMailLocale(): Promise<MailLocale> {
  * Only the error is logged. The message itself carries a single-use link.
  */
 export async function deliverAuthEmail(
-    sending: AppResultAsync<void, InfrastructureAppError>,
-    kind: AuthEmailKind
+  sending: AppResultAsync<void, InfrastructureAppError>,
+  kind: AuthEmailKind,
 ): Promise<void> {
-    const result = await sending;
-    if (result.isErr()) {
-        mailLogger.error('auth.email_delivery_failed', { kind, err: result.error });
-    }
+  const result = await sending;
+  if (result.isErr()) {
+    mailLogger.error('auth.email_delivery_failed', { kind, err: result.error });
+  }
 }

@@ -30,16 +30,13 @@ export function conflictKey(path: string, nodeId: string, key: string): string {
 }
 
 type CustomValue =
-  | { readonly isValid: true; readonly value: JsonValue }
-  | { readonly isValid: false };
+  { readonly isValid: true; readonly value: JsonValue } | { readonly isValid: false };
 
 /** Asks the server's own rule, so the reviewer is told before submitting; the server still decides. */
 export function parseCustomValue(text: string): CustomValue {
   try {
     const value = parseJson(text);
-    return isAcceptableCustomValue(value)
-      ? { isValid: true, value }
-      : { isValid: false };
+    return isAcceptableCustomValue(value) ? { isValid: true, value } : { isValid: false };
   } catch {
     // Not JSON yet: the field shows the error, nothing else needs to know why.
     return { isValid: false };
@@ -49,34 +46,23 @@ export function parseCustomValue(text: string): CustomValue {
 /** A custom choice whose text is not acceptable JSON blocks submitting. */
 export function hasInvalidChoice(choices: ChoiceMap): boolean {
   return Object.values(choices).some(
-    (choice) =>
-      choice.action === 'custom' && !parseCustomValue(choice.text).isValid
+    (choice) => choice.action === 'custom' && !parseCustomValue(choice.text).isValid,
   );
 }
 
-function isNodeUnresolved(
-  pagePath: string,
-  node: NodeMigrationView,
-  choices: ChoiceMap
-): boolean {
+function isNodeUnresolved(pagePath: string, node: NodeMigrationView, choices: ChoiceMap): boolean {
   return (
     node.status === 'needs_review' &&
     node.conflicts.some(
-      (conflict) =>
-        choices[conflictKey(pagePath, node.nodeId, conflict.key)] === undefined
+      (conflict) => choices[conflictKey(pagePath, node.nodeId, conflict.key)] === undefined,
     )
   );
 }
 
 /** How many nodes would be skipped because not every one of their conflicts has a choice. */
-export function countUnresolvedNodes(
-  plan: MigrationPlanView,
-  choices: ChoiceMap
-): number {
+export function countUnresolvedNodes(plan: MigrationPlanView, choices: ChoiceMap): number {
   return plan.pages
-    .flatMap((page) =>
-      page.nodes.map((node) => isNodeUnresolved(page.path, node, choices))
-    )
+    .flatMap((page) => page.nodes.map((node) => isNodeUnresolved(page.path, node, choices)))
     .filter(Boolean).length;
 }
 
@@ -99,7 +85,7 @@ function isNotEmpty(entry: readonly [string, object]): boolean {
 function resolutionsForNode(
   pagePath: string,
   node: NodeMigrationView,
-  choices: ChoiceMap
+  choices: ChoiceMap,
 ): Record<string, ResolutionInput> {
   if (node.status !== 'needs_review') {
     return {};
@@ -110,14 +96,14 @@ function resolutionsForNode(
       const choice = choices[conflictKey(pagePath, node.nodeId, conflict.key)];
       const resolution = choice === undefined ? null : toResolution(choice);
       return resolution === null ? [] : [[conflict.key, resolution] as const];
-    })
+    }),
   );
 }
 
 /** Nests the flat choices into the shape the action takes; pages and nodes with nothing decided are omitted. */
 export function toResolutionsInput(
   plan: MigrationPlanView,
-  choices: ChoiceMap
+  choices: ChoiceMap,
 ): ConflictResolutionsInput {
   return Object.fromEntries(
     plan.pages
@@ -127,17 +113,11 @@ export function toResolutionsInput(
             page.path,
             Object.fromEntries(
               page.nodes
-                .map(
-                  (node) =>
-                    [
-                      node.nodeId,
-                      resolutionsForNode(page.path, node, choices),
-                    ] as const
-                )
-                .filter(isNotEmpty)
+                .map((node) => [node.nodeId, resolutionsForNode(page.path, node, choices)] as const)
+                .filter(isNotEmpty),
             ),
-          ] as const
+          ] as const,
       )
-      .filter(isNotEmpty)
+      .filter(isNotEmpty),
   );
 }

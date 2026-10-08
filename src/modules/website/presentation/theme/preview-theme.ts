@@ -1,4 +1,4 @@
-import {isDefined} from "@lib/utils";
+import { isDefined } from '@lib/utils';
 
 import { HEX_COLOR_PATTERN } from '../../application/contracts/website-constraints';
 
@@ -29,7 +29,7 @@ function validColor(value: string | undefined, fallback: string): string {
  */
 export function toPreviewTheme(
   values: PartialThemeSettings,
-  saved: WebsiteThemeView
+  saved: WebsiteThemeView,
 ): WebsiteThemeView {
   return {
     colors: {

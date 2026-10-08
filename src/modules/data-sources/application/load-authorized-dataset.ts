@@ -1,10 +1,6 @@
 import type { Actor, AuthorizationError, Permission } from '@modules/auth';
 
-import type {
-    InfrastructureAppError,
-    NotFoundAppError,
-    ValidationAppError,
-} from '@lib/errors';
+import type { InfrastructureAppError, NotFoundAppError, ValidationAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
@@ -19,16 +15,13 @@ import type { Dataset, DatasetWithSource } from '../domain/models/dataset';
 
 /** Everything an operation on one existing dataset can fail with. */
 export type LoadDatasetError =
-    | AuthorizationError
-    | ValidationAppError
-    | NotFoundAppError
-    | InfrastructureAppError;
+  AuthorizationError | ValidationAppError | NotFoundAppError | InfrastructureAppError;
 
 export interface AuthorizedDataset {
-    readonly actor: Actor;
-    readonly dataset: Dataset;
-    /** The complete parent source, for operations that call the external system. */
-    readonly source: DataSource;
+  readonly actor: Actor;
+  readonly dataset: Dataset;
+  /** The complete parent source, for operations that call the external system. */
+  readonly source: DataSource;
 }
 
 /**
@@ -36,23 +29,22 @@ export interface AuthorizedDataset {
  * is read through its parent source, and lookups are by (id, actor.tenantId).
  */
 export function loadAuthorizedDataset(
-    deps: DataSourceDependencies,
-    rawId: string,
-    permission: Permission
+  deps: DataSourceDependencies,
+  rawId: string,
+  permission: Permission,
 ): AppResultAsync<AuthorizedDataset, LoadDatasetError> {
-    const { authorization, datasets } = deps;
+  const { authorization, datasets } = deps;
 
-    return authorization.requireInTenant(permission).andThen((actor) =>
-        parseDatasetId(rawId)
-            .asyncAndThen((id) => datasets.findWithSource(id, actor.tenantId))
-            .andThen(
-                (found): AppResultAsync<DatasetWithSource, NotFoundAppError> =>
-                    found === null ? errAsync(datasetNotFound()) : okAsync(found)
-            )
-            .andThen(({ dataset, source }) =>
-                authorization
-                    .requireOnResource(permission, scopeOf(dataset))
-                    .map((verifiedActor) => ({ actor: verifiedActor, dataset, source }))
-            )
-    );
+  return authorization.requireInTenant(permission).andThen((actor) =>
+    parseDatasetId(rawId)
+      .asyncAndThen((id) => datasets.findWithSource(id, actor.tenantId))
+      .andThen((found): AppResultAsync<DatasetWithSource, NotFoundAppError> =>
+        found === null ? errAsync(datasetNotFound()) : okAsync(found),
+      )
+      .andThen(({ dataset, source }) =>
+        authorization
+          .requireOnResource(permission, scopeOf(dataset))
+          .map((verifiedActor) => ({ actor: verifiedActor, dataset, source })),
+      ),
+  );
 }

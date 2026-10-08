@@ -16,7 +16,8 @@
       "propsNotPermitted": "You are not allowed to change these properties.",
       "pageCorrupted": "The stored page is damaged and cannot be opened.",
       "persistenceFailed": "The page could not be saved. Please try again.",
-      "pageLimitExceeded": "This website has more pages than can be processed at once."
+      "pageLimitExceeded": "This website has more pages than can be processed at once.",
+      "unexpected": "An unexpected error occurred."
     },
     "validation": {
       "contentInvalid": "The page content is invalid.",
@@ -117,6 +118,13 @@
         "placeholder": "Sample data (no dataset)",
         "unavailable": "Context missing.",
         "option": "{name} ({source})"
+      },
+      "items": {
+        "empty": "No entries yet.",
+        "entry": "Entry {number}",
+        "add": "Add entry",
+        "remove": "Remove entry {number}",
+        "limit": "This list holds at most {max} entries."
       }
     },
     "pages": {

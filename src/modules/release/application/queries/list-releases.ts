@@ -1,11 +1,7 @@
 import type { AppResultAsync } from '@lib/result';
 import { clamp } from '@lib/utils';
 
-import {
-  DEFAULT_HISTORY_LIMIT,
-  MAX_HISTORY_LIMIT,
-  MIN_HISTORY_LIMIT,
-} from '../list-limits';
+import { DEFAULT_HISTORY_LIMIT, MAX_HISTORY_LIMIT, MIN_HISTORY_LIMIT } from '../list-limits';
 import { loadAuthorizedReleaseWebsite } from '../load-authorized-release-website';
 import { toReleaseHistoryView } from '../release-view-mappers';
 
@@ -23,7 +19,7 @@ export class ListReleases {
 
   execute(
     rawWebsiteId: string,
-    options: ListReleasesOptions = {}
+    options: ListReleasesOptions = {},
   ): AppResultAsync<ReleaseHistoryView, LoadReleaseWebsiteError> {
     const requested =
       options.limit !== undefined && Number.isInteger(options.limit)
@@ -32,9 +28,7 @@ export class ListReleases {
     const limit = clamp(requested, MIN_HISTORY_LIMIT, MAX_HISTORY_LIMIT);
 
     return loadAuthorizedReleaseWebsite(this.deps, rawWebsiteId, 'release.read')
-      .andThen(({ website }) =>
-        this.deps.releases.findHistory(website.id, limit)
-      )
+      .andThen(({ website }) => this.deps.releases.findHistory(website.id, limit))
       .map(toReleaseHistoryView);
   }
 }

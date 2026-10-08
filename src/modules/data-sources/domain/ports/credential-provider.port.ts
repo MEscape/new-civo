@@ -11,17 +11,14 @@ import type { DataSourceId } from '../models/ids';
  * so there is nothing to leak for an unauthenticated source.
  */
 export type ResolvedCredential =
-    | { readonly mode: 'NONE' }
-    | { readonly mode: Exclude<AuthMode, 'NONE'>; readonly secret: string };
+  { readonly mode: 'NONE' } | { readonly mode: Exclude<AuthMode, 'NONE'>; readonly secret: string };
 
 /**
  * Failures the port may report. A missing secret is a configuration problem
  * the administrator can act on (`credentialsMissing()`, a validation error);
  * a failing secret store is infrastructure.
  */
-export type CredentialResolutionError =
-    | ValidationAppError
-    | InfrastructureAppError;
+export type CredentialResolutionError = ValidationAppError | InfrastructureAppError;
 
 /**
  * Resolves the secret of a source from server-only configuration at request
@@ -33,9 +30,9 @@ export type CredentialResolutionError =
  * `ResolvedCredential`.
  */
 export interface CredentialProvider {
-    resolve(input: {
-        readonly tenantId: TenantId;
-        readonly dataSourceId: DataSourceId;
-        readonly authMode: AuthMode;
-    }): AppResultAsync<ResolvedCredential, CredentialResolutionError>;
+  resolve(input: {
+    readonly tenantId: TenantId;
+    readonly dataSourceId: DataSourceId;
+    readonly authMode: AuthMode;
+  }): AppResultAsync<ResolvedCredential, CredentialResolutionError>;
 }

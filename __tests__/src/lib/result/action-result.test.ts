@@ -8,14 +8,14 @@ import { err, ok } from '@lib/result/app-result';
 const createError = (
   kind: 'domain' | 'validation' | 'system',
   code: string,
-  fieldErrors?: Record<string, string[]>
+  fieldErrors?: Record<string, string[]>,
 ): AppError =>
-({
-  kind,
-  code,
-  message: 'Test error message',
-  ...(fieldErrors ? { fieldErrors } : {}),
-} as unknown as AppError);
+  ({
+    kind,
+    code,
+    message: 'Test error message',
+    ...(fieldErrors ? { fieldErrors } : {}),
+  }) as unknown as AppError;
 
 describe('toActionResult', () => {
   it('maps an Ok result to a serializable success object', () => {

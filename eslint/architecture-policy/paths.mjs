@@ -47,16 +47,7 @@ export function classifyFile(repoPath) {
   if (parts[1] !== 'modules' || parts.length < 4) {
     const area = parts[1] ?? 'other';
     return {
-      area: [
-        'lib',
-        'components',
-        'app',
-        'i18n',
-        'hooks',
-        'store',
-        'types',
-        'data',
-      ].includes(area)
+      area: ['lib', 'components', 'app', 'i18n', 'hooks', 'store', 'types', 'data'].includes(area)
         ? area
         : 'other',
       path: repoPath,
@@ -77,12 +68,7 @@ export function classifyFile(repoPath) {
       path: repoPath,
     };
   }
-  const isLayer = [
-    'domain',
-    'application',
-    'infrastructure',
-    'presentation',
-  ].includes(first);
+  const isLayer = ['domain', 'application', 'infrastructure', 'presentation'].includes(first);
   return {
     area: 'module',
     module,
@@ -101,9 +87,7 @@ export function classifyFile(repoPath) {
 export function resolveSpecifier(fromRepoPath, specifier) {
   let target = null;
   if (specifier.startsWith('.')) {
-    target = posix.normalize(
-      posix.join(posix.dirname(fromRepoPath), specifier)
-    );
+    target = posix.normalize(posix.join(posix.dirname(fromRepoPath), specifier));
   } else if (specifier === '@i18n') {
     target = 'src/i18n/index';
   } else {
@@ -117,10 +101,7 @@ export function resolveSpecifier(fromRepoPath, specifier) {
   target = stripExt(target).replace(/\/index$/, '');
   const info = classifyFile(target);
   if (info.area === 'module') {
-    const isRoot =
-      info.rest.length === 1 &&
-      info.layer === 'root' &&
-      info.file === undefined;
+    const isRoot = info.rest.length === 1 && info.layer === 'root' && info.file === undefined;
     return { kind: 'internal', specifier, path: target, ...info, isRoot };
   }
   // `src/modules/<m>` (the public API) has only three segments.
@@ -159,8 +140,7 @@ export function isPublicApiOf(resolved) {
     resolved.kind === 'internal' &&
     resolved.area === 'module' &&
     (resolved.isPublicApi === true ||
-      (resolved.layer === 'root' &&
-        (resolved.file === 'index' || resolved.file === 'client')))
+      (resolved.layer === 'root' && (resolved.file === 'index' || resolved.file === 'client')))
   );
 }
 

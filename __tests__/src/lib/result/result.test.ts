@@ -5,11 +5,11 @@ import type { AppError } from '@lib/errors';
 import { fromThrowable, fromThrowableAsync } from '../../../../src/lib/result/app-result';
 
 const toSystemError = (thrown: unknown): AppError =>
-({
-  kind: 'system',
-  code: 'UNEXPECTED',
-  message: thrown instanceof Error ? thrown.message : 'Unknown',
-} as unknown as AppError);
+  ({
+    kind: 'system',
+    code: 'UNEXPECTED',
+    message: thrown instanceof Error ? thrown.message : 'Unknown',
+  }) as unknown as AppError;
 
 describe('fromThrowable', () => {
   it('wraps successful synchronous returns in an Ok Result', () => {
@@ -36,10 +36,7 @@ describe('fromThrowable', () => {
 
 describe('fromThrowableAsync', () => {
   it('wraps resolved promises in an Ok ResultAsync', async () => {
-    const result = await fromThrowableAsync(
-      async () => 'async success',
-      toSystemError
-    );
+    const result = await fromThrowableAsync(async () => 'async success', toSystemError);
 
     expect(result.isOk()).toBe(true);
     if (result.isOk()) {

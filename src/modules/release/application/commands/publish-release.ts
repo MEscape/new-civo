@@ -1,10 +1,6 @@
 import type { Actor } from '@modules/auth';
 
-import type {
-  ConflictAppError,
-  InfrastructureAppError,
-  ValidationAppError,
-} from '@lib/errors';
+import type { ConflictAppError, InfrastructureAppError, ValidationAppError } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
 
 import { assembleReleaseSnapshot } from '../../domain/models/release-assembly';
@@ -12,18 +8,11 @@ import { loadAuthorizedReleaseWebsite } from '../load-authorized-release-website
 import { toReleaseSummaryView } from '../release-view-mappers';
 
 import type { PublishableWebsite } from '../../domain/models/publishable';
-import type {
-  PublishReleaseInput,
-  ReleaseSummaryView,
-} from '../contracts/release-views';
+import type { PublishReleaseInput, ReleaseSummaryView } from '../contracts/release-views';
 import type { LoadReleaseWebsiteError } from '../load-authorized-release-website';
 import type { PublishReleaseDependencies } from '../release-dependencies';
 
-
-type PublishFailure =
-  | ValidationAppError
-  | ConflictAppError
-  | InfrastructureAppError;
+type PublishFailure = ValidationAppError | ConflictAppError | InfrastructureAppError;
 
 export type PublishReleaseError = LoadReleaseWebsiteError | ConflictAppError;
 
@@ -39,43 +28,38 @@ export type PublishReleaseError = LoadReleaseWebsiteError | ConflictAppError;
 export class PublishRelease {
   constructor(private readonly deps: PublishReleaseDependencies) {}
 
-  execute(
-    input: PublishReleaseInput
-  ): AppResultAsync<ReleaseSummaryView, PublishReleaseError> {
+  execute(input: PublishReleaseInput): AppResultAsync<ReleaseSummaryView, PublishReleaseError> {
     const { pages, components, releases, audit, clock } = this.deps;
 
-    return loadAuthorizedReleaseWebsite(
-      this.deps,
-      input.websiteId,
-      'release.publish'
-    ).andThen(({ actor, website }) =>
-      pages
-        .listForRelease(website.id)
-        .andThen((publishable) =>
-          assembleReleaseSnapshot({
-            website,
-            pages: publishable,
-            resolveComponent: (type) => components.resolve(type),
-          }).asyncAndThen((snapshot) =>
-            releases.publish({
-              websiteId: website.id,
-              snapshot,
-              publishedAt: clock.now(),
-            })
+    return loadAuthorizedReleaseWebsite(this.deps, input.websiteId, 'release.publish').andThen(
+      ({ actor, website }) =>
+        pages
+          .listForRelease(website.id)
+          .andThen((publishable) =>
+            assembleReleaseSnapshot({
+              website,
+              pages: publishable,
+              resolveComponent: (type) => components.resolve(type),
+            }).asyncAndThen((snapshot) =>
+              releases.publish({
+                websiteId: website.id,
+                snapshot,
+                publishedAt: clock.now(),
+              }),
+            ),
           )
-        )
-        .map((release) => {
-          audit.record({
-            type: 'release.published',
-            actorId: actor.id,
-            tenantId: actor.tenantId,
-            websiteId: website.id,
-            releaseId: release.id,
-            releaseNumber: release.releaseNumber,
-          });
-          return toReleaseSummaryView(release, release.id);
-        })
-        .mapErr((error) => this.reportBlocked(actor, website, error))
+          .map((release) => {
+            audit.record({
+              type: 'release.published',
+              actorId: actor.id,
+              tenantId: actor.tenantId,
+              websiteId: website.id,
+              releaseId: release.id,
+              releaseNumber: release.releaseNumber,
+            });
+            return toReleaseSummaryView(release, release.id);
+          })
+          .mapErr((error) => this.reportBlocked(actor, website, error)),
     );
   }
 
@@ -83,7 +67,7 @@ export class PublishRelease {
   private reportBlocked(
     actor: Actor,
     website: PublishableWebsite,
-    error: PublishFailure
+    error: PublishFailure,
   ): PublishFailure {
     if (error.kind === 'validation') {
       this.deps.audit.record({

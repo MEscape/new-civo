@@ -21,14 +21,10 @@ export {
   validationError,
 } from './factory';
 
-export {
-  httpStatusForError,
-  toErrorResponseBody,
-  type ErrorResponseBody,
-} from './http-mapping';
+export { httpStatusForError, toErrorResponseBody, type ErrorResponseBody } from './http-mapping';
 
 export { FieldErrorBag } from './field-error-bag';
 
 export { ROOT_FIELD, fieldPath } from './validation';
 
-export { failRoute, escalate } from './route-errors';
+export { escalate } from './route-errors';

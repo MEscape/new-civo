@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { Card, CardContent } from '@components/ui/card';
 
 import { getTranslations } from '@i18n/server';
@@ -25,11 +21,7 @@ export interface OpeningHoursComponentProps {
 }
 
 /** The general opening hours, one row per weekday. */
-export async function OpeningHours({
-  props,
-  context,
-  loadContent,
-}: OpeningHoursComponentProps) {
+export async function OpeningHours({ props, context, loadContent }: OpeningHoursComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -58,17 +50,10 @@ export async function OpeningHours({
           <CardContent className="pt-5">
             <dl className="divide-y divide-border">
               {items.map((entry) => (
-                <div
-                  key={entry.day}
-                  className="flex items-center justify-between py-2.5 text-sm"
-                >
-                  <dt className="text-copy">
-                    {t(`openingHours.days.${entry.day}`)}
-                  </dt>
+                <div key={entry.day} className="flex items-center justify-between py-2.5 text-sm">
+                  <dt className="text-copy">{t(`openingHours.days.${entry.day}`)}</dt>
                   <dd className="text-copy-muted">
-                    {entry.closed ||
-                    entry.opensAt === undefined ||
-                    entry.closesAt === undefined
+                    {entry.closed || entry.opensAt === undefined || entry.closesAt === undefined
                       ? t('openingHours.closed')
                       : t('openingHours.range', {
                           from: entry.opensAt,

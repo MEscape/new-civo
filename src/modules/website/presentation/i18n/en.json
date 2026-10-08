@@ -60,7 +60,10 @@
     },
     "errors": {
       "notFound": "The website was not found.",
-      "slugTaken": "This slug is already taken."
+      "slugTaken": "This slug is already taken.",
+      "validation": "Please check your input.",
+      "infrastructure": "A service error occurred. Please try again later.",
+      "unexpected": "An unexpected error occurred."
     },
     "validation": {
       "idInvalid": "Invalid identifier.",
@@ -82,8 +85,7 @@
         "description": "Create and manage your municipality's websites.",
         "empty": "No websites yet",
         "emptyDescription": "Create your first website to get started.",
-        "createTitle": "Create a website",
-        "open": "Open"
+        "createTitle": "Create a website"
       },
       "detail": {
         "releasesTitle": "Releases",

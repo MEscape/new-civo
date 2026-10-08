@@ -43,9 +43,9 @@ function toProvisioningError(cause: AppError): HomePageProvisioningError {
 export class BuilderHomePageProvisioner implements HomePageProvisioner {
   constructor(
     private readonly createPage: (
-      input: CreateSystemPageInput
+      input: CreateSystemPageInput,
     ) => AppResultAsync<PageSummaryView, CreateSystemPageError>,
-    private readonly homePagePath: string
+    private readonly homePagePath: string,
   ) {}
 
   provision(input: Parameters<HomePageProvisioner['provision']>[0]) {

@@ -5,28 +5,28 @@ import { logger } from '@lib/logger';
 const poolLogger = logger.withContext({ module: 'auth.pg' });
 
 export interface AuthPoolSettings {
-    readonly databaseUrl: string;
-    readonly maxConnections: number;
-    /** True outside production: reuse one pool across dev hot reloads. */
-    readonly reuseAcrossReloads: boolean;
+  readonly databaseUrl: string;
+  readonly maxConnections: number;
+  /** True outside production: reuse one pool across dev hot reloads. */
+  readonly reuseAcrossReloads: boolean;
 }
 
 const globalForAuth = globalThis as unknown as {
-    authPool: Pool | undefined;
+  authPool: Pool | undefined;
 }; // globalThis has no declared shape; this is the standard hot-reload singleton pattern.
 
 function createAuthPool(settings: AuthPoolSettings): Pool {
-    const pool = new Pool({
-        connectionString: settings.databaseUrl,
-        max: settings.maxConnections,
-    });
-    // An idle client can error after the request that used it is gone. Without
-    // a listener that is an unhandled 'error' event and crashes the process.
-    // The connection string is never logged: it can embed credentials.
-    pool.on('error', (error) => {
-        poolLogger.error('auth.pool_error', { err: error });
-    });
-    return pool;
+  const pool = new Pool({
+    connectionString: settings.databaseUrl,
+    max: settings.maxConnections,
+  });
+  // An idle client can error after the request that used it is gone. Without
+  // a listener that is an unhandled 'error' event and crashes the process.
+  // The connection string is never logged: it can embed credentials.
+  pool.on('error', (error) => {
+    poolLogger.error('auth.pool_error', { err: error });
+  });
+  return pool;
 }
 
 /**
@@ -37,7 +37,9 @@ function createAuthPool(settings: AuthPoolSettings): Pool {
  * auth schema, so a flaw on either side cannot read the other's data.
  */
 export function getAuthPool(settings: AuthPoolSettings): Pool {
-    const pool = globalForAuth.authPool ?? createAuthPool(settings);
-    if (settings.reuseAcrossReloads) {globalForAuth.authPool = pool;}
-    return pool;
+  const pool = globalForAuth.authPool ?? createAuthPool(settings);
+  if (settings.reuseAcrossReloads) {
+    globalForAuth.authPool = pool;
+  }
+  return pool;
 }

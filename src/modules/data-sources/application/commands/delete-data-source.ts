@@ -14,33 +14,31 @@ import type { LoadDataSourceError } from '../load-authorized-data-source';
  * after the fact.
  */
 export class DeleteDataSource {
-    constructor(private readonly deps: DataSourceDependencies) {}
+  constructor(private readonly deps: DataSourceDependencies) {}
 
-    execute(
-        id: string
-    ): AppResultAsync<DataSourceRemovalView, LoadDataSourceError> {
-        const { dataSources, datasets, audit } = this.deps;
+  execute(id: string): AppResultAsync<DataSourceRemovalView, LoadDataSourceError> {
+    const { dataSources, datasets, audit } = this.deps;
 
-        return loadAuthorizedDataSource(this.deps, id, 'datasource.delete').andThen(
-            ({ actor, source }) =>
-                datasets
-                    .listByDataSource(source.id, actor.tenantId, MAX_DATASETS_PER_SOURCE)
-                    .andThen((removed) =>
-                        dataSources.deleteById(source.id, actor.tenantId).map(() => {
-                            audit.record({
-                                type: 'data_source.deleted',
-                                actorId: actor.id,
-                                tenantId: actor.tenantId,
-                                websiteId: source.websiteId,
-                                dataSourceId: source.id,
-                            });
-                            return {
-                                id: source.id,
-                                websiteId: source.websiteId,
-                                removedDatasetIds: removed.map((dataset) => dataset.id),
-                            };
-                        })
-                    )
-        );
-    }
+    return loadAuthorizedDataSource(this.deps, id, 'datasource.delete').andThen(
+      ({ actor, source }) =>
+        datasets
+          .listByDataSource(source.id, actor.tenantId, MAX_DATASETS_PER_SOURCE)
+          .andThen((removed) =>
+            dataSources.deleteById(source.id, actor.tenantId).map(() => {
+              audit.record({
+                type: 'data_source.deleted',
+                actorId: actor.id,
+                tenantId: actor.tenantId,
+                websiteId: source.websiteId,
+                dataSourceId: source.id,
+              });
+              return {
+                id: source.id,
+                websiteId: source.websiteId,
+                removedDatasetIds: removed.map((dataset) => dataset.id),
+              };
+            }),
+          ),
+    );
+  }
 }

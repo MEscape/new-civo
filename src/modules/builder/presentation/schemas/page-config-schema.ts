@@ -35,15 +35,13 @@ function createNodeSchema(children: ChildrenSchema): z.ZodType<PageNodeInput> {
  * total size, nesting rules) stays with the domain.
  */
 function buildNodeSchema(): z.ZodType<PageNodeInput> {
-  let schema = createNodeSchema(
-    z.array(z.never({ message: CODES.depthLimitExceeded })).optional()
-  );
+  let schema = createNodeSchema(z.array(z.never({ message: CODES.depthLimitExceeded })).optional());
   for (let level = 1; level < PAGE_TREE_LIMITS.maxDepth; level += 1) {
     schema = createNodeSchema(
       z
         .array(schema)
         .max(PAGE_TREE_LIMITS.maxNodes, { message: CODES.nodeLimitExceeded })
-        .optional()
+        .optional(),
     );
   }
   return schema;
