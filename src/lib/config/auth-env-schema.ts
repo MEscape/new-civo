@@ -13,6 +13,10 @@ const DEFAULT_SESSION_MAX_LIFETIME_SECONDS = 30 * SECONDS_PER_DAY;
 
 const DEFAULT_DEV_ACTOR_ROLE = 'viewer';
 
+/** Mailpit's SMTP port, the local development default. */
+const DEFAULT_SMTP_PORT = 1025;
+const DEFAULT_RESEND_API_URL = 'https://api.resend.com/emails';
+
 const MIN_AUTH_SECRET_LENGTH = 32;
 
 /**
@@ -72,9 +76,9 @@ export const authEnvSchema = z
 
     AUTH_MAIL_PROVIDER: z.enum(['none', 'resend', 'smtp']).default('none'),
     AUTH_MAIL_API_KEY: z.string().min(1).optional(),
-    AUTH_MAIL_API_URL: z.url().optional(),
+    AUTH_MAIL_API_URL: z.url().default(DEFAULT_RESEND_API_URL),
     AUTH_MAIL_SMTP_HOST: z.string().min(1).optional(),
-    AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(1025).optional(),
+    AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(DEFAULT_SMTP_PORT),
     AUTH_MAIL_SMTP_SECURE: booleanFlagSchema(false),
     AUTH_MAIL_FROM: z.string().min(1).optional(),
   })
@@ -139,13 +143,6 @@ export const authEnvSchema = z
           code: 'custom',
           path: ['AUTH_MAIL_API_KEY'],
           message: 'AUTH_MAIL_API_KEY is required when AUTH_MAIL_PROVIDER is "resend".',
-        });
-      }
-      if (!env.AUTH_MAIL_API_URL) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['AUTH_MAIL_API_URL'],
-          message: 'AUTH_MAIL_API_URL is required when AUTH_MAIL_PROVIDER is "resend".',
         });
       }
     }

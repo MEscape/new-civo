@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { I18N_CONFIG, type Locale } from '@i18n';
 
+import { APP_IDENTITY } from '@lib/config';
+
 import { buildAlternateLanguages } from './build-alternate-languages';
 import { toLocalizedPath } from './to-localized-path';
 
@@ -23,6 +25,7 @@ export function buildLocalizedMetadata({ locale, pathname, title, description }:
         alternates: { canonical, languages: buildAlternateLanguages(pathname) },
         openGraph: {
             type: 'website',
+            siteName: APP_IDENTITY.name,
             title,
             description,
             url: canonical,

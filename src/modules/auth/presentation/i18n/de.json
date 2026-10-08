@@ -63,8 +63,7 @@
       "missingToken": "Dem Link zum Zurücksetzen fehlt das Token. Fordern Sie einen neuen Link an.",
       "requestNew": "Neuen Link anfordern",
       "metadata": {
-        "title": "Ein neues Passwort festlegen",
-        "description": "Wählen Sie ein neues Passwort für Ihr Konto."
+        "title": "Ein neues Passwort festlegen"
       }
     },
     "emailVerification": {
@@ -76,8 +75,7 @@
       "failure": "Dieser Bestätigungslink ist ungültig oder abgelaufen. Melden Sie sich an, dann senden wir Ihnen einen neuen.",
       "signIn": "Zur Anmeldung",
       "metadata": {
-        "title": "Ihre E-Mail-Adresse bestätigen",
-        "description": "Bestätigen Sie Ihre E-Mail-Adresse, um die Registrierung abzuschließen."
+        "title": "Ihre E-Mail-Adresse bestätigen"
       }
     },
     "signOut": {

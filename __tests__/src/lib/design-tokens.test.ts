@@ -26,6 +26,7 @@ const ALLOWED_PATHS: ReadonlyArray<{ match: (path: string) => boolean; why: stri
     { match: (p) => p === "app/globals.css", why: "defines the tokens" },
     { match: (p) => p.startsWith("data/"), why: "seed content" },
     { match: (p) => /\.test\.(ts|tsx)$/.test(p), why: "tests describe violations on purpose" },
+    { match: (p) => p === "lib/config/app-identity.ts", why: "theme-color and the manifest need literal colours; pinned to the tokens below" },
     { match: (p) => p.startsWith("lib/db/contract."), why: "generated from prisma/schema.prisma, which stores theme defaults" },
     { match: (p) => p.startsWith("modules/auth/infrastructure/mail/"), why: "mail clients do not resolve CSS custom properties" },
     { match: (p) => p === "modules/website/domain/models/website-theme.ts", why: "a website theme IS colour data; its default is a value, not styling" },
@@ -150,5 +151,16 @@ describe("the rules themselves (so the guard cannot silently rot)", () => {
         const name = "arbitrary value pointing at a --civo token";
         expect(flagged(name, "bg-[var(--civo-color-primary)] rounded-[var(--civo-radius)]")).toHaveLength(2);
         expect(flagged(name, 'fill: "var(--civo-color-primary)"')).toEqual([]);
+    });
+});
+
+describe("app identity colours", () => {
+    it("equal the platform tokens they stand in for", async () => {
+        const { APP_IDENTITY } = await import("@lib/config/app-identity");
+        const css = readFileSync(join(SRC, "app/globals.css"), "utf8");
+        const token = (name: string) => new RegExp(`${name}:\\s*([^;]+);`).exec(css)?.[1]?.trim().toLowerCase();
+
+        expect(APP_IDENTITY.themeColor).toBe(token("--civo-color-primary"));
+        expect(APP_IDENTITY.backgroundColor).toBe(token("--civo-color-background"));
     });
 });

@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: RouteProps): Promise<Metadata
         pathname: pagePath === '' ? `/s/${siteSlug}` : `/s/${siteSlug}/${pagePath}`,
         title: `${page.title} | ${snapshot.website.name}`,
         description: snapshot.website.description ?? snapshot.website.name,
+        siteName: snapshot.website.name,
     });
 }
 

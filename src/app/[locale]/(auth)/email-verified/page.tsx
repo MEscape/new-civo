@@ -14,7 +14,7 @@ import { Container, PageHeading, Section } from '@components/layout/layout-primi
 
 import type { Locale } from '@i18n';
 
-import { buildLocalizedMetadata } from '@lib/seo';
+import { buildPrivateMetadata } from '@lib/seo';
 
 
 interface RouteProps {
@@ -25,12 +25,8 @@ interface RouteProps {
 export async function generateMetadata({ params }: RouteProps): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'auth' });
-    return buildLocalizedMetadata({
-        locale,
-        pathname: '/email-verified',
-        title: t('emailVerification.metadata.title'),
-        description: t('emailVerification.metadata.description'),
-    });
+    // Reached only through a single-use emailed link: never indexed.
+    return buildPrivateMetadata(t('emailVerification.metadata.title'));
 }
 
 export default async function EmailVerifiedPage({ searchParams }: RouteProps) {

@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { headers } from 'next/headers';
 
 import { systemClock } from '@lib/clock';
-import { publicEnv, serverEnv } from '@lib/config';
+import { APP_IDENTITY, publicEnv, serverEnv } from '@lib/config';
 import type { ServerEnv } from '@lib/config';
 import { invariant, isDefined, once } from '@lib/utils';
 
@@ -58,7 +58,6 @@ import type { MailTransport } from './infrastructure/mail/mail-transport';
  * build error.
  */
 
-const APP_NAME = 'Civo';
 const MILLISECONDS_PER_SECOND = 1000;
 
 /**
@@ -140,7 +139,7 @@ function buildMailer(env: ServerEnv): AuthMailer {
       );
       transport = new SmtpMailTransport({
         host,
-        port: port ?? 1025,
+        port,
         secure,
         from,
       });
@@ -155,7 +154,7 @@ function buildMailer(env: ServerEnv): AuthMailer {
       transport = new ResendMailTransport({
         apiKey,
         from,
-        apiUrl: apiUrl ?? 'https://api.resend.com/emails',
+        apiUrl,
       });
       break;
     }
@@ -166,7 +165,7 @@ function buildMailer(env: ServerEnv): AuthMailer {
   }
 
   return new TransactionalAuthMailer(transport, {
-    appName: APP_NAME,
+    appName: APP_IDENTITY.name,
   });
 }
 

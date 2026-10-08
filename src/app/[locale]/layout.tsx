@@ -1,8 +1,8 @@
 import React from "react";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
-import { publicEnv } from '@lib/config';
+import { APP_IDENTITY, publicEnv } from '@lib/config';
 import { fontVariables } from "@lib/fonts";
 
 import { setRequestLocale } from 'next-intl/server';
@@ -22,7 +22,15 @@ import "../globals.css";
  */
 export const metadata: Metadata = {
     metadataBase: new URL(publicEnv.NEXT_PUBLIC_APP_URL),
-    title: { template: '%s | Civo', default: 'Civo' },
+    applicationName: APP_IDENTITY.name,
+    title: { template: `%s | ${APP_IDENTITY.name}`, default: APP_IDENTITY.name },
+    twitter: { card: 'summary' },
+    formatDetection: { telephone: false, email: false, address: false },
+};
+
+export const viewport: Viewport = {
+    themeColor: APP_IDENTITY.themeColor,
+    colorScheme: 'light',
 };
 
 export function generateStaticParams() {
