@@ -1,4 +1,3 @@
-
 import { EmptyState } from '@components/layout/layout-primitives';
 import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
@@ -22,10 +21,7 @@ export function PageList({ websiteId, pages }: PageListProps) {
 
   if (pages.length === 0) {
     return (
-      <EmptyState
-        title={t('pages.list.empty')}
-        description={t('pages.list.emptyDescription')}
-      />
+      <EmptyState title={t('pages.list.empty')} description={t('pages.list.emptyDescription')} />
     );
   }
 

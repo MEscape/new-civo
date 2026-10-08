@@ -82,7 +82,7 @@ const IDLE: DragState = {
  * the state the view renders. No React, so it runs against a fake DOM.
  */
 export function createCanvasDragController(
-  options: CanvasDragControllerOptions
+  options: CanvasDragControllerOptions,
 ): CanvasDragController {
   let state = IDLE;
   let rects = new Map<PageNodeId, Rect>();
@@ -90,7 +90,9 @@ export function createCanvasDragController(
 
   function setState(next: DragState): void {
     state = next;
-    listeners.forEach((listener) => { listener(); });
+    listeners.forEach((listener) => {
+      listener();
+    });
   }
 
   function labelOf(type: string): string {
@@ -110,12 +112,16 @@ export function createCanvasDragController(
   }
 
   function setTarget(target: DropTarget | null): void {
-    if (state.session === null || deepEqual(target, state.target)) {return;}
+    if (state.session === null || deepEqual(target, state.target)) {
+      return;
+    }
     setState({ ...state, target, indicator: indicatorFor(target) });
   }
 
   function begin(session: DragSession, isKeyboard: boolean): void {
-    if (!options.isEnabled()) {return;}
+    if (!options.isEnabled()) {
+      return;
+    }
     const container = options.getContainer();
     rects = container === null ? new Map<PageNodeId, Rect>() : measureAllNodeRects(container);
     setState({ session, target: null, indicator: null, isKeyboard });
@@ -124,36 +130,37 @@ export function createCanvasDragController(
   function computeTarget(
     session: DragSession,
     clientX: number,
-    clientY: number
+    clientY: number,
   ): DropTarget | null {
     const container = options.getContainer();
     const element = document.elementFromPoint(clientX, clientY);
     // The whole canvas frame counts as "over the canvas", so whitespace below the last node still drops.
-    if (
-      container === null ||
-      element === null ||
-      !container.parentElement?.contains(element)
-    ) {
+    if (container === null || element === null || !container.parentElement?.contains(element)) {
       return null;
     }
     const children = options.getChildren();
     const active = { id: session.id, type: session.type };
     const nodeId = findNodeId(element);
-    if (nodeId === null)
-      {return resolveDropTargetAtCanvasEnd({ tree: children, active, policy: options.catalog });}
+    if (nodeId === null) {
+      return resolveDropTargetAtCanvasEnd({ tree: children, active, policy: options.catalog });
+    }
 
     const rect = rects.get(nodeId);
-    if (rect === undefined) {return null;}
+    if (rect === undefined) {
+      return null;
+    }
     // Rects are container-relative, so the pointer must be too.
     const pointerY = clientY - container.getBoundingClientRect().top;
     return resolveDropTargetForNode(
       { tree: children, active, policy: options.catalog },
-      { targetId: nodeId, pointerY, targetRect: rect }
+      { targetId: nodeId, pointerY, targetRect: rect },
     );
   }
 
   function movePointer(clientX: number, clientY: number): void {
-    if (state.session === null || state.isKeyboard) {return;}
+    if (state.session === null || state.isKeyboard) {
+      return;
+    }
     setTarget(computeTarget(state.session, clientX, clientY));
   }
 
@@ -164,16 +171,16 @@ export function createCanvasDragController(
   function drop(): void {
     const { session, target } = state;
     setState(IDLE);
-    if (session !== null && target !== null) {options.onDrop(session, target);}
+    if (session !== null && target !== null) {
+      options.onDrop(session, target);
+    }
   }
 
   function beginNodeDrag(nodeId: PageNodeId, isKeyboard: boolean): void {
     const node = findNode(options.getChildren(), nodeId);
-    if (node !== null)
-      {begin(
-        { id: nodeId, type: node.type, label: labelOf(node.type) },
-        isKeyboard
-      );}
+    if (node !== null) {
+      begin({ id: nodeId, type: node.type, label: labelOf(node.type) }, isKeyboard);
+    }
   }
 
   function stepKeyboardTarget(session: DragSession, nodeId: PageNodeId, direction: -1 | 1): void {
@@ -185,9 +192,11 @@ export function createCanvasDragController(
         policy: options.catalog,
       },
       current === null || current.kind === 'root' ? nodeId : current.targetNodeId,
-      direction
+      direction,
     );
-    if (next !== null) {setTarget(next);}
+    if (next !== null) {
+      setTarget(next);
+    }
   }
 
   /** Space or Enter picks the node up, then drops it; arrows move the target; Escape cancels. */
@@ -201,7 +210,9 @@ export function createCanvasDragController(
       return;
     }
     const { session } = state;
-    if (session?.id !== nodeId) {return;}
+    if (session?.id !== nodeId) {
+      return;
+    }
 
     if (isPickupKey) {
       event.preventDefault();
@@ -238,10 +249,14 @@ export function createCanvasDragController(
     }
 
     function handlePointerMove(event: PointerEvent): void {
-      if (pending === null) {return;}
+      if (pending === null) {
+        return;
+      }
       if (state.session === null) {
         const current = { x: event.clientX, y: event.clientY };
-        if (!hasExceededActivationDistance(pending, current)) {return;}
+        if (!hasExceededActivationDistance(pending, current)) {
+          return;
+        }
         beginNodeDrag(pending.id, false);
       }
       movePointer(event.clientX, event.clientY);
@@ -250,13 +265,17 @@ export function createCanvasDragController(
     function handlePointerUp(): void {
       const wasDragging = pending !== null && state.session !== null;
       pending = null;
-      if (wasDragging) {drop();}
+      if (wasDragging) {
+        drop();
+      }
     }
 
     function handlePointerCancel(): void {
       const wasDragging = pending !== null && state.session !== null;
       pending = null;
-      if (wasDragging) {cancel();}
+      if (wasDragging) {
+        cancel();
+      }
     }
 
     container.addEventListener('pointerdown', handlePointerDown);
@@ -280,10 +299,9 @@ export function createCanvasDragController(
     },
     getSnapshot: () => state,
     attach,
-    beginPaletteDrag: (componentType) => { begin(
-        { id: null, type: componentType, label: labelOf(componentType) },
-        false
-      ); },
+    beginPaletteDrag: (componentType) => {
+      begin({ id: null, type: componentType, label: labelOf(componentType) }, false);
+    },
     movePointer,
     drop,
     cancel,

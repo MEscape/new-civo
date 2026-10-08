@@ -10,21 +10,12 @@ import type {
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
-import {
-  releaseMigrationNotFound,
-  releaseNotPublished,
-} from '../../domain/errors/release-errors';
+import { releaseMigrationNotFound, releaseNotPublished } from '../../domain/errors/release-errors';
 import { applyMigrationPlan } from '../../domain/models/apply-migration';
 import { parseConflictResolutions } from '../../domain/models/conflict-resolution';
 import { parseMigrationId } from '../../domain/models/ids';
-import {
-  ensureApplicable,
-  ensureSourceIsLive,
-} from '../../domain/models/migration';
-import {
-  isSuccessfulOutcome,
-  judgeDraft,
-} from '../../domain/models/page-draft';
+import { ensureApplicable, ensureSourceIsLive } from '../../domain/models/migration';
+import { isSuccessfulOutcome, judgeDraft } from '../../domain/models/page-draft';
 import { loadAuthorizedReleaseWebsite } from '../load-authorized-release-website';
 
 import type { AppliedPage } from '../../domain/models/apply-migration';
@@ -37,10 +28,7 @@ import type { Release } from '../../domain/models/release';
 import type { MigrationReadError } from '../../domain/ports/migration.repository';
 import type { PageDraftError } from '../../domain/ports/page-source.port';
 import type { ReleaseReadError } from '../../domain/ports/release.repository';
-import type {
-  ApplyMigrationInput,
-  ApplyMigrationResultView,
-} from '../contracts/release-views';
+import type { ApplyMigrationInput, ApplyMigrationResultView } from '../contracts/release-views';
 import type { LoadReleaseWebsiteError } from '../load-authorized-release-website';
 import type { ApplyMigrationDependencies } from '../release-dependencies';
 
@@ -74,16 +62,12 @@ interface Review {
 }
 
 function requireMigration(
-  migration: Migration | null
+  migration: Migration | null,
 ): AppResultAsync<Migration, NotFoundAppError> {
-  return migration === null
-    ? errAsync(releaseMigrationNotFound())
-    : okAsync(migration);
+  return migration === null ? errAsync(releaseMigrationNotFound()) : okAsync(migration);
 }
 
-function requirePublished(
-  release: Release | null
-): AppResultAsync<Release, NotFoundAppError> {
+function requirePublished(release: Release | null): AppResultAsync<Release, NotFoundAppError> {
   return release === null ? errAsync(releaseNotPublished()) : okAsync(release);
 }
 
@@ -104,16 +88,11 @@ export class ApplyMigration {
   constructor(private readonly deps: ApplyMigrationDependencies) {}
 
   execute(
-    input: ApplyMigrationInput
+    input: ApplyMigrationInput,
   ): AppResultAsync<ApplyMigrationResultView, ApplyMigrationError | StopError> {
-    return loadAuthorizedReleaseWebsite(
-      this.deps,
-      input.websiteId,
-      'release.publish'
-    ).andThen(({ actor, website }) =>
-      this.loadReview(actor, website.id, input).andThen((review) =>
-        this.applyPages(review)
-      )
+    return loadAuthorizedReleaseWebsite(this.deps, input.websiteId, 'release.publish').andThen(
+      ({ actor, website }) =>
+        this.loadReview(actor, website.id, input).andThen((review) => this.applyPages(review)),
     );
   }
 
@@ -125,7 +104,7 @@ export class ApplyMigration {
   private loadReview(
     actor: Actor,
     websiteId: WebsiteId,
-    input: ApplyMigrationInput
+    input: ApplyMigrationInput,
   ): AppResultAsync<Review, ApplyMigrationError> {
     const { migrations, releases, pages } = this.deps;
 
@@ -133,9 +112,7 @@ export class ApplyMigration {
       .asyncAndThen((id) => migrations.findById(websiteId, id))
       .andThen(requireMigration)
       .andThen((migration) =>
-        ensureApplicable(migration).asyncAndThen((applicable) =>
-          okAsync(applicable)
-        )
+        ensureApplicable(migration).asyncAndThen((applicable) => okAsync(applicable)),
       )
       .andThen((migration) =>
         releases
@@ -143,70 +120,59 @@ export class ApplyMigration {
           .andThen(requirePublished)
           .andThen((release) =>
             ensureSourceIsLive(migration, release.id)
-              .andThen(() =>
-                parseConflictResolutions(input.resolutions, migration.plan)
-              )
+              .andThen(() => parseConflictResolutions(input.resolutions, migration.plan))
               .andThen((resolutions) =>
-                pages
-                  .readTrees(release.snapshot.pages)
-                  .map((trees) => ({ resolutions, trees }))
+                pages.readTrees(release.snapshot.pages).map((trees) => ({ resolutions, trees })),
               )
               .asyncAndThen(({ resolutions, trees }) =>
-                pages.listDrafts(websiteId).map(
-                  (drafts): Review => ({
-                    actor,
-                    websiteId,
-                    migration,
-                    pages: trees,
-                    published: new Map(trees.map((tree) => [tree.path, tree])),
-                    drafts: new Map(drafts.map((draft) => [draft.path, draft])),
-                    resolutions,
-                  })
-                )
-              )
-          )
+                pages.listDrafts(websiteId).map((drafts): Review => ({
+                  actor,
+                  websiteId,
+                  migration,
+                  pages: trees,
+                  published: new Map(trees.map((tree) => [tree.path, tree])),
+                  drafts: new Map(drafts.map((draft) => [draft.path, draft])),
+                  resolutions,
+                })),
+              ),
+          ),
       );
   }
 
   private applyPages(
-    review: Review
+    review: Review,
   ): AppResultAsync<ApplyMigrationResultView, ApplyMigrationError | StopError> {
     const { migration, pages, resolutions } = review;
     const { changedPages, skippedNodeCount } = applyMigrationPlan(
       migration.plan,
       pages,
-      resolutions
+      resolutions,
     );
 
     return this.writePages(review, changedPages).andThen((results) =>
-      this.finish(review, results, skippedNodeCount)
+      this.finish(review, results, skippedNodeCount),
     );
   }
 
   /** One page after another: the builder revises pages independently, and the order is stable. */
   private writePages(
     review: Review,
-    pages: readonly AppliedPage[]
+    pages: readonly AppliedPage[],
   ): AppResultAsync<readonly PageResult[], StopError> {
     return pages.reduce<AppResultAsync<readonly PageResult[], StopError>>(
       (done, page) =>
         done.andThen((results) =>
-          this.writePage(review, page).map((result) => [...results, result])
+          this.writePage(review, page).map((result) => [...results, result]),
         ),
-      okAsync([])
+      okAsync([]),
     );
   }
 
-  private writePage(
-    review: Review,
-    page: AppliedPage
-  ): AppResultAsync<PageResult, StopError> {
+  private writePage(review: Review, page: AppliedPage): AppResultAsync<PageResult, StopError> {
     const toResult = (outcome: PageOutcome): PageResult => ({
       path: page.path,
       outcome,
-      updatedNodeCount: isSuccessfulOutcome(outcome)
-        ? page.updatedNodeIds.length
-        : 0,
+      updatedNodeCount: isSuccessfulOutcome(outcome) ? page.updatedNodeIds.length : 0,
     });
 
     const published = review.published.get(page.path);
@@ -240,42 +206,32 @@ export class ApplyMigration {
    */
   private settle(
     error: ConflictAppError | PageDraftError,
-    toResult: (outcome: PageOutcome) => PageResult
+    toResult: (outcome: PageOutcome) => PageResult,
   ): AppResultAsync<PageResult, StopError> {
     if (error.kind === 'unauthorized' || error.kind === 'forbidden') {
       return errAsync(error);
     }
-    return okAsync(
-      toResult(error.kind === 'conflict' ? 'draft_diverged' : 'failed')
-    );
+    return okAsync(toResult(error.kind === 'conflict' ? 'draft_diverged' : 'failed'));
   }
 
   private finish(
     review: Review,
     results: readonly PageResult[],
-    skippedNodeCount: number
+    skippedNodeCount: number,
   ): AppResultAsync<ApplyMigrationResultView, ApplyMigrationError> {
     const { migrations, audit, clock } = this.deps;
     const { actor, websiteId, migration, resolutions } = review;
 
-    const isComplete = results.every((result) =>
-      isSuccessfulOutcome(result.outcome)
-    );
+    const isComplete = results.every((result) => isSuccessfulOutcome(result.outcome));
     // Nothing written and something left unresolved: keep it open so it can be resolved and retried.
-    const isFinished =
-      isComplete && (results.length > 0 || skippedNodeCount === 0);
+    const isFinished = isComplete && (results.length > 0 || skippedNodeCount === 0);
 
-    const toView = (
-      status: 'proposed' | 'applied'
-    ): ApplyMigrationResultView => ({
+    const toView = (status: 'proposed' | 'applied'): ApplyMigrationResultView => ({
       migrationId: migration.id,
       websiteId,
       status,
       pages: results.map(({ path, outcome }) => ({ path, outcome })),
-      updatedNodeCount: results.reduce(
-        (total, result) => total + result.updatedNodeCount,
-        0
-      ),
+      updatedNodeCount: results.reduce((total, result) => total + result.updatedNodeCount, 0),
       skippedNodeCount,
     });
 
@@ -288,9 +244,7 @@ export class ApplyMigration {
           websiteId,
           migrationId: migration.id,
           failedPageCount: results.filter((r) => r.outcome === 'failed').length,
-          divergedPageCount: results.filter(
-            (r) => r.outcome === 'draft_diverged'
-          ).length,
+          divergedPageCount: results.filter((r) => r.outcome === 'draft_diverged').length,
         });
       }
       return okAsync(toView('proposed'));
@@ -311,8 +265,7 @@ export class ApplyMigration {
           tenantId: actor.tenantId,
           websiteId,
           migrationId: migration.id,
-          writtenPageCount: results.filter((r) => r.outcome === 'written')
-            .length,
+          writtenPageCount: results.filter((r) => r.outcome === 'written').length,
           skippedNodeCount,
         });
         return toView('applied');

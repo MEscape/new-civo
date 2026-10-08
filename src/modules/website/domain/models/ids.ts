@@ -1,10 +1,7 @@
 import { createIdParser } from '@lib/result';
 import type { Brand } from '@lib/utils';
 
-import {
-  WEBSITE_VALIDATION_CODES,
-  fieldValidationFailed,
-} from '../errors/website-errors';
+import { WEBSITE_VALIDATION_CODES, fieldValidationFailed } from '../errors/website-errors';
 
 /** Opaque identity of a website. */
 export type WebsiteId = Brand<string, 'WebsiteId'>;

@@ -21,8 +21,7 @@ export interface PageDependencies extends PageAccessDependencies {
   readonly audit: BuilderAuditLog;
 }
 
-export interface RenderDraftPageDependencies<TOutput>
-  extends PageAccessDependencies {
+export interface RenderDraftPageDependencies<TOutput> extends PageAccessDependencies {
   readonly renderer: DraftPageRenderer<TOutput>;
 }
 

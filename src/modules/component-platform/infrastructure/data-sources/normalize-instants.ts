@@ -29,7 +29,7 @@ function toCanonicalInstant(value: unknown): unknown {
  */
 export function normalizeInstants(
   values: Readonly<Record<string, unknown>>,
-  instantFields: readonly string[]
+  instantFields: readonly string[],
 ): Record<string, unknown> {
   const normalized: Record<string, unknown> = { ...values };
   for (const field of instantFields) {

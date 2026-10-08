@@ -4,16 +4,15 @@ import type { AppResultAsync } from '@lib/result';
 import type { AuthRateLimitAction } from '../models/rate-limit';
 
 export interface RateLimitRequest {
-    readonly action: AuthRateLimitAction;
-    /** What is being throttled, e.g. a normalised email. Adapters must not store it in clear. */
-    readonly subject: string;
-    readonly limit: number;
-    readonly windowSeconds: number;
+  readonly action: AuthRateLimitAction;
+  /** What is being throttled, e.g. a normalised email. Adapters must not store it in clear. */
+  readonly subject: string;
+  readonly limit: number;
+  readonly windowSeconds: number;
 }
 
 export type RateLimitDecision =
-    | { readonly isAllowed: true }
-    | { readonly isAllowed: false; readonly retryAfterSeconds: number };
+  { readonly isAllowed: true } | { readonly isAllowed: false; readonly retryAfterSeconds: number };
 
 /**
  * Throttles unauthenticated operations. Needed because Better Auth's own
@@ -24,7 +23,5 @@ export type RateLimitDecision =
  * requests cannot both slip under the limit.
  */
 export interface AuthRateLimiter {
-    consume(
-        request: RateLimitRequest
-    ): AppResultAsync<RateLimitDecision, InfrastructureAppError>;
+  consume(request: RateLimitRequest): AppResultAsync<RateLimitDecision, InfrastructureAppError>;
 }

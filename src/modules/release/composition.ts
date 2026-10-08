@@ -1,10 +1,6 @@
 import 'server-only';
 import { getAccessControl } from '@modules/auth';
-import {
-  listPagesForRelease,
-  restoreStoredPageConfig,
-  savePageDraft,
-} from '@modules/builder';
+import { listPagesForRelease, restoreStoredPageConfig, savePageDraft } from '@modules/builder';
 import { componentPlatformQueries } from '@modules/component-platform';
 import { websiteQueries } from '@modules/website';
 
@@ -42,9 +38,7 @@ const releases = new PrismaReleaseRepository();
 
 const dependencies = {
   authorization: getAccessControl(),
-  websites: new WebsiteModuleSource((id) =>
-    websiteQueries.getWebsiteById.execute(id)
-  ),
+  websites: new WebsiteModuleSource((id) => websiteQueries.getWebsiteById.execute(id)),
   releases,
   audit: loggerReleaseAuditLog,
 };
@@ -54,16 +48,11 @@ const migrationDependencies = {
   migrations: new PrismaMigrationRepository(),
 };
 
-const pages = new BuilderPageSource(
-  listPagesForRelease,
-  restoreStoredPageConfig,
-  savePageDraft
-);
+const pages = new BuilderPageSource(listPagesForRelease, restoreStoredPageConfig, savePageDraft);
 
 const components = new ComponentPlatformCatalog(
   (type) => componentPlatformQueries.getComponentReleaseInfo.execute(type),
-  (type, version) =>
-    componentPlatformQueries.getComponentDefaultProps.execute({ type, version })
+  (type, version) => componentPlatformQueries.getComponentDefaultProps.execute({ type, version }),
 );
 
 const clock = systemClock;

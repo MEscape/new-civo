@@ -1,15 +1,5 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 import { ContentLink } from '@components/ui/content-link';
 
 import { trimToNull } from '@lib/utils';

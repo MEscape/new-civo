@@ -15,13 +15,7 @@ import { moduleSpecifierVisitors } from '../plugins/architecture/util.mjs';
 
 import { classifyFile, resolveSpecifier } from './paths.mjs';
 
-const SKIP_DIRS = new Set([
-  'node_modules',
-  '.next',
-  'generated',
-  '.git',
-  'coverage',
-]);
+const SKIP_DIRS = new Set(['node_modules', '.next', 'generated', '.git', 'coverage']);
 const SKIP_FILES = new Set(['src/lib/db/contract.d.ts']);
 
 function walk(dir, found = []) {
@@ -50,19 +44,14 @@ export function visit(node, visitors, parent = null) {
       continue;
     const child = node[key];
     if (Array.isArray(child)) for (const c of child) visit(c, visitors, node);
-    else if (child && typeof child.type === 'string')
-      visit(child, visitors, node);
+    else if (child && typeof child.type === 'string') visit(child, visitors, node);
   }
 }
 
 function directivesOf(ast) {
   const found = new Set();
   for (const statement of ast.body) {
-    if (
-      statement.type !== 'ExpressionStatement' ||
-      typeof statement.directive !== 'string'
-    )
-      break;
+    if (statement.type !== 'ExpressionStatement' || typeof statement.directive !== 'string') break;
     found.add(statement.directive);
   }
   return found;
@@ -128,9 +117,7 @@ export function loadProject(root) {
     /** Module names found under src/modules. */
     modules: [
       ...new Set(
-        [...files.values()]
-          .filter((f) => f.info.area === 'module')
-          .map((f) => f.info.module)
+        [...files.values()].filter((f) => f.info.area === 'module').map((f) => f.info.module),
       ),
     ].sort(),
     /** Files of one module, relative to the module folder (`domain/models/x.ts`). */
@@ -162,9 +149,7 @@ export function topLevelClasses(file) {
   const classes = [];
   for (const statement of file.ast.body) {
     const declaration =
-      statement.type === 'ExportNamedDeclaration'
-        ? statement.declaration
-        : statement;
+      statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
     if (declaration?.type === 'ClassDeclaration' && declaration.id) {
       classes.push({
         name: declaration.id.name,
@@ -181,8 +166,7 @@ export function topLevelClasses(file) {
 export function instantiatedClasses(file) {
   const names = new Set();
   visit(file.ast, {
-    NewExpression: (node) =>
-      node.callee.type === 'Identifier' && names.add(node.callee.name),
+    NewExpression: (node) => node.callee.type === 'Identifier' && names.add(node.callee.name),
   });
   return names;
 }
@@ -196,11 +180,9 @@ export function exportedNames(file) {
       const d = s.declaration;
       if (d.id) names.push(d.id.name);
       if (d.declarations)
-        for (const v of d.declarations)
-          if (v.id.type === 'Identifier') names.push(v.id.name);
+        for (const v of d.declarations) if (v.id.type === 'Identifier') names.push(v.id.name);
     }
-    for (const spec of s.specifiers)
-      names.push(spec.exported.name ?? spec.exported.value);
+    for (const spec of s.specifiers) names.push(spec.exported.name ?? spec.exported.value);
   }
   return names;
 }
@@ -211,7 +193,7 @@ export function leadingComment(file, statement) {
     (c) =>
       c.type === 'Block' &&
       c.range[1] <= statement.range[0] &&
-      file.code.slice(c.range[1], statement.range[0]).trim() === ''
+      file.code.slice(c.range[1], statement.range[0]).trim() === '',
   );
   return before.length > 0 ? before[before.length - 1].value : '';
 }

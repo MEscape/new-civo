@@ -1,10 +1,6 @@
-import {
-  isUniqueConstraintViolation,
-  SqlConnectionError,
-} from '@prisma/orm-family-sql/errors';
+import { isUniqueConstraintViolation, SqlConnectionError } from '@prisma/orm-family-sql/errors';
 import { isStructuredError } from '@prisma/orm-postgres/utils/structured-error';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 
 import { mapPrismaError } from '@lib/db/prisma-error-mapping';
 
@@ -67,9 +63,7 @@ describe('mapPrismaError', () => {
 
   it('maps unique constraint violations to a conflict error', () => {
     const error = new Error('Duplicate key value');
-    vi.mocked(isUniqueConstraintViolation).mockImplementation(
-      (e) => e === error
-    );
+    vi.mocked(isUniqueConstraintViolation).mockImplementation((e) => e === error);
 
     const result = mapPrismaError(error, context);
 
@@ -133,9 +127,7 @@ describe('mapPrismaError', () => {
 
     // We mock the predicate to only recognize the inner error, proving the mapper
     // correctly unwraps `cause` one level deep.
-    vi.mocked(isUniqueConstraintViolation).mockImplementation(
-      (e) => e === innerError
-    );
+    vi.mocked(isUniqueConstraintViolation).mockImplementation((e) => e === innerError);
 
     const result = mapPrismaError(outerError, context);
 

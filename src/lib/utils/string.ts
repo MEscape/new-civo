@@ -5,16 +5,16 @@
  */
 
 const TRANSLITERATIONS: Readonly<Record<string, string>> = {
-    ä: 'ae',
-    ö: 'oe',
-    ü: 'ue',
-    ß: 'ss',
-    æ: 'ae',
-    œ: 'oe',
-    ø: 'o',
-    å: 'a',
-    ł: 'l',
-    đ: 'd',
+  ä: 'ae',
+  ö: 'oe',
+  ü: 'ue',
+  ß: 'ss',
+  æ: 'ae',
+  œ: 'oe',
+  ø: 'o',
+  å: 'a',
+  ł: 'l',
+  đ: 'd',
 };
 
 /**
@@ -24,13 +24,13 @@ const TRANSLITERATIONS: Readonly<Record<string, string>> = {
  * usable remains.
  */
 export function slugify(text: string): string {
-    return text
-        .toLowerCase()
-        .replace(/[äöüßæœøåłđ]/g, (char) => TRANSLITERATIONS[char] ?? char)
-        .normalize('NFKD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+  return text
+    .toLowerCase()
+    .replace(/[äöüßæœøåłđ]/g, (char) => TRANSLITERATIONS[char] ?? char)
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /**
@@ -39,24 +39,28 @@ export function slugify(text: string): string {
  * happened. The ellipsis counts toward `maxLength`.
  */
 export function truncate(text: string, maxLength: number): string {
-    const characters = Array.from(text);
-    if (characters.length <= maxLength) {return text;}
-    if (maxLength <= 1) {return '…'.slice(0, Math.max(0, maxLength));}
-    return `${characters
-        .slice(0, maxLength - 1)
-        .join('')
-        .trimEnd()}…`;
+  const characters = Array.from(text);
+  if (characters.length <= maxLength) {
+    return text;
+  }
+  if (maxLength <= 1) {
+    return '…'.slice(0, Math.max(0, maxLength));
+  }
+  return `${characters
+    .slice(0, maxLength - 1)
+    .join('')
+    .trimEnd()}…`;
 }
 
 /** Uppercases the first character and leaves the rest untouched. */
 export function capitalize(text: string): string {
-    const [first, ...rest] = Array.from(text);
-    return first === undefined ? '' : first.toLocaleUpperCase() + rest.join('');
+  const [first, ...rest] = Array.from(text);
+  return first === undefined ? '' : first.toLocaleUpperCase() + rest.join('');
 }
 
 /** Collapses runs of whitespace (including newlines) into single spaces and trims. */
 export function normalizeWhitespace(text: string): string {
-    return text.replace(/\s+/g, ' ').trim();
+  return text.replace(/\s+/g, ' ').trim();
 }
 
 /**
@@ -67,26 +71,26 @@ export function normalizeWhitespace(text: string): string {
  * sanitizer).
  */
 export function stripHtml(html: string): string {
-    return normalizeWhitespace(html.replace(/<[^>]*>/g, ' '));
+  return normalizeWhitespace(html.replace(/<[^>]*>/g, ' '));
 }
 
 /** Escapes the characters that are significant in HTML text and attribute values. */
 export function escapeHtml(text: string): string {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 /** True when the string has no characters other than whitespace. */
 export function isBlank(text: string | null | undefined): boolean {
-    return text === null || text === undefined || text.trim().length === 0;
+  return text === null || text === undefined || text.trim().length === 0;
 }
 
 /** Trims the text; returns `null` when only whitespace is left. For optional text stored as NULL. */
 export function trimToNull(text: string | null | undefined): string | null {
-    const trimmed = text?.trim();
-    return trimmed ?? null;
+  const trimmed = text?.trim();
+  return trimmed ?? null;
 }

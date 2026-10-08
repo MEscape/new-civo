@@ -3,10 +3,8 @@
 import { useId, useState, useTransition } from 'react';
 import type { ChangeEvent } from 'react';
 
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
 
 import { builderRoutes } from '@modules/builder/client';
 
@@ -18,7 +16,6 @@ import { useRouter } from '@i18n';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { applyActionError } from '@lib/actions';
 import { slugify } from '@lib/utils';
 
@@ -29,7 +26,6 @@ import {
 import { createWebsiteAction } from '../actions/create-website-action';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
 import { newWebsiteSchema } from '../schemas/new-website-schema';
-
 
 import { TemplatePicker } from './template-picker';
 
@@ -65,7 +61,9 @@ export function CreateWebsiteForm() {
 
   /** Follow the name until the user has typed their own slug. */
   function handleNameChange(event: ChangeEvent<HTMLInputElement>) {
-    if (form.getFieldState('slug').isDirty) {return;}
+    if (form.getFieldState('slug').isDirty) {
+      return;
+    }
     form.setValue('slug', slugify(event.target.value), {
       shouldValidate: form.formState.isSubmitted,
     });
@@ -87,9 +85,7 @@ export function CreateWebsiteForm() {
         router.push(builderRoutes.pages(result.data.id));
         return;
       }
-      setFormErrorCode(
-        applyActionError(result.error, form.setError, CODE_FIELDS)
-      );
+      setFormErrorCode(applyActionError(result.error, form.setError, CODE_FIELDS));
     });
   }
 

@@ -24,15 +24,7 @@ export const SHARED_LIB_ALLOW = {
   domain: ['errors', 'result', 'utils'],
   application: ['errors', 'result', 'utils'],
   infrastructure: ['errors', 'result', 'utils', 'logger', 'db', 'config'],
-  presentation: [
-    'errors',
-    'result',
-    'utils',
-    'actions',
-    'seo',
-    'config',
-    'fonts',
-  ],
+  presentation: ['errors', 'result', 'utils', 'actions', 'seo', 'config', 'fonts'],
   // composition.ts, index.ts and module-root files: everything.
   root: null,
 };
@@ -83,16 +75,7 @@ export const LAYER_DIRS = {
   // `services` holds logic shared by several use cases (gate helpers, pure decisions); never I/O, never business rules.
   application: ['commands', 'queries', 'contracts', 'services'],
   infrastructure: ['audit', 'logging', 'prisma', 'provisioner'],
-  presentation: [
-    'actions',
-    'cache',
-    'components',
-    'dto',
-    'guards',
-    'i18n',
-    'messages',
-    'schemas',
-  ],
+  presentation: ['actions', 'cache', 'components', 'dto', 'guards', 'i18n', 'messages', 'schemas'],
 };
 
 /**
@@ -151,9 +134,7 @@ export const DIR_FILE_PATTERNS = {
   // What a contract holds: validation limits, read shapes, request shapes, the editor/session model, a stored snapshot
   // and the cache tags that name what a read depends on. One file per kind, named `<name>-<kind>.ts`.
   'application/contracts': [
-    new RegExp(
-      `^${KEBAB}-(?:constraints|views|inputs|model|snapshot|tags)\\.ts$`
-    ),
+    new RegExp(`^${KEBAB}-(?:constraints|views|inputs|model|snapshot|tags)\\.ts$`),
   ],
   'infrastructure/prisma': [
     new RegExp(`^${KEBAB}\\.repository\\.ts$`),

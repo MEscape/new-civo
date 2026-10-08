@@ -1,7 +1,4 @@
-import type {
-  ReleaseStatus,
-  ReleaseSummaryView,
-} from '../../application/contracts/release-views';
+import type { ReleaseStatus, ReleaseSummaryView } from '../../application/contracts/release-views';
 
 /** The JSON-safe shape Server Actions return: dates as ISO-8601 strings. Never carries the snapshot. */
 export interface ReleaseSummaryDto {
@@ -15,9 +12,7 @@ export interface ReleaseSummaryDto {
   readonly createdAt: string;
 }
 
-export function toReleaseSummaryDto(
-  view: ReleaseSummaryView
-): ReleaseSummaryDto {
+export function toReleaseSummaryDto(view: ReleaseSummaryView): ReleaseSummaryDto {
   return {
     id: view.id,
     websiteId: view.websiteId,

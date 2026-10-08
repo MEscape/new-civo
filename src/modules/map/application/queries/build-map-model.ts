@@ -38,19 +38,13 @@ export class BuildMapModel {
 
     return ok({
       layers,
-      styles: layers.map((layer, index) =>
-        resolveLayerStyle(layer, input.config, index)
-      ),
+      styles: layers.map((layer, index) => resolveLayerStyle(layer, input.config, index)),
       filters: input.config.showFilters ? deriveFilters(layers) : [],
       bounds: layers.reduce<Bounds | null>(
-        (bounds, layer) =>
-          layer.bounds === null ? bounds : mergeBounds(bounds, layer.bounds),
-        null
+        (bounds, layer) => (layer.bounds === null ? bounds : mergeBounds(bounds, layer.bounds)),
+        null,
       ),
-      featureCount: layers.reduce(
-        (sum, layer) => sum + layer.features.length,
-        0
-      ),
+      featureCount: layers.reduce((sum, layer) => sum + layer.features.length, 0),
       issues,
     });
   }

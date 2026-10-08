@@ -6,13 +6,13 @@ import { logger } from '@lib/logger';
 import { assertNever, isDefined } from '@lib/utils';
 
 import {
-    accountConflict,
-    authValidationFailed,
-    emailNotVerified,
-    invalidCredentials,
-    invalidToken,
-    reauthenticationRequired,
-    unauthenticated,
+  accountConflict,
+  authValidationFailed,
+  emailNotVerified,
+  invalidCredentials,
+  invalidToken,
+  reauthenticationRequired,
+  unauthenticated,
 } from '../../domain/errors/auth-errors';
 
 const authLogger = logger.withContext({ module: 'auth.better-auth' });
@@ -35,12 +35,12 @@ const authLogger = logger.withContext({ module: 'auth.better-auth' });
  * - `validation`: malformed input.
  */
 type ProviderCodeClass =
-    | 'credential_failure'
-    | 'reauthentication'
-    | 'token'
-    | 'email_not_verified'
-    | 'conflict'
-    | 'validation';
+  | 'credential_failure'
+  | 'reauthentication'
+  | 'token'
+  | 'email_not_verified'
+  | 'conflict'
+  | 'validation';
 
 /**
  * Better Auth's stable `body.code` strings (BASE_ERROR_CODES in
@@ -51,30 +51,30 @@ type ProviderCodeClass =
  * "constructor" from resolving through the prototype chain.
  */
 const PROVIDER_CODE_CLASSES: ReadonlyMap<string, ProviderCodeClass> = new Map<
-    string,
-    ProviderCodeClass
+  string,
+  ProviderCodeClass
 >([
-    ['INVALID_EMAIL_OR_PASSWORD', 'credential_failure'],
-    ['INVALID_PASSWORD', 'credential_failure'],
-    ['USER_NOT_FOUND', 'credential_failure'],
-    ['CREDENTIAL_ACCOUNT_NOT_FOUND', 'credential_failure'],
-    ['INVALID_USER', 'credential_failure'],
-    ['SESSION_EXPIRED', 'reauthentication'],
-    ['SESSION_NOT_FRESH', 'reauthentication'],
-    ['INVALID_TOKEN', 'token'],
-    ['TOKEN_EXPIRED', 'token'],
-    ['EMAIL_NOT_VERIFIED', 'email_not_verified'],
-    ['USER_ALREADY_EXISTS', 'conflict'],
-    ['USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL', 'conflict'],
-    ['LINKED_ACCOUNT_ALREADY_EXISTS', 'conflict'],
-    ['SOCIAL_ACCOUNT_ALREADY_LINKED', 'conflict'],
-    ['INVALID_EMAIL', 'validation'],
-    ['PASSWORD_TOO_SHORT', 'validation'],
-    ['PASSWORD_TOO_LONG', 'validation'],
-    ['VALIDATION_ERROR', 'validation'],
-    ['MISSING_FIELD', 'validation'],
-    ['FIELD_NOT_ALLOWED', 'validation'],
-    ['BODY_MUST_BE_AN_OBJECT', 'validation'],
+  ['INVALID_EMAIL_OR_PASSWORD', 'credential_failure'],
+  ['INVALID_PASSWORD', 'credential_failure'],
+  ['USER_NOT_FOUND', 'credential_failure'],
+  ['CREDENTIAL_ACCOUNT_NOT_FOUND', 'credential_failure'],
+  ['INVALID_USER', 'credential_failure'],
+  ['SESSION_EXPIRED', 'reauthentication'],
+  ['SESSION_NOT_FRESH', 'reauthentication'],
+  ['INVALID_TOKEN', 'token'],
+  ['TOKEN_EXPIRED', 'token'],
+  ['EMAIL_NOT_VERIFIED', 'email_not_verified'],
+  ['USER_ALREADY_EXISTS', 'conflict'],
+  ['USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL', 'conflict'],
+  ['LINKED_ACCOUNT_ALREADY_EXISTS', 'conflict'],
+  ['SOCIAL_ACCOUNT_ALREADY_LINKED', 'conflict'],
+  ['INVALID_EMAIL', 'validation'],
+  ['PASSWORD_TOO_SHORT', 'validation'],
+  ['PASSWORD_TOO_LONG', 'validation'],
+  ['VALIDATION_ERROR', 'validation'],
+  ['MISSING_FIELD', 'validation'],
+  ['FIELD_NOT_ALLOWED', 'validation'],
+  ['BODY_MUST_BE_AN_OBJECT', 'validation'],
 ]);
 
 /**
@@ -82,9 +82,7 @@ const PROVIDER_CODE_CLASSES: ReadonlyMap<string, ProviderCodeClass> = new Map<
  * inputs from the same source of truth instead of keeping a second list that
  * can drift. Not part of the module's public API.
  */
-export const CLASSIFIED_PROVIDER_CODES: readonly string[] = [
-    ...PROVIDER_CODE_CLASSES.keys(),
-];
+export const CLASSIFIED_PROVIDER_CODES: readonly string[] = [...PROVIDER_CODE_CLASSES.keys()];
 
 /** HTTP status Better Auth reports for "no valid session". */
 const UNAUTHORIZED_STATUS_CODE = 401;
@@ -97,27 +95,27 @@ const providerErrorBodySchema = z.object({ code: z.string() });
  * UNAUTHORIZED APIError with no body), so absence is a normal outcome.
  */
 function readProviderCode(body: unknown): string | undefined {
-    const parsed = providerErrorBodySchema.safeParse(body);
-    return parsed.success ? parsed.data.code : undefined;
+  const parsed = providerErrorBodySchema.safeParse(body);
+  return parsed.success ? parsed.data.code : undefined;
 }
 
 function fromCodeClass(codeClass: ProviderCodeClass): AppError {
-    switch (codeClass) {
-        case 'credential_failure':
-            return invalidCredentials();
-        case 'reauthentication':
-            return reauthenticationRequired();
-        case 'token':
-            return invalidToken();
-        case 'email_not_verified':
-            return emailNotVerified();
-        case 'conflict':
-            return accountConflict();
-        case 'validation':
-            return authValidationFailed({});
-        default:
-            return assertNever(codeClass);
-    }
+  switch (codeClass) {
+    case 'credential_failure':
+      return invalidCredentials();
+    case 'reauthentication':
+      return reauthenticationRequired();
+    case 'token':
+      return invalidToken();
+    case 'email_not_verified':
+      return emailNotVerified();
+    case 'conflict':
+      return accountConflict();
+    case 'validation':
+      return authValidationFailed({});
+    default:
+      return assertNever(codeClass);
+  }
 }
 
 /**
@@ -138,24 +136,29 @@ function fromCodeClass(codeClass: ProviderCodeClass): AppError {
  * provider error can never be mistaken for a benign outcome.
  */
 export function mapBetterAuthError(
-    thrown: unknown,
-    onUnclassified: (cause: unknown) => InfrastructureAppError
+  thrown: unknown,
+  onUnclassified: (cause: unknown) => InfrastructureAppError,
 ): AppError {
-    if (!isAPIError(thrown)) {return onUnclassified(thrown);}
+  if (!isAPIError(thrown)) {
+    return onUnclassified(thrown);
+  }
 
-    const code = readProviderCode(thrown.body);
-    const codeClass =
-        code === undefined ? undefined : PROVIDER_CODE_CLASSES.get(code);
-    if (isDefined(codeClass)) {return fromCodeClass(codeClass);}
+  const code = readProviderCode(thrown.body);
+  const codeClass = code === undefined ? undefined : PROVIDER_CODE_CLASSES.get(code);
+  if (isDefined(codeClass)) {
+    return fromCodeClass(codeClass);
+  }
 
-    // A bare 401 with no recognizable code means "no valid session".
-    if (thrown.statusCode === UNAUTHORIZED_STATUS_CODE) {return unauthenticated();}
+  // A bare 401 with no recognizable code means "no valid session".
+  if (thrown.statusCode === UNAUTHORIZED_STATUS_CODE) {
+    return unauthenticated();
+  }
 
-    const fallback = onUnclassified(thrown);
-    authLogger.warn('auth.unclassified_provider_error', {
-        mappedTo: fallback.code,
-        status: thrown.status,
-        providerCode: code,
-    });
-    return fallback;
+  const fallback = onUnclassified(thrown);
+  authLogger.warn('auth.unclassified_provider_error', {
+    mappedTo: fallback.code,
+    status: thrown.status,
+    providerCode: code,
+  });
+  return fallback;
 }

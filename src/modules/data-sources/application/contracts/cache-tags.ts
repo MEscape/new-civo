@@ -7,9 +7,9 @@
  *  - `dataset:<id>`      anything derived from one dataset's mapped records.
  */
 export function dataSourceCacheTag(dataSourceId: string): string {
-    return `data-source:${dataSourceId}`;
+  return `data-source:${dataSourceId}`;
 }
 
 export function datasetCacheTag(datasetId: string): string {
-    return `dataset:${datasetId}`;
+  return `dataset:${datasetId}`;
 }

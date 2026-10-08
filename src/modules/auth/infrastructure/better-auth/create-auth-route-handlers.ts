@@ -7,8 +7,8 @@ import type { BetterAuthInstance } from './create-auth';
 type RouteHandler = (request: Request) => Promise<Response>;
 
 export interface AuthRouteHandlers {
-    readonly GET: RouteHandler;
-    readonly POST: RouteHandler;
+  readonly GET: RouteHandler;
+  readonly POST: RouteHandler;
 }
 
 const NOT_FOUND_STATUS = 404;
@@ -24,16 +24,14 @@ const NOT_FOUND_STATUS = 404;
  * disabled the endpoint answers 404 instead of throwing.
  */
 export function createAuthRouteHandlers(options: {
-    readonly isEnabled: boolean;
-    readonly getAuth: () => BetterAuthInstance;
+  readonly isEnabled: boolean;
+  readonly getAuth: () => BetterAuthInstance;
 }): AuthRouteHandlers {
-    const getHandlers = once(() => toNextJsHandler(options.getAuth()));
-    const notFound = () => Promise.resolve(new Response(null, { status: NOT_FOUND_STATUS }));
+  const getHandlers = once(() => toNextJsHandler(options.getAuth()));
+  const notFound = () => Promise.resolve(new Response(null, { status: NOT_FOUND_STATUS }));
 
-    return {
-        GET: (request) =>
-            options.isEnabled ? getHandlers().GET(request) : notFound(),
-        POST: (request) =>
-            options.isEnabled ? getHandlers().POST(request) : notFound(),
-    };
+  return {
+    GET: (request) => (options.isEnabled ? getHandlers().GET(request) : notFound()),
+    POST: (request) => (options.isEnabled ? getHandlers().POST(request) : notFound()),
+  };
 }

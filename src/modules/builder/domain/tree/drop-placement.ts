@@ -5,19 +5,12 @@ import { assertNever } from '@lib/utils';
 
 import { pageNodeNotFound } from '../errors/builder-errors';
 
-import {
-  childrenOf,
-  findNode,
-  flattenNodes,
-  isInSubtree,
-  locateNode,
-} from './tree-operations';
+import { childrenOf, findNode, flattenNodes, isInSubtree, locateNode } from './tree-operations';
 
 import type { FlatNode, Placement } from './tree-operations';
 import type { NestingPolicy } from '../models/component-catalog';
 import type { PageNodeId } from '../models/ids';
 import type { PageNode } from '../models/page-node';
-
 
 /*
  * Pure drag-and-drop placement. It turns "the pointer is at Y over node N"
@@ -93,18 +86,24 @@ const MIDPOINT_RATIO = 0.5;
 export function resolveDropPosition(
   pointerY: number,
   targetRect: Rect,
-  target: { readonly acceptsChildren: boolean; readonly isEmpty: boolean }
+  target: { readonly acceptsChildren: boolean; readonly isEmpty: boolean },
 ): DropPosition {
   const { acceptsChildren: targetAcceptsChildren, isEmpty: targetIsEmpty } = target;
-  if (targetAcceptsChildren && targetIsEmpty) {return 'inside';}
+  if (targetAcceptsChildren && targetIsEmpty) {
+    return 'inside';
+  }
 
   const relativeY =
-    targetRect.height > 0
-      ? (pointerY - targetRect.top) / targetRect.height
-      : MIDPOINT_RATIO;
-  if (relativeY < EDGE_BAND_RATIO) {return 'before';}
-  if (relativeY > 1 - EDGE_BAND_RATIO) {return 'after';}
-  if (targetAcceptsChildren) {return 'inside';}
+    targetRect.height > 0 ? (pointerY - targetRect.top) / targetRect.height : MIDPOINT_RATIO;
+  if (relativeY < EDGE_BAND_RATIO) {
+    return 'before';
+  }
+  if (relativeY > 1 - EDGE_BAND_RATIO) {
+    return 'after';
+  }
+  if (targetAcceptsChildren) {
+    return 'inside';
+  }
   return relativeY < MIDPOINT_RATIO ? 'before' : 'after';
 }
 
@@ -115,13 +114,16 @@ export function resolveDropPosition(
 function relativeTarget(
   { tree, active, policy }: DropContext,
   anchor: DropAnchor,
-  position: 'before' | 'after'
+  position: 'before' | 'after',
 ): DropTarget | null {
-  const parent =
-    anchor.parentId === null ? null : findNode(tree, anchor.parentId);
-  if (anchor.parentId !== null && parent === null) {return null;}
+  const parent = anchor.parentId === null ? null : findNode(tree, anchor.parentId);
+  if (anchor.parentId !== null && parent === null) {
+    return null;
+  }
   // Before/after makes the node a sibling, so the PARENT must accept it.
-  if (!policy.canNest(parent?.type ?? null, active.type)) {return null;}
+  if (!policy.canNest(parent?.type ?? null, active.type)) {
+    return null;
+  }
 
   return {
     kind: 'relative',
@@ -134,9 +136,11 @@ function relativeTarget(
 function insideTarget(
   node: PageNode,
   active: ActiveDrag,
-  policy: NestingPolicy
+  policy: NestingPolicy,
 ): DropTarget | null {
-  if (!policy.canNest(node.type, active.type)) {return null;}
+  if (!policy.canNest(node.type, active.type)) {
+    return null;
+  }
   return {
     kind: 'inside',
     targetNodeId: node.id,
@@ -146,12 +150,13 @@ function insideTarget(
 }
 
 /** True when `targetId` is the dragged node or lies inside it: never a valid drop. */
-function isOwnSubtree(
-  { tree, active }: DropContext,
-  targetId: PageNodeId
-): boolean {
-  if (active.id === null) {return false;}
-  if (active.id === targetId) {return true;}
+function isOwnSubtree({ tree, active }: DropContext, targetId: PageNodeId): boolean {
+  if (active.id === null) {
+    return false;
+  }
+  if (active.id === targetId) {
+    return true;
+  }
   const activeNode = findNode(tree, active.id);
   return activeNode === null || isInSubtree(activeNode, targetId);
 }
@@ -163,10 +168,12 @@ function isOwnSubtree(
  */
 export function resolveDropTargetForNode(
   context: DropContext,
-  { targetId, pointerY, targetRect }: PointerOverNode
+  { targetId, pointerY, targetRect }: PointerOverNode,
 ): DropTarget | null {
   const location = locateNode(context.tree, targetId);
-  if (location === null || isOwnSubtree(context, targetId)) {return null;}
+  if (location === null || isOwnSubtree(context, targetId)) {
+    return null;
+  }
 
   const position = resolveDropPosition(pointerY, targetRect, {
     acceptsChildren: context.policy.acceptsChildren(location.node.type),
@@ -181,17 +188,15 @@ export function resolveDropTargetForNode(
  * The drop target for a pointer over empty canvas: after the last root
  * node, or the start of an empty page.
  */
-export function resolveDropTargetAtCanvasEnd(
-  context: DropContext
-): DropTarget | null {
+export function resolveDropTargetAtCanvasEnd(context: DropContext): DropTarget | null {
   const { tree, active, policy } = context;
   const lastRoot = tree.at(-1);
   if (lastRoot === undefined) {
-    return policy.canNest(null, active.type)
-      ? { kind: 'root', index: 0 }
-      : null;
+    return policy.canNest(null, active.type) ? { kind: 'root', index: 0 } : null;
   }
-  if (lastRoot.id === active.id) {return null;}
+  if (lastRoot.id === active.id) {
+    return null;
+  }
   return relativeTarget(context, { node: lastRoot, parentId: null }, 'after');
 }
 
@@ -203,13 +208,13 @@ export function resolveDropTargetAtCanvasEnd(
 export function stepDropTarget(
   context: DropContext,
   currentTargetId: PageNodeId,
-  direction: -1 | 1
+  direction: -1 | 1,
 ): DropTarget | null {
   const flat = flattenNodes(context.tree);
-  const currentIndex = flat.findIndex(
-    (entry) => entry.node.id === currentTargetId
-  );
-  if (currentIndex === -1) {return null;}
+  const currentIndex = flat.findIndex((entry) => entry.node.id === currentTargetId);
+  if (currentIndex === -1) {
+    return null;
+  }
 
   for (
     let index = currentIndex + direction;
@@ -217,17 +222,13 @@ export function stepDropTarget(
     index += direction
   ) {
     const candidate = flat[index];
-    if (
-      candidate === undefined ||
-      isOwnSubtree(context, candidate.node.id)
-    )
-      {continue;}
-    const target = relativeTarget(
-      context,
-      candidate,
-      direction === -1 ? 'before' : 'after'
-    );
-    if (target !== null) {return target;}
+    if (candidate === undefined || isOwnSubtree(context, candidate.node.id)) {
+      continue;
+    }
+    const target = relativeTarget(context, candidate, direction === -1 ? 'before' : 'after');
+    if (target !== null) {
+      return target;
+    }
   }
   return null;
 }
@@ -241,7 +242,7 @@ export function stepDropTarget(
 export function resolvePlacement(
   tree: readonly PageNode[],
   activeId: PageNodeId | null,
-  target: DropTarget
+  target: DropTarget,
 ): AppResult<Placement, NotFoundAppError> {
   switch (target.kind) {
     case 'root':
@@ -250,19 +251,18 @@ export function resolvePlacement(
       return ok({ parentId: target.parentId, index: target.index });
     case 'relative': {
       const siblings = childrenOf(tree, target.parentId);
-      if (siblings === null) {return err(pageNodeNotFound());}
-      const targetIndex = siblings.findIndex(
-        (node) => node.id === target.targetNodeId
-      );
-      if (targetIndex === -1) {return err(pageNodeNotFound());}
+      if (siblings === null) {
+        return err(pageNodeNotFound());
+      }
+      const targetIndex = siblings.findIndex((node) => node.id === target.targetNodeId);
+      if (targetIndex === -1) {
+        return err(pageNodeNotFound());
+      }
 
       const activeIndex =
-        activeId === null
-          ? -1
-          : siblings.findIndex((node) => node.id === activeId);
+        activeId === null ? -1 : siblings.findIndex((node) => node.id === activeId);
       const base = target.position === 'before' ? targetIndex : targetIndex + 1;
-      const isLiftedFromBefore =
-        activeIndex !== -1 && activeIndex < targetIndex;
+      const isLiftedFromBefore = activeIndex !== -1 && activeIndex < targetIndex;
       return ok({
         parentId: target.parentId,
         index: isLiftedFromBefore ? base - 1 : base,

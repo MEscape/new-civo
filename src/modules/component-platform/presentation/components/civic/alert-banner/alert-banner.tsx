@@ -41,11 +41,7 @@ export interface AlertBannerComponentProps {
  * Official notices. Site-level notices read as part of the page frame, so
  * an empty result renders nothing instead of an "empty" state.
  */
-export async function AlertBanner({
-  props,
-  context,
-  loadContent,
-}: AlertBannerComponentProps) {
+export async function AlertBanner({ props, context, loadContent }: AlertBannerComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -59,12 +55,7 @@ export async function AlertBanner({
   const heading = trimToNull(props.heading);
 
   if (result.isErr()) {
-    return (
-      <ContentState
-        kind="error"
-        heading={heading ?? t('alertBanner.defaultHeading')}
-      />
-    );
+    return <ContentState kind="error" heading={heading ?? t('alertBanner.defaultHeading')} />;
   }
   const { items, origin } = result.value;
   if (items.length === 0) {
@@ -75,9 +66,7 @@ export async function AlertBanner({
     <div className="relative py-4">
       <ContentOriginBadge origin={origin} />
       <Container className="flex flex-col gap-3">
-        {heading !== null && (
-          <h2 className="font-heading text-lg text-copy">{heading}</h2>
-        )}
+        {heading !== null && <h2 className="font-heading text-lg text-copy">{heading}</h2>}
         {items.map((alert) => {
           const Icon = SEVERITY_ICONS[alert.severity];
 

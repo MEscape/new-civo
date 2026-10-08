@@ -6,7 +6,6 @@ import { useScaledHeight } from '@hooks/use-scaled-height';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { useComponentPreview } from '../../hooks/use-component-preview';
 import { useComponentText } from '../../hooks/use-component-text';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../../messages/message-keys';
@@ -29,11 +28,8 @@ export interface ComponentPreviewPopoverProps {
 
 /** Aligned with the hovered row; shifted up when it would run off the bottom of the screen. */
 function popoverTop(anchor: DOMRect): number {
-  const fitsBelow =
-    anchor.top + POPOVER_HEIGHT_PX + VIEWPORT_PADDING_PX <= window.innerHeight;
-  return fitsBelow
-    ? anchor.top
-    : Math.max(VIEWPORT_PADDING_PX, anchor.bottom - POPOVER_HEIGHT_PX);
+  const fitsBelow = anchor.top + POPOVER_HEIGHT_PX + VIEWPORT_PADDING_PX <= window.innerHeight;
+  return fitsBelow ? anchor.top : Math.max(VIEWPORT_PADDING_PX, anchor.bottom - POPOVER_HEIGHT_PX);
 }
 
 /**
@@ -52,15 +48,12 @@ export function ComponentPreviewPopover({
   const text = useComponentText();
   const { node, isLoading, errorCode } = useComponentPreview(componentType);
   const contentRef = useRef<HTMLDivElement>(null);
-  const scaledHeight = useScaledHeight(
-    contentRef,
-    PREVIEW_SCALE,
-    node !== null
-  );
+  const scaledHeight = useScaledHeight(contentRef, PREVIEW_SCALE, node !== null);
 
-  const descriptor =
-    componentType === null ? null : catalog.describe(componentType);
-  if (descriptor === null || anchorRect === null) {return null;}
+  const descriptor = componentType === null ? null : catalog.describe(componentType);
+  if (descriptor === null || anchorRect === null) {
+    return null;
+  }
   const description = text.componentDescription(descriptor.type);
 
   return createPortal(
@@ -79,11 +72,7 @@ export function ComponentPreviewPopover({
         )}
       </div>
       <div className="civo-preview-popover__stage">
-        {isLoading && (
-          <div className="civo-preview-popover__status">
-            {t('preview.rendering')}
-          </div>
-        )}
+        {isLoading && <div className="civo-preview-popover__status">{t('preview.rendering')}</div>}
         {errorCode !== null && (
           <div className="civo-preview-popover__status text-danger">
             {t(messageKeyForCode(errorCode), MESSAGE_PARAMS)}
@@ -96,14 +85,12 @@ export function ComponentPreviewPopover({
               className="civo-preview-popover__scale"
               style={{ transform: `scale(${PREVIEW_SCALE})` }}
             >
-              <CanvasThemeScope themeStyle={themeStyle}>
-                {node}
-              </CanvasThemeScope>
+              <CanvasThemeScope themeStyle={themeStyle}>{node}</CanvasThemeScope>
             </div>
           </div>
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }

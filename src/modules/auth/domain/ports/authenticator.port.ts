@@ -1,16 +1,16 @@
 import type {
-    ForbiddenAppError,
-    InfrastructureAppError,
-    UnauthorizedAppError,
-    ValidationAppError,
+  ForbiddenAppError,
+  InfrastructureAppError,
+  UnauthorizedAppError,
+  ValidationAppError,
 } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
 
 import type {
-    PasswordResetDraft,
-    PasswordResetRequest,
-    SignInCredentials,
-    SignUpDraft,
+  PasswordResetDraft,
+  PasswordResetRequest,
+  SignInCredentials,
+  SignUpDraft,
 } from '../models/credentials';
 
 /**
@@ -19,10 +19,7 @@ import type {
  * bad or expired tokens.
  */
 export type AuthenticatorError =
-    | UnauthorizedAppError
-    | ForbiddenAppError
-    | ValidationAppError
-    | InfrastructureAppError;
+  UnauthorizedAppError | ForbiddenAppError | ValidationAppError | InfrastructureAppError;
 
 /**
  * The authentication flows, expressed without a provider. Inputs are
@@ -35,15 +32,9 @@ export type AuthenticatorError =
  * - `signOut` succeeds when nobody is signed in.
  */
 export interface Authenticator {
-    signIn(
-        credentials: SignInCredentials
-    ): AppResultAsync<void, AuthenticatorError>;
-    signUp(draft: SignUpDraft): AppResultAsync<void, AuthenticatorError>;
-    signOut(): AppResultAsync<void, AuthenticatorError>;
-    requestPasswordReset(
-        request: PasswordResetRequest
-    ): AppResultAsync<void, AuthenticatorError>;
-    resetPassword(
-        draft: PasswordResetDraft
-    ): AppResultAsync<void, AuthenticatorError>;
+  signIn(credentials: SignInCredentials): AppResultAsync<void, AuthenticatorError>;
+  signUp(draft: SignUpDraft): AppResultAsync<void, AuthenticatorError>;
+  signOut(): AppResultAsync<void, AuthenticatorError>;
+  requestPasswordReset(request: PasswordResetRequest): AppResultAsync<void, AuthenticatorError>;
+  resetPassword(draft: PasswordResetDraft): AppResultAsync<void, AuthenticatorError>;
 }

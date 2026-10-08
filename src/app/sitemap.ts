@@ -10,16 +10,16 @@ import { mapValues } from '@lib/utils';
 const INDEXABLE_PATHNAMES = ['/'] as const;
 
 function toAbsoluteUrl(path: string): string {
-    return new URL(path, publicEnv.NEXT_PUBLIC_APP_URL).toString();
+  return new URL(path, publicEnv.NEXT_PUBLIC_APP_URL).toString();
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    return INDEXABLE_PATHNAMES.flatMap((pathname) => {
-        const languages = mapValues(buildAlternateLanguages(pathname), toAbsoluteUrl);
+  return INDEXABLE_PATHNAMES.flatMap((pathname) => {
+    const languages = mapValues(buildAlternateLanguages(pathname), toAbsoluteUrl);
 
-        return I18N_CONFIG.locales.map((locale) => ({
-            url: toAbsoluteUrl(toLocalizedPath(locale, pathname)),
-            alternates: { languages },
-        }));
-    });
+    return I18N_CONFIG.locales.map((locale) => ({
+      url: toAbsoluteUrl(toLocalizedPath(locale, pathname)),
+      alternates: { languages },
+    }));
+  });
 }

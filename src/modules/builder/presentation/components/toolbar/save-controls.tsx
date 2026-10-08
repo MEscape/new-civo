@@ -2,12 +2,8 @@ import { Button } from '@components/ui/button';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { BUILDER_ERROR_CODES } from '../../../application/contracts/builder-constraints';
-import {
-  useBuilderDispatch,
-  useBuilderSelector,
-} from '../../state/builder-hooks';
+import { useBuilderDispatch, useBuilderSelector } from '../../state/builder-hooks';
 import {
   selectIsDirty,
   selectSaveErrorCode,
@@ -49,9 +45,15 @@ function SaveStatusMessage({ status, errorCode, isDirty }: SaveStatusMessageProp
       </>
     );
   }
-  if (status === 'saving') {return <span className={MUTED}>{t('save.saving')}</span>;}
-  if (isDirty) {return <span className="text-xs text-accent-copy">{t('save.unsaved')}</span>;}
-  if (status === 'saved') {return <span className={MUTED}>{t('save.saved')}</span>;}
+  if (status === 'saving') {
+    return <span className={MUTED}>{t('save.saving')}</span>;
+  }
+  if (isDirty) {
+    return <span className="text-xs text-accent-copy">{t('save.unsaved')}</span>;
+  }
+  if (status === 'saved') {
+    return <span className={MUTED}>{t('save.saved')}</span>;
+  }
   return null;
 }
 
@@ -67,17 +69,9 @@ export function SaveControls() {
   return (
     <>
       <div role="status" aria-live="polite" className="flex items-center gap-2">
-        <SaveStatusMessage
-          status={status}
-          errorCode={errorCode}
-          isDirty={isDirty}
-        />
+        <SaveStatusMessage status={status} errorCode={errorCode} isDirty={isDirty} />
       </div>
-      <Button
-        size="sm"
-        disabled={isSaving || !isDirty}
-        onClick={() => void dispatch(saveDraft())}
-      >
+      <Button size="sm" disabled={isSaving || !isDirty} onClick={() => void dispatch(saveDraft())}>
         {isSaving ? t('toolbar.saving') : t('toolbar.save')}
       </Button>
     </>

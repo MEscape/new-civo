@@ -9,34 +9,30 @@ import { isPlainObject } from './object';
 
 import type { JsonValue } from './json';
 
-function checkJsonValue(
-    value: unknown,
-    depth: number,
-    maxDepth: number
-): boolean {
-    if (depth > maxDepth) {return false;}
-    if (value === null) {return true;}
-    switch (typeof value) {
-        case 'string':
-        case 'boolean':
-            return true;
-        case 'number':
-            return Number.isFinite(value);
-        case 'object':
-            if (Array.isArray(value)) {
-                return value.every((item: unknown) =>
-                    checkJsonValue(item, depth + 1, maxDepth)
-                );
-            }
-            return (
-                isPlainObject(value) &&
-                Object.values(value).every((item) =>
-                    checkJsonValue(item, depth + 1, maxDepth)
-                )
-            );
-        default:
-            return false;
-    }
+function checkJsonValue(value: unknown, depth: number, maxDepth: number): boolean {
+  if (depth > maxDepth) {
+    return false;
+  }
+  if (value === null) {
+    return true;
+  }
+  switch (typeof value) {
+    case 'string':
+    case 'boolean':
+      return true;
+    case 'number':
+      return Number.isFinite(value);
+    case 'object':
+      if (Array.isArray(value)) {
+        return value.every((item: unknown) => checkJsonValue(item, depth + 1, maxDepth));
+      }
+      return (
+        isPlainObject(value) &&
+        Object.values(value).every((item) => checkJsonValue(item, depth + 1, maxDepth))
+      );
+    default:
+      return false;
+  }
 }
 
 /**
@@ -45,10 +41,10 @@ function checkJsonValue(
  * itself is level 1, so a scalar needs `maxDepth >= 1`.
  */
 export function isJsonValue(
-    value: unknown,
-    maxDepth = Number.POSITIVE_INFINITY
+  value: unknown,
+  maxDepth = Number.POSITIVE_INFINITY,
 ): value is JsonValue {
-    return checkJsonValue(value, 1, maxDepth);
+  return checkJsonValue(value, 1, maxDepth);
 }
 
 /**
@@ -57,13 +53,12 @@ export function isJsonValue(
  * passed to `isJsonValue`.
  */
 export function isJsonRecord(
-    value: unknown,
-    maxDepth = Number.POSITIVE_INFINITY
+  value: unknown,
+  maxDepth = Number.POSITIVE_INFINITY,
 ): value is Record<string, JsonValue> {
-    return (
-        isPlainObject(value) &&
-        Object.values(value).every((item) => checkJsonValue(item, 1, maxDepth))
-    );
+  return (
+    isPlainObject(value) && Object.values(value).every((item) => checkJsonValue(item, 1, maxDepth))
+  );
 }
 
 /** Every scalar, entry and container weighs one, plus its characters. */
@@ -75,16 +70,17 @@ const VALUE_WEIGHT = 1;
  * bound untrusted input, not to predict exact byte counts.
  */
 export function jsonWeight(value: JsonValue): number {
-    if (typeof value === 'string') {return VALUE_WEIGHT + value.length;}
-    if (value === null || typeof value !== 'object') {return VALUE_WEIGHT;}
-    if (Array.isArray(value)) {
-        return value.reduce(
-            (total: number, item) => total + jsonWeight(item),
-            VALUE_WEIGHT
-        );
-    }
-    return Object.entries(value).reduce(
-        (total, [key, item]) => total + key.length + jsonWeight(item),
-        VALUE_WEIGHT
-    );
+  if (typeof value === 'string') {
+    return VALUE_WEIGHT + value.length;
+  }
+  if (value === null || typeof value !== 'object') {
+    return VALUE_WEIGHT;
+  }
+  if (Array.isArray(value)) {
+    return value.reduce((total: number, item) => total + jsonWeight(item), VALUE_WEIGHT);
+  }
+  return Object.entries(value).reduce(
+    (total, [key, item]) => total + key.length + jsonWeight(item),
+    VALUE_WEIGHT,
+  );
 }

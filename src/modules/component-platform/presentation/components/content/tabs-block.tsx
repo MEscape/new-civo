@@ -21,19 +21,13 @@ export function TabsBlock({ props }: TabsBlockComponentProps) {
         <Tabs defaultValue={FIRST_TAB}>
           <TabsList>
             {props.tabs.map((tab, index) => (
-              <TabsTrigger
-                key={`${String(index)}-${tab.label}`}
-                value={`tab-${String(index)}`}
-              >
+              <TabsTrigger key={`${String(index)}-${tab.label}`} value={`tab-${String(index)}`}>
                 {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
           {props.tabs.map((tab, index) => (
-            <TabsContent
-              key={`${String(index)}-${tab.label}`}
-              value={`tab-${String(index)}`}
-            >
+            <TabsContent key={`${String(index)}-${tab.label}`} value={`tab-${String(index)}`}>
               {tab.body}
             </TabsContent>
           ))}

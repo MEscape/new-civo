@@ -25,8 +25,7 @@ export const MESSAGE_KEY_BY_CODE = {
 export const GENERIC_ERROR_MESSAGE_KEY = fieldPath('issues', 'generic');
 
 export type MessageKey =
-  | (typeof MESSAGE_KEY_BY_CODE)[MapValidationCode]
-  | typeof GENERIC_ERROR_MESSAGE_KEY;
+  (typeof MESSAGE_KEY_BY_CODE)[MapValidationCode] | typeof GENERIC_ERROR_MESSAGE_KEY;
 
 function isKnownCode(code: string): code is MapValidationCode {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code);
@@ -34,7 +33,5 @@ function isKnownCode(code: string): code is MapValidationCode {
 
 /** Codes from elsewhere fall back to the generic key. */
 export function messageKeyForCode(code: string): MessageKey {
-  return isKnownCode(code)
-    ? MESSAGE_KEY_BY_CODE[code]
-    : GENERIC_ERROR_MESSAGE_KEY;
+  return isKnownCode(code) ? MESSAGE_KEY_BY_CODE[code] : GENERIC_ERROR_MESSAGE_KEY;
 }

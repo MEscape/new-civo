@@ -65,17 +65,14 @@ export const MESSAGE_KEY_BY_CODE = {
 export const GENERIC_ERROR_MESSAGE_KEY = fieldPath('errors', 'unexpected');
 
 export type MessageKey =
-  | (typeof MESSAGE_KEY_BY_CODE)[BuilderCode]
-  | typeof GENERIC_ERROR_MESSAGE_KEY;
+  (typeof MESSAGE_KEY_BY_CODE)[BuilderCode] | typeof GENERIC_ERROR_MESSAGE_KEY;
 
 function isBuilderCode(code: string): code is BuilderCode {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code);
 }
 
 export function messageKeyForCode(code: string): MessageKey {
-  return isBuilderCode(code)
-    ? MESSAGE_KEY_BY_CODE[code]
-    : GENERIC_ERROR_MESSAGE_KEY;
+  return isBuilderCode(code) ? MESSAGE_KEY_BY_CODE[code] : GENERIC_ERROR_MESSAGE_KEY;
 }
 
 /** Interpolation values for messages that mention a limit. */

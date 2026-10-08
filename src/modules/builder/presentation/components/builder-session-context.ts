@@ -14,9 +14,6 @@ export const BuilderSessionContext = createContext<BuilderSession | null>(null);
 
 export function useBuilderSession(): BuilderSession {
   const session = useContext(BuilderSessionContext);
-  invariant(
-    session !== null,
-    'useBuilderSession must be used inside BuilderSessionProvider.'
-  );
+  invariant(session !== null, 'useBuilderSession must be used inside BuilderSessionProvider.');
   return session;
 }

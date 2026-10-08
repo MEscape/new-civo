@@ -6,6 +6,5 @@
  */
 export const builderRoutes = {
   pages: (websiteId: string) => `/websites/${websiteId}/builder`,
-  editor: (websiteId: string, pageId: string) =>
-    `/websites/${websiteId}/builder/${pageId}`,
+  editor: (websiteId: string, pageId: string) => `/websites/${websiteId}/builder/${pageId}`,
 } as const;

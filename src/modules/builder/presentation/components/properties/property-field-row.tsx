@@ -25,11 +25,7 @@ export interface PropertyFieldRowProps {
  * `onCommit` ends the undo step on blur or after a discrete choice, so a
  * typing burst is a single undo.
  */
-export function PropertyFieldRow({
-  nodeId,
-  field,
-  value,
-}: PropertyFieldRowProps) {
+export function PropertyFieldRow({ nodeId, field, value }: PropertyFieldRowProps) {
   const dispatch = useBuilderDispatch();
   const text = useComponentText();
   const id = useId();
@@ -45,8 +41,9 @@ export function PropertyFieldRow({
         labelId={labelId}
         field={field}
         value={value}
-        onChange={(next) => { dispatch(editNodeProps(nodeId, { [field.key]: next })); }
-        }
+        onChange={(next) => {
+          dispatch(editNodeProps(nodeId, { [field.key]: next }));
+        }}
         onCommit={() => dispatch(propsEditFinished())}
       />
     </div>

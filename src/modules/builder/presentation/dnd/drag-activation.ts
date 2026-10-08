@@ -6,12 +6,6 @@ interface Point {
   readonly y: number;
 }
 
-export function hasExceededActivationDistance(
-  start: Point,
-  current: Point
-): boolean {
-  return (
-    Math.hypot(current.x - start.x, current.y - start.y) >=
-    ACTIVATION_DISTANCE_PX
-  );
+export function hasExceededActivationDistance(start: Point, current: Point): boolean {
+  return Math.hypot(current.x - start.x, current.y - start.y) >= ACTIVATION_DISTANCE_PX;
 }

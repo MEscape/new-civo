@@ -108,7 +108,7 @@ function MapNotes({ model, unavailableLayers, hasTiles, hasCanvasFailed }: MapNo
 /** The selected feature, while the filters still show it. */
 function findVisible(
   visible: ReadonlyArray<{ readonly features: readonly MapFeature[] }>,
-  key: string | null
+  key: string | null,
 ): MapFeature | undefined {
   return key === null
     ? undefined
@@ -130,9 +130,8 @@ function linkOf(model: MapModel, key: string | null): string | undefined {
   if (key === null) {
     return undefined;
   }
-  return model.layers
-    .flatMap((layer) => layer.features)
-    .find((candidate) => candidate.key === key)?.href;
+  return model.layers.flatMap((layer) => layer.features).find((candidate) => candidate.key === key)
+    ?.href;
 }
 
 /**

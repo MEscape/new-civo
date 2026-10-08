@@ -1,7 +1,4 @@
-import type {
-  CatalogFieldView,
-  ComponentCatalogEntry,
-} from '@modules/component-platform';
+import type { CatalogFieldView, ComponentCatalogEntry } from '@modules/component-platform';
 
 import { invariant, isJsonRecord } from '@lib/utils';
 
@@ -15,10 +12,7 @@ import type {
 import type { ComponentDescriptorProvider } from '../../domain/ports/component-descriptor-provider.port';
 
 /** The platform's own nesting rule; `parentType: null` is the page root. */
-export type CanNestFn = (
-  parentType: string | null,
-  childType: string
-) => boolean;
+export type CanNestFn = (parentType: string | null, childType: string) => boolean;
 
 function toFieldDescriptor(field: CatalogFieldView): PropFieldDescriptor {
   return {
@@ -45,7 +39,7 @@ function toBlueprint(entry: ComponentCatalogEntry): NodeBlueprint {
   // Default props are a platform contract, not user input: a violation is a platform bug, so fail fast at startup.
   invariant(
     isJsonRecord(entry.blueprint.props, PAGE_TREE_LIMITS.maxPropsDepth),
-    `Component "${entry.type}" has default props that are not plain JSON.`
+    `Component "${entry.type}" has default props that are not plain JSON.`,
   );
   return { type: entry.type, props: entry.blueprint.props, children: [] };
 }
@@ -53,7 +47,7 @@ function toBlueprint(entry: ComponentCatalogEntry): NodeBlueprint {
 function toDescriptor(
   entry: ComponentCatalogEntry,
   all: readonly ComponentCatalogEntry[],
-  canNest: CanNestFn
+  canNest: CanNestFn,
 ): ComponentDescriptor {
   return {
     type: entry.type,
@@ -78,17 +72,13 @@ function toDescriptor(
  * (render functions, prop parsers) never cross this boundary; descriptors
  * are plain JSON.
  */
-export class ComponentPlatformDescriptorProvider
-  implements ComponentDescriptorProvider
-{
+export class ComponentPlatformDescriptorProvider implements ComponentDescriptorProvider {
   constructor(
     private readonly catalog: readonly ComponentCatalogEntry[],
-    private readonly canNest: CanNestFn
+    private readonly canNest: CanNestFn,
   ) {}
 
   listDescriptors(): readonly ComponentDescriptor[] {
-    return this.catalog.map((entry) =>
-      toDescriptor(entry, this.catalog, this.canNest)
-    );
+    return this.catalog.map((entry) => toDescriptor(entry, this.catalog, this.canNest));
   }
 }

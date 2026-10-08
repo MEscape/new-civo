@@ -4,7 +4,7 @@ import { fontSans, fontSerif, fontGeist, fontDMSans, fontVariables } from '@lib/
 
 // Mock the Next.js font compiler macros which otherwise require the Next.js build step
 vi.mock('next/font/local', () => ({
-  default: vi.fn((options: any) => ({ variable: `${options.variable  }-mock` })),
+  default: vi.fn((options: any) => ({ variable: `${options.variable}-mock` })),
 }));
 
 describe('fonts design tokens', () => {
@@ -18,6 +18,8 @@ describe('fonts design tokens', () => {
   });
 
   it('concatenates font variables into a single string for the root layout', () => {
-    expect(fontVariables).toBe('--font-serif-mock --font-sans-mock --font-geist-mock --font-dm-sans-mock');
+    expect(fontVariables).toBe(
+      '--font-serif-mock --font-sans-mock --font-geist-mock --font-dm-sans-mock',
+    );
   });
 });

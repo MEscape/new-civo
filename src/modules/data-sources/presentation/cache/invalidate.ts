@@ -1,10 +1,7 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from 'next/cache';
 
-import {
-  dataSourceCacheTag,
-  datasetCacheTag,
-} from "../../application/contracts/cache-tags";
-import { dataSourceRoutes } from "../routes";
+import { dataSourceCacheTag, datasetCacheTag } from '../../application/contracts/cache-tags';
+import { dataSourceRoutes } from '../routes';
 
 /**
  * The ONE place cache invalidation is expressed (caching.md: "mutations
@@ -20,11 +17,8 @@ export function invalidateSettings(websiteId: string): void {
 }
 
 /** A dataset change also changes what builder components resolve. */
-export function invalidateDatasetConsumers(
-  websiteId: string,
-  datasetId: string,
-): void {
-  revalidateTag(datasetCacheTag(datasetId), "default");
+export function invalidateDatasetConsumers(websiteId: string, datasetId: string): void {
+  revalidateTag(datasetCacheTag(datasetId), 'default');
   revalidatePath(dataSourceRoutes.settings(websiteId));
   revalidatePath(dataSourceRoutes.builder(websiteId));
 }
@@ -35,8 +29,10 @@ export function invalidateRemovedDataSource(
   dataSourceId: string,
   datasetIds: readonly string[],
 ): void {
-  revalidateTag(dataSourceCacheTag(dataSourceId), "default");
-  datasetIds.forEach((datasetId) => { revalidateTag(datasetCacheTag(datasetId), "default"); });
+  revalidateTag(dataSourceCacheTag(dataSourceId), 'default');
+  datasetIds.forEach((datasetId) => {
+    revalidateTag(datasetCacheTag(datasetId), 'default');
+  });
   revalidatePath(dataSourceRoutes.settings(websiteId));
   revalidatePath(dataSourceRoutes.builder(websiteId));
 }

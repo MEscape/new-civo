@@ -20,4 +20,7 @@ const LEVEL_BY_EVENT = {
 } as const satisfies Record<DataSourceEvent['type'], 'info' | 'warn'>;
 
 /** One structured log line per event under `data-source.audit`; never throws. */
-export const loggerDataSourceAuditLog: DataSourceAuditLog = createAuditLog('data-source.audit', LEVEL_BY_EVENT);
+export const loggerDataSourceAuditLog: DataSourceAuditLog = createAuditLog(
+  'data-source.audit',
+  LEVEL_BY_EVENT,
+);

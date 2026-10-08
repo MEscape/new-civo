@@ -149,7 +149,11 @@ export function countActiveFilters(state: FilterState): number {
 }
 
 /** Inclusive bounds where `null` means unbounded; works for numbers and ISO dates alike. */
-function isWithin<T extends number | string>(candidate: T, lower: T | null, upper: T | null): boolean {
+function isWithin<T extends number | string>(
+  candidate: T,
+  lower: T | null,
+  upper: T | null,
+): boolean {
   return (lower === null || candidate >= lower) && (upper === null || candidate <= upper);
 }
 

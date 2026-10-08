@@ -9,15 +9,8 @@ import type {
 import type { AppResultAsync } from '@lib/result';
 
 import type { ReleaseId, WebsiteId } from '../models/ids';
-import type {
-  Release,
-  ReleaseHistory,
-  ReleaseSummary,
-} from '../models/release';
-import type {
-  ReleaseComponentDependency,
-  ReleaseSnapshot,
-} from '../models/release-snapshot';
+import type { Release, ReleaseHistory, ReleaseSummary } from '../models/release';
+import type { ReleaseComponentDependency, ReleaseSnapshot } from '../models/release-snapshot';
 
 /** Reading a snapshot can also fail because the stored JSON is corrupted. */
 export type ReleaseReadError = InfrastructureAppError | UnexpectedAppError;
@@ -58,18 +51,13 @@ export interface ReleaseRepository {
   /** Bounded: never returns more than `limit` releases (performance.md). */
   findHistory(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<ReleaseHistory, InfrastructureAppError>;
 
-  findById(
-    websiteId: WebsiteId,
-    id: ReleaseId
-  ): AppResultAsync<Release | null, ReleaseReadError>;
+  findById(websiteId: WebsiteId, id: ReleaseId): AppResultAsync<Release | null, ReleaseReadError>;
 
   /** The release the public site serves, resolved through the live pointer only. */
-  findPublished(
-    websiteId: WebsiteId
-  ): AppResultAsync<Release | null, ReleaseReadError>;
+  findPublished(websiteId: WebsiteId): AppResultAsync<Release | null, ReleaseReadError>;
 
   /**
    * The live releases' dependency records of one tenant. Bounded by
@@ -78,7 +66,7 @@ export interface ReleaseRepository {
    */
   listPublishedDependencies(
     tenantId: TenantId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly PublishedDependencies[], InfrastructureAppError>;
 
   /**
@@ -87,7 +75,7 @@ export interface ReleaseRepository {
    * the same number surfaces as a conflict the caller may retry.
    */
   publish(
-    input: NewRelease
+    input: NewRelease,
   ): AppResultAsync<ReleaseSummary, ConflictAppError | InfrastructureAppError>;
 
   /**

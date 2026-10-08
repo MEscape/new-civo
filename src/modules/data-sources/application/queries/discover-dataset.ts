@@ -14,16 +14,13 @@ import type { LoadDatasetError } from '../load-authorized-dataset';
  * stay on the server.
  */
 export class DiscoverDataset {
-    constructor(private readonly deps: ConnectedDataSourceDependencies) {}
+  constructor(private readonly deps: ConnectedDataSourceDependencies) {}
 
-    execute(
-        id: string
-    ): AppResultAsync<DiscoveryView, LoadDatasetError | ConnectorError> {
-        return loadAuthorizedDataset(this.deps, id, 'dataset.map').andThen(
-            ({ source }) =>
-                this.deps.connector.fetchBody(source).map((body) => ({
-                    fields: discoverFromBody(body).fields,
-                }))
-        );
-    }
+  execute(id: string): AppResultAsync<DiscoveryView, LoadDatasetError | ConnectorError> {
+    return loadAuthorizedDataset(this.deps, id, 'dataset.map').andThen(({ source }) =>
+      this.deps.connector.fetchBody(source).map((body) => ({
+        fields: discoverFromBody(body).fields,
+      })),
+    );
+  }
 }

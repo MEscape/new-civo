@@ -31,10 +31,7 @@ export function toPageView(page: Page): PageView {
   return { ...toPageSummaryView(page), config: page.config };
 }
 
-export function toSavedRevisionView(
-  revision: SavedRevision,
-  page: PageSummary
-): SavedRevisionView {
+export function toSavedRevisionView(revision: SavedRevision, page: PageSummary): SavedRevisionView {
   return {
     pageId: page.id,
     websiteId: page.websiteId,

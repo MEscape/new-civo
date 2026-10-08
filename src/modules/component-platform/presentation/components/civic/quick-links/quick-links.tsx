@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { ContentLink } from '@components/ui/content-link';
 import { ArrowRight } from '@components/ui/icons';
 

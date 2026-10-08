@@ -1,6 +1,6 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes } from 'react';
 
-import { cn } from "@lib/utils";
+import { cn } from '@lib/utils';
 
 /**
  * Animated loading placeholder. Uses `bg-canvas` to stay on-theme.
@@ -12,13 +12,13 @@ import { cn } from "@lib/utils";
  * stands in for marks itself `aria-busy` and announces loading once.
  */
 function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-    return (
-        <div
-            className={cn("animate-pulse rounded-token bg-canvas", className)}
-            aria-hidden="true"
-            {...props}
-        />
-    );
+  return (
+    <div
+      className={cn('animate-pulse rounded-token bg-canvas', className)}
+      aria-hidden="true"
+      {...props}
+    />
+  );
 }
 
 export { Skeleton };

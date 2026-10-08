@@ -19,14 +19,11 @@ export interface ComponentRegistry {
  * not runtime conditions.
  */
 export function createComponentRegistry(
-  definitions: readonly ComponentDefinition[]
+  definitions: readonly ComponentDefinition[],
 ): ComponentRegistry {
   const byType = new Map<string, ComponentDefinition>();
   for (const definition of definitions) {
-    invariant(
-      !byType.has(definition.type),
-      `Duplicate component type "${definition.type}".`
-    );
+    invariant(!byType.has(definition.type), `Duplicate component type "${definition.type}".`);
     byType.set(definition.type, definition);
   }
 
@@ -34,7 +31,7 @@ export function createComponentRegistry(
     for (const child of definition.acceptsChildTypes ?? []) {
       invariant(
         byType.has(child),
-        `"${definition.type}" accepts the unknown component type "${child}".`
+        `"${definition.type}" accepts the unknown component type "${child}".`,
       );
     }
     for (const field of definition.fields) {
@@ -42,7 +39,7 @@ export function createComponentRegistry(
         field.control !== 'dataset' ||
           field.datasetKind !== null ||
           definition.dataBinding !== null,
-        `"${definition.type}" has the dataset prop "${field.key}" but declares no data binding for it.`
+        `"${definition.type}" has the dataset prop "${field.key}" but declares no data binding for it.`,
       );
     }
   }

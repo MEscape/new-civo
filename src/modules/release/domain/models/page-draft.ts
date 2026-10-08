@@ -45,7 +45,7 @@ export type DraftVerdict = 'writable' | 'already_applied' | 'diverged';
 export function judgeDraft(
   draft: PageDraft,
   published: PageTree,
-  migrated: readonly TreeNode[]
+  migrated: readonly TreeNode[],
 ): DraftVerdict {
   // A draft that cannot be read is never overwritten: it may hold work.
   if (draft.children === null) {

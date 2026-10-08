@@ -1,10 +1,6 @@
 import type { Actor, AuthorizationError, Permission } from '@modules/auth';
 
-import type {
-  InfrastructureAppError,
-  NotFoundAppError,
-  ValidationAppError,
-} from '@lib/errors';
+import type { InfrastructureAppError, NotFoundAppError, ValidationAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
@@ -16,10 +12,7 @@ import type { PublishableWebsite } from '../domain/models/publishable';
 
 /** Everything an operation on one website's releases can fail with. */
 export type LoadReleaseWebsiteError =
-  | AuthorizationError
-  | ValidationAppError
-  | NotFoundAppError
-  | InfrastructureAppError;
+  AuthorizationError | ValidationAppError | NotFoundAppError | InfrastructureAppError;
 
 export interface AuthorizedReleaseWebsite {
   readonly actor: Actor;
@@ -43,19 +36,16 @@ export interface AuthorizedReleaseWebsite {
 export function loadAuthorizedReleaseWebsite(
   deps: ReleaseDependencies,
   rawWebsiteId: string,
-  permission: Permission
+  permission: Permission,
 ): AppResultAsync<AuthorizedReleaseWebsite, LoadReleaseWebsiteError> {
   const { authorization, websites } = deps;
 
   return authorization.requireInTenant(permission).andThen((actor) =>
     parseWebsiteId(rawWebsiteId)
       .asyncAndThen((id) => websites.findById(id))
-      .andThen(
-        (website): AppResultAsync<PublishableWebsite, NotFoundAppError> =>
-          website === null
-            ? errAsync(releaseWebsiteNotFound())
-            : okAsync(website)
+      .andThen((website): AppResultAsync<PublishableWebsite, NotFoundAppError> =>
+        website === null ? errAsync(releaseWebsiteNotFound()) : okAsync(website),
       )
-      .map((website) => ({ actor, website }))
+      .map((website) => ({ actor, website })),
   );
 }

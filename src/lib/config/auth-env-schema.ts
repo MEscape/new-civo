@@ -36,52 +36,41 @@ const commaSeparatedListSchema = z
     (value ?? '')
       .split(',')
       .map((entry) => entry.trim())
-      .filter((entry) => entry.length > 0)
+      .filter((entry) => entry.length > 0),
   );
 
 const positiveIntegerSchema = (defaultValue: number) =>
   z.coerce.number().int().positive().default(defaultValue);
 
-const authEnvObjectSchema = z
-  .object({
-    AUTH_ENABLED: booleanFlagSchema(DEFAULT_AUTH_ENABLED),
+const authEnvObjectSchema = z.object({
+  AUTH_ENABLED: booleanFlagSchema(DEFAULT_AUTH_ENABLED),
 
-    AUTH_SECRET: z.string().optional(),
+  AUTH_SECRET: z.string().optional(),
 
-    AUTH_DATABASE_URL: z.string().optional(),
+  AUTH_DATABASE_URL: z.string().optional(),
 
-    AUTH_DATABASE_POOL_SIZE: positiveIntegerSchema(
-      DEFAULT_AUTH_DATABASE_POOL_SIZE
-    ),
+  AUTH_DATABASE_POOL_SIZE: positiveIntegerSchema(DEFAULT_AUTH_DATABASE_POOL_SIZE),
 
-    AUTH_SESSION_EXPIRES_IN_SECONDS: positiveIntegerSchema(
-      DEFAULT_SESSION_EXPIRES_IN_SECONDS
-    ),
+  AUTH_SESSION_EXPIRES_IN_SECONDS: positiveIntegerSchema(DEFAULT_SESSION_EXPIRES_IN_SECONDS),
 
-    AUTH_SESSION_UPDATE_AGE_SECONDS: positiveIntegerSchema(
-      DEFAULT_SESSION_UPDATE_AGE_SECONDS
-    ),
+  AUTH_SESSION_UPDATE_AGE_SECONDS: positiveIntegerSchema(DEFAULT_SESSION_UPDATE_AGE_SECONDS),
 
-    AUTH_SESSION_FRESH_AGE_SECONDS: positiveIntegerSchema(
-      DEFAULT_SESSION_FRESH_AGE_SECONDS
-    ),
+  AUTH_SESSION_FRESH_AGE_SECONDS: positiveIntegerSchema(DEFAULT_SESSION_FRESH_AGE_SECONDS),
 
-    AUTH_SESSION_MAX_LIFETIME_SECONDS: positiveIntegerSchema(
-      DEFAULT_SESSION_MAX_LIFETIME_SECONDS
-    ),
+  AUTH_SESSION_MAX_LIFETIME_SECONDS: positiveIntegerSchema(DEFAULT_SESSION_MAX_LIFETIME_SECONDS),
 
-    AUTH_TRUSTED_PROXIES: commaSeparatedListSchema,
+  AUTH_TRUSTED_PROXIES: commaSeparatedListSchema,
 
-    AUTH_DEV_ACTOR_ROLE: z.string().default(DEFAULT_DEV_ACTOR_ROLE),
+  AUTH_DEV_ACTOR_ROLE: z.string().default(DEFAULT_DEV_ACTOR_ROLE),
 
-    AUTH_MAIL_PROVIDER: z.enum(['none', 'resend', 'smtp']).default('none'),
-    AUTH_MAIL_API_KEY: z.string().min(1).optional(),
-    AUTH_MAIL_API_URL: z.url().default(DEFAULT_RESEND_API_URL),
-    AUTH_MAIL_SMTP_HOST: z.string().min(1).optional(),
-    AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(DEFAULT_SMTP_PORT),
-    AUTH_MAIL_SMTP_SECURE: booleanFlagSchema(false),
-    AUTH_MAIL_FROM: z.string().min(1).optional(),
-  });
+  AUTH_MAIL_PROVIDER: z.enum(['none', 'resend', 'smtp']).default('none'),
+  AUTH_MAIL_API_KEY: z.string().min(1).optional(),
+  AUTH_MAIL_API_URL: z.url().default(DEFAULT_RESEND_API_URL),
+  AUTH_MAIL_SMTP_HOST: z.string().min(1).optional(),
+  AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(DEFAULT_SMTP_PORT),
+  AUTH_MAIL_SMTP_SECURE: booleanFlagSchema(false),
+  AUTH_MAIL_FROM: z.string().min(1).optional(),
+});
 
 /** A setting that must hold once auth is enabled. */
 interface Requirement {

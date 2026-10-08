@@ -24,20 +24,17 @@ export interface ContentSelection<K extends ContentKind> {
 export function selectContent<K extends ContentKind>(
   kind: K,
   records: ReadonlyArray<ContentOf<K>>,
-  options: ContentSelectionOptions
+  options: ContentSelectionOptions,
 ): ContentSelection<K> {
   const { rule } = getContentDefinition(kind);
   const { now, category, limit } = options;
 
-  const relevant = records.filter(
-    (record) => rule.isRelevant?.(record, now) ?? true
-  );
+  const relevant = records.filter((record) => rule.isRelevant?.(record, now) ?? true);
   const matching =
     category === null || rule.categoryOf === undefined
       ? relevant
       : relevant.filter((record) => rule.categoryOf?.(record) === category);
-  const ordered =
-    rule.compare === undefined ? matching : [...matching].sort(rule.compare);
+  const ordered = rule.compare === undefined ? matching : [...matching].sort(rule.compare);
 
   return { items: ordered.slice(0, limit), truncated: ordered.length > limit };
 }

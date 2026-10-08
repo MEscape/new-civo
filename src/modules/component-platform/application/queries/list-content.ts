@@ -12,10 +12,7 @@ import {
   MIN_CONTENT_LIST_LIMIT,
 } from '../list-limits';
 
-import type {
-  ContentKind,
-  ContentOf,
-} from '../../domain/content/content-definitions';
+import type { ContentKind, ContentOf } from '../../domain/content/content-definitions';
 import type { PublicComponentPlatformDependencies } from '../component-platform-dependencies';
 import type {
   ContentListRequest,
@@ -26,9 +23,7 @@ import type {
 
 function resolveLimit(requested: number | undefined): number {
   const wanted =
-    isDefined(requested) && Number.isInteger(requested)
-      ? requested
-      : DEFAULT_CONTENT_LIST_LIMIT;
+    isDefined(requested) && Number.isInteger(requested) ? requested : DEFAULT_CONTENT_LIST_LIMIT;
   return clamp(wanted, MIN_CONTENT_LIST_LIMIT, MAX_CONTENT_LIST_LIMIT);
 }
 
@@ -48,7 +43,7 @@ export class ListContent {
   constructor(private readonly deps: PublicComponentPlatformDependencies) {}
 
   execute<K extends ContentKind>(
-    request: ContentListRequest<K>
+    request: ContentListRequest<K>,
   ): AppResultAsync<ContentListView<K>, ContentLoadError> {
     const { live, clock } = this.deps;
     const parsedWebsite = parseWebsiteId(request.websiteId);
@@ -64,7 +59,7 @@ export class ListContent {
 
     const present = (
       records: ReadonlyArray<ContentOf<K>>,
-      origin: ContentOrigin
+      origin: ContentOrigin,
     ): ContentListView<K> => ({
       ...selectContent(request.kind, records, { now, category, limit }),
       origin,
@@ -75,15 +70,13 @@ export class ListContent {
         cause,
       });
     const fallback = (
-      error: ContentLoadError
+      error: ContentLoadError,
     ): AppResultAsync<ContentListView<K>, ContentLoadError> =>
       isDraft ? okAsync(sampled(error.code)) : errAsync(error);
 
     const rawDatasetId = trimToNull(request.datasetId);
     if (rawDatasetId === null) {
-      return okAsync(
-        isDraft ? sampled(null) : present([], { kind: 'unbound' })
-      );
+      return okAsync(isDraft ? sampled(null) : present([], { kind: 'unbound' }));
     }
 
     // A malformed id is "not found", like an unknown one: a visitor learns nothing about which ids exist.

@@ -29,13 +29,20 @@ export function DragAnnouncer({ dnd }: DragAnnouncerProps) {
   }
 
   function message(): string {
-    if (session === null || !isKeyboard) {return '';}
-    if (target === null) {return t('drag.pickedUp', { label: session.label });}
-    if (target.kind === 'root') {return t('drag.root', { label: session.label });}
+    if (session === null || !isKeyboard) {
+      return '';
+    }
+    if (target === null) {
+      return t('drag.pickedUp', { label: session.label });
+    }
+    if (target.kind === 'root') {
+      return t('drag.root', { label: session.label });
+    }
 
     const targetLabel = labelOfNode(target.targetNodeId);
-    if (target.kind === 'inside')
-      {return t('drag.inside', { label: session.label, target: targetLabel });}
+    if (target.kind === 'inside') {
+      return t('drag.inside', { label: session.label, target: targetLabel });
+    }
     return target.position === 'before'
       ? t('drag.before', { label: session.label, target: targetLabel })
       : t('drag.after', { label: session.label, target: targetLabel });

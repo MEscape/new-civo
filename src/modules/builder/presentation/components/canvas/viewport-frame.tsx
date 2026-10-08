@@ -21,7 +21,7 @@ export function ViewportFrame({ viewport, children }: ViewportFrameProps) {
     <div
       className={cn(
         'mx-auto transition-[max-width] duration-150 motion-reduce:transition-none',
-        VIEWPORT_CLASS[viewport]
+        VIEWPORT_CLASS[viewport],
       )}
     >
       {children}

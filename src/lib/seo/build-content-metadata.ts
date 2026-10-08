@@ -5,12 +5,12 @@ import { I18N_CONFIG } from '@i18n';
 import { toLocalizedPath } from './to-localized-path';
 
 interface ContentMetadataOptions {
-    /** Locale-free path, e.g. `/s/springfield/about`. */
-    readonly pathname: string;
-    readonly title: string;
-    readonly description: string;
-    /** The name of the site the content belongs to, e.g. the municipality's website. */
-    readonly siteName: string;
+  /** Locale-free path, e.g. `/s/springfield/about`. */
+  readonly pathname: string;
+  readonly title: string;
+  readonly description: string;
+  /** The name of the site the content belongs to, e.g. the municipality's website. */
+  readonly siteName: string;
 }
 
 /**
@@ -21,13 +21,18 @@ interface ContentMetadataOptions {
  *
  * The title is absolute: the site's name is the brand here, not Civo's.
  */
-export function buildContentMetadata({ pathname, title, description, siteName }: ContentMetadataOptions): Metadata {
-    const canonical = toLocalizedPath(I18N_CONFIG.defaultLocale, pathname);
+export function buildContentMetadata({
+  pathname,
+  title,
+  description,
+  siteName,
+}: ContentMetadataOptions): Metadata {
+  const canonical = toLocalizedPath(I18N_CONFIG.defaultLocale, pathname);
 
-    return {
-        title: { absolute: title },
-        description,
-        alternates: { canonical },
-        openGraph: { type: 'website', siteName, title, description, url: canonical },
-    };
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical },
+    openGraph: { type: 'website', siteName, title, description, url: canonical },
+  };
 }

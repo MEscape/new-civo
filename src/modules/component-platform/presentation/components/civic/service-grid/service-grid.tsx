@@ -1,9 +1,4 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { Card, CardContent } from '@components/ui/card';
 import { ContentLink } from '@components/ui/content-link';
 import { DynamicIcon } from '@components/ui/dynamic-icon';
@@ -30,11 +25,7 @@ export interface ServiceGridComponentProps {
 }
 
 /** A compact overview of the online services of a bound dataset. */
-export async function ServiceGrid({
-  props,
-  context,
-  loadContent,
-}: ServiceGridComponentProps) {
+export async function ServiceGrid({ props, context, loadContent }: ServiceGridComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -71,9 +62,7 @@ export async function ServiceGrid({
                       className="h-5 w-5 shrink-0 text-primary-copy"
                       aria-hidden="true"
                     />
-                    <span className="text-sm font-medium text-copy">
-                      {service.title}
-                    </span>
+                    <span className="text-sm font-medium text-copy">{service.title}</span>
                   </CardContent>
                 </Card>
               </ContentLink>

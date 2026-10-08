@@ -18,15 +18,13 @@ export type RequestPasswordResetError = AuthenticatorError | RateLimitError;
  * @audit-exempt Outcomes are audited by the identity provider hooks (create-security-audit-options) where sessions and accounts change; this command audits only its rate-limit refusal, through enforceRateLimit.
  */
 export class RequestPasswordReset {
-    constructor(private readonly deps: AuthenticationDependencies) {}
+  constructor(private readonly deps: AuthenticationDependencies) {}
 
-    execute(
-        input: PasswordResetRequestInput
-    ): AppResultAsync<void, RequestPasswordResetError> {
-        return createPasswordResetRequest(input).asyncAndThen((request) =>
-            enforceRateLimit(this.deps, 'password_reset', request.email).andThen(
-                () => this.deps.authenticator.requestPasswordReset(request)
-            )
-        );
-    }
+  execute(input: PasswordResetRequestInput): AppResultAsync<void, RequestPasswordResetError> {
+    return createPasswordResetRequest(input).asyncAndThen((request) =>
+      enforceRateLimit(this.deps, 'password_reset', request.email).andThen(() =>
+        this.deps.authenticator.requestPasswordReset(request),
+      ),
+    );
+  }
 }

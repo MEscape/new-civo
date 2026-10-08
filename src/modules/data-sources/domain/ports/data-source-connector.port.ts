@@ -32,9 +32,9 @@ export type ConnectorError = ValidationAppError | InfrastructureAppError;
  * connector, such as MOCK, yields `connectorUnavailable()`.
  */
 export interface DataSourceConnector {
-    /** Checks reachability, authentication and that the response is readable JSON. */
-    test(source: DataSource): AppResultAsync<void, ConnectorError>;
+  /** Checks reachability, authentication and that the response is readable JSON. */
+  test(source: DataSource): AppResultAsync<void, ConnectorError>;
 
-    /** The parsed JSON body of the source's configured endpoint, unmapped. */
-    fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError>;
+  /** The parsed JSON body of the source's configured endpoint, unmapped. */
+  fetchBody(source: DataSource): AppResultAsync<unknown, ConnectorError>;
 }

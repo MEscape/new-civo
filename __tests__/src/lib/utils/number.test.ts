@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  clamp,
-  formatBytes,
-  formatMoney,
-  formatNumber,
-  formatPercent,
-} from '@lib/utils/number';
+import { clamp, formatBytes, formatMoney, formatNumber, formatPercent } from '@lib/utils/number';
 
 describe('clamp', () => {
   it('clamps to the bounds inclusively', () => {

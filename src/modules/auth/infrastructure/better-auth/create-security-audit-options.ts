@@ -21,53 +21,57 @@ const SIGN_IN_PATH_PREFIX = '/sign-in';
  * the port's non-throwing call and nothing else happens here.
  */
 export function createSecurityAuditOptions(
-    audit: SecurityAuditLog
+  audit: SecurityAuditLog,
 ): Pick<BetterAuthOptions, 'databaseHooks' | 'hooks'> {
-    return {
-        databaseHooks: {
-            user: {
-                create: {
-                    after: (user) => {
-                        audit.record({
-                            type: 'authentication.account_created',
-                            actorId: toActorId(user.id),
-                        });
-                        return Promise.resolve();
-                    },
-                },
-            },
-            session: {
-                create: {
-                    after: (session) => {
-                        audit.record({
-                            type: 'authentication.session_created',
-                            actorId: toActorId(session.userId),
-                        });
-                        return Promise.resolve();
-                    },
-                },
-                delete: {
-                    after: (session) => {
-                        audit.record({
-                            type: 'authentication.session_revoked',
-                            actorId: toActorId(session.userId),
-                        });
-                        return Promise.resolve();
-                    },
-                },
-            },
+  return {
+    databaseHooks: {
+      user: {
+        create: {
+          after: (user) => {
+            audit.record({
+              type: 'authentication.account_created',
+              actorId: toActorId(user.id),
+            });
+            return Promise.resolve();
+          },
         },
-        hooks: {
-            after: createAuthMiddleware((ctx) => {
-                if (!ctx.path.startsWith(SIGN_IN_PATH_PREFIX)) {return Promise.resolve();}
-                const returned: unknown = ctx.context.returned;
-                if (!isAPIError(returned)) {return Promise.resolve();}
-                audit.record({
-                    type: 'authentication.sign_in_failed',
-                    errorCode: mapBetterAuthError(returned, providerFailed).code,
-                });
-                return Promise.resolve();
-            }),
+      },
+      session: {
+        create: {
+          after: (session) => {
+            audit.record({
+              type: 'authentication.session_created',
+              actorId: toActorId(session.userId),
+            });
+            return Promise.resolve();
+          },
         },
-    };
+        delete: {
+          after: (session) => {
+            audit.record({
+              type: 'authentication.session_revoked',
+              actorId: toActorId(session.userId),
+            });
+            return Promise.resolve();
+          },
+        },
+      },
+    },
+    hooks: {
+      after: createAuthMiddleware((ctx) => {
+        if (!ctx.path.startsWith(SIGN_IN_PATH_PREFIX)) {
+          return Promise.resolve();
+        }
+        const returned: unknown = ctx.context.returned;
+        if (!isAPIError(returned)) {
+          return Promise.resolve();
+        }
+        audit.record({
+          type: 'authentication.sign_in_failed',
+          errorCode: mapBetterAuthError(returned, providerFailed).code,
+        });
+        return Promise.resolve();
+      }),
+    },
+  };
 }

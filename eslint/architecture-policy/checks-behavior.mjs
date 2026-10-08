@@ -10,17 +10,11 @@ import {
 } from '../plugins/architecture/rules/authorization-flow.mjs';
 
 import { kebabToCamel, stripFileExtension } from './paths.mjs';
-import {
-  exportedNames,
-  leadingComment,
-  topLevelClasses,
-  violation,
-  visit,
-} from './project.mjs';
+import { exportedNames, leadingComment, topLevelClasses, violation, visit } from './project.mjs';
 
 function ctorDependencyName(classNode) {
   const ctor = classNode.body.body.find(
-    (m) => m.type === 'MethodDefinition' && m.kind === 'constructor'
+    (m) => m.type === 'MethodDefinition' && m.kind === 'constructor',
   );
   const param = ctor?.value.params[0];
   const type =
@@ -40,41 +34,26 @@ function interfaceMembers(project, file, interfaceName, seen = new Set()) {
   seen.add(key);
   let declaration = null;
   for (const statement of file.ast.body) {
-    const d =
-      statement.type === 'ExportNamedDeclaration'
-        ? statement.declaration
-        : statement;
-    if (d?.type === 'TSInterfaceDeclaration' && d.id.name === interfaceName)
-      declaration = d;
+    const d = statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+    if (d?.type === 'TSInterfaceDeclaration' && d.id.name === interfaceName) declaration = d;
   }
   if (!declaration) return members;
   for (const member of declaration.body.body) {
-    if (
-      member.type !== 'TSPropertySignature' ||
-      member.key.type !== 'Identifier'
-    )
-      continue;
+    if (member.type !== 'TSPropertySignature' || member.key.type !== 'Identifier') continue;
     const type = member.typeAnnotation?.typeAnnotation;
     members.set(
       member.key.name,
       type?.type === 'TSTypeReference' && type.typeName.type === 'Identifier'
         ? type.typeName.name
-        : null
+        : null,
     );
   }
   for (const heritage of declaration.extends ?? []) {
     if (heritage.expression.type !== 'Identifier') continue;
     const parentName = heritage.expression.name;
     const imported = file.imports.find((i) => i.names?.includes(parentName));
-    const parentFile = imported
-      ? project.resolveFile(file.path, imported.specifier)
-      : file;
-    for (const [k, v] of interfaceMembers(
-      project,
-      parentFile ?? file,
-      parentName,
-      seen
-    ))
+    const parentFile = imported ? project.resolveFile(file.path, imported.specifier) : file;
+    for (const [k, v] of interfaceMembers(project, parentFile ?? file, parentName, seen))
       members.set(k, v);
   }
   return members;
@@ -84,16 +63,10 @@ function interfaceMembers(project, file, interfaceName, seen = new Set()) {
 function eventTypes(file, aliasName) {
   const types = new Set();
   for (const statement of file.ast.body) {
-    const d =
-      statement.type === 'ExportNamedDeclaration'
-        ? statement.declaration
-        : statement;
-    if (d?.type !== 'TSTypeAliasDeclaration' || d.id.name !== aliasName)
-      continue;
+    const d = statement.type === 'ExportNamedDeclaration' ? statement.declaration : statement;
+    if (d?.type !== 'TSTypeAliasDeclaration' || d.id.name !== aliasName) continue;
     const members =
-      d.typeAnnotation.type === 'TSUnionType'
-        ? d.typeAnnotation.types
-        : [d.typeAnnotation];
+      d.typeAnnotation.type === 'TSUnionType' ? d.typeAnnotation.types : [d.typeAnnotation];
     for (const m of members) {
       for (const prop of m.members ?? []) {
         const literal = prop.typeAnnotation?.typeAnnotation;
@@ -116,18 +89,14 @@ export function checkCommandAuditDependency(project) {
   const out = [];
   for (const name of project.modules) {
     const files = project.moduleFiles(name);
-    const portFiles = files.filter((f) =>
-      /^domain\/ports\/.*-audit-log\.port\.ts$/.test(f.local)
-    );
+    const portFiles = files.filter((f) => /^domain\/ports\/.*-audit-log\.port\.ts$/.test(f.local));
     const ports = new Map(); // AuditLog interface name -> Set(event types)
     for (const f of portFiles) {
       const names = exportedNames(f);
       for (const n of names.filter((x) => /AuditLog$/.test(x)))
         ports.set(n, eventTypes(f, n.replace(/AuditLog$/, 'Event')));
     }
-    for (const f of files.filter((x) =>
-      x.local.startsWith('application/commands/')
-    )) {
+    for (const f of files.filter((x) => x.local.startsWith('application/commands/'))) {
       for (const cls of topLevelClasses(f)) {
         const depsName = ctorDependencyName(cls.node);
         if (depsName === null) {
@@ -135,32 +104,26 @@ export function checkCommandAuditDependency(project) {
             violation(
               'command-audit',
               f.path,
-              `\`${cls.name}\` has no constructor dependencies, so it cannot receive an audit log.`
-            )
+              `\`${cls.name}\` has no constructor dependencies, so it cannot receive an audit log.`,
+            ),
           );
           continue;
         }
         const imported = f.imports.find((i) => i.names?.includes(depsName));
-        const depsFile = imported
-          ? project.resolveFile(f.path, imported.specifier)
-          : null;
+        const depsFile = imported ? project.resolveFile(f.path, imported.specifier) : null;
         if (!depsFile) {
           out.push(
             violation(
               'command-audit',
               f.path,
-              `Cannot resolve \`${depsName}\` for \`${cls.name}\`; dependencies come from application/<module>-dependencies.ts.`
-            )
+              `Cannot resolve \`${depsName}\` for \`${cls.name}\`; dependencies come from application/<module>-dependencies.ts.`,
+            ),
           );
           continue;
         }
         const members = interfaceMembers(project, depsFile, depsName);
         const auditType = members.get('audit');
-        if (
-          auditType === undefined ||
-          auditType === null ||
-          !ports.has(auditType)
-        ) {
+        if (auditType === undefined || auditType === null || !ports.has(auditType)) {
           out.push(
             violation(
               'command-audit',
@@ -169,8 +132,8 @@ export function checkCommandAuditDependency(project) {
                 cls.name
               }\` is built from \`${depsName}\`, which has no \`audit\` member typed as one of this module's audit ports (${
                 [...ports.keys()].join(', ') || 'none declared'
-              }).`
-            )
+              }).`,
+            ),
           );
           continue;
         }
@@ -179,51 +142,37 @@ export function checkCommandAuditDependency(project) {
         visit(cls.node, {
           CallExpression(node) {
             const callee = node.callee;
-            if (
-              callee.type !== 'MemberExpression' ||
-              callee.property.name !== 'record'
-            )
-              return;
+            if (callee.type !== 'MemberExpression' || callee.property.name !== 'record') return;
             const target = callee.object;
             const isAudit =
               (target.type === 'Identifier' && target.name === 'audit') ||
-              (target.type === 'MemberExpression' &&
-                target.property.name === 'audit');
+              (target.type === 'MemberExpression' && target.property.name === 'audit');
             if (!isAudit) return;
             records += 1;
             const literal = node.arguments[0]?.properties?.find(
-              (p) => p.key?.name === 'type'
+              (p) => p.key?.name === 'type',
             )?.value;
-            if (
-              literal?.type === 'Literal' &&
-              allowed.size > 0 &&
-              !allowed.has(literal.value)
-            ) {
+            if (literal?.type === 'Literal' && allowed.size > 0 && !allowed.has(literal.value)) {
               out.push(
                 violation(
                   'command-audit',
                   f.path,
                   `\`${cls.name}\` records event type '${
                     literal.value
-                  }', which is not part of ${auditType.replace(
-                    /AuditLog$/,
-                    'Event'
-                  )}.`
-                )
+                  }', which is not part of ${auditType.replace(/AuditLog$/, 'Event')}.`,
+                ),
               );
             }
           },
         });
-        const exempt = /@audit-exempt\s+\S/.test(
-          leadingComment(f, cls.statement)
-        );
+        const exempt = /@audit-exempt\s+\S/.test(leadingComment(f, cls.statement));
         if (records === 0 && !exempt) {
           out.push(
             violation(
               'command-audit',
               f.path,
-              `\`${cls.name}\` receives the audit log but never records an event. Emit one for its outcome or document \`@audit-exempt <reason>\`.`
-            )
+              `\`${cls.name}\` receives the audit log but never records an event. Emit one for its outcome or document \`@audit-exempt <reason>\`.`,
+            ),
           );
         }
         if (records > 0 && exempt) {
@@ -231,8 +180,8 @@ export function checkCommandAuditDependency(project) {
             violation(
               'command-audit',
               f.path,
-              `\`${cls.name}\` is marked @audit-exempt but records events. Remove the exemption.`
-            )
+              `\`${cls.name}\` is marked @audit-exempt but records events. Remove the exemption.`,
+            ),
           );
         }
       }
@@ -243,29 +192,19 @@ export function checkCommandAuditDependency(project) {
 
 const ROUTE_TAG = /@authorization\s+(public|protected|none)\s+(\S.*)/;
 const USE_CASE_TAG = /@authorization\s+(public|system)\s+(\S.*)/;
-const HTTP_METHODS = new Set([
-  'GET',
-  'POST',
-  'PUT',
-  'PATCH',
-  'DELETE',
-  'HEAD',
-  'OPTIONS',
-]);
+const HTTP_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']);
 
 /** The authorization category of one use case class. */
 function classifyUseCase(file, cls) {
   const depsName = ctorDependencyName(cls.node);
   const tag = USE_CASE_TAG.exec(leadingComment(file, cls.statement));
   const execute = cls.node.body.body.find(
-    (m) => m.type === 'MethodDefinition' && m.key.name === 'execute'
+    (m) => m.type === 'MethodDefinition' && m.key.name === 'execute',
   );
   const returns = execute ? returnsOf(execute.value.body) : [];
   const authorizedFirst =
     returns.length > 0 &&
-    returns.every(
-      (r) => r.argument && isAuthorizationRoot(rootCall(r.argument))
-    );
+    returns.every((r) => r.argument && isAuthorizationRoot(rootCall(r.argument)));
   const category = tag ? tag[1] : 'protected';
   return {
     depsName,
@@ -327,10 +266,7 @@ export function describeEntryPoints(project) {
         const object = init?.type === 'TSAsExpression' ? init.expression : init;
         if (object?.type !== 'ObjectExpression') return;
         for (const p of object.properties)
-          if (
-            p.value?.type === 'NewExpression' &&
-            p.value.callee.type === 'Identifier'
-          )
+          if (p.value?.type === 'NewExpression' && p.value.callee.type === 'Identifier')
             objects.set(`${id}.${p.key.name}`, p.value.callee.name);
       };
       visit(composition.ast, {
@@ -348,8 +284,7 @@ export function describeEntryPoints(project) {
             return;
           const fn = call.arguments[0];
           if (!fn || !/Function/.test(fn.type)) return;
-          if (fn.body.type === 'ObjectExpression')
-            collect(`${owner.id.name}()`, fn.body);
+          if (fn.body.type === 'ObjectExpression') collect(`${owner.id.name}()`, fn.body);
           else
             visit(fn.body, {
               ReturnStatement: (r) => collect(`${owner.id.name}()`, r.argument),
@@ -367,14 +302,9 @@ export function describeEntryPoints(project) {
         },
       });
     }
-    for (const f of files.filter((x) =>
-      /^presentation\/actions\//.test(x.local)
-    )) {
+    for (const f of files.filter((x) => /^presentation\/actions\//.test(x.local))) {
       for (const statement of f.ast.body) {
-        const d =
-          statement.type === 'ExportNamedDeclaration'
-            ? statement.declaration
-            : null;
+        const d = statement.type === 'ExportNamedDeclaration' ? statement.declaration : null;
         if (d?.type !== 'FunctionDeclaration') continue;
         const called = new Set();
         visit(d, {
@@ -390,17 +320,14 @@ export function describeEntryPoints(project) {
             const rootName =
               holder.type === 'Identifier'
                 ? holder.name
-                : holder.type === 'CallExpression' &&
-                  holder.callee.type === 'Identifier'
-                ? `${holder.callee.name}()`
-                : null;
+                : holder.type === 'CallExpression' && holder.callee.type === 'Identifier'
+                  ? `${holder.callee.name}()`
+                  : null;
             if (rootName) called.add(`${rootName}.${c.object.property.name}`);
           },
         });
         const resolved = [...called].map((k) => objects.get(k)).filter(Boolean);
-        const classified = resolved
-          .map((cn) => useCases.get(`${name}::${cn}`))
-          .filter(Boolean);
+        const classified = resolved.map((cn) => useCases.get(`${name}::${cn}`)).filter(Boolean);
         const reachesSystem = classified.some((c) => c.category === 'system');
         entries.push({
           kind: 'action',
@@ -411,12 +338,9 @@ export function describeEntryPoints(project) {
             classified.length === 0
               ? 'unclassified'
               : classified.every((c) => c.category === 'public')
-              ? 'public'
-              : 'protected',
-          ok:
-            classified.length > 0 &&
-            classified.length === called.size &&
-            !reachesSystem,
+                ? 'public'
+                : 'protected',
+          ok: classified.length > 0 && classified.length === called.size && !reachesSystem,
           useCases: resolved,
           reachesSystem,
         });
@@ -427,25 +351,19 @@ export function describeEntryPoints(project) {
   for (const file of project.files.values()) {
     if (!/^src\/app\/.*\/?route\.ts$/.test(file.path)) continue;
     for (const statement of file.ast.body) {
-      const d =
-        statement.type === 'ExportNamedDeclaration'
-          ? statement.declaration
-          : null;
+      const d = statement.type === 'ExportNamedDeclaration' ? statement.declaration : null;
       const method =
         d?.type === 'FunctionDeclaration'
           ? d.id.name
           : d?.type === 'VariableDeclaration'
-          ? d.declarations[0]?.id?.name
-          : null;
+            ? d.declarations[0]?.id?.name
+            : null;
       if (!method || !HTTP_METHODS.has(method)) continue;
       const tag = ROUTE_TAG.exec(leadingComment(file, statement));
       let usesUseCase = false;
       visit(d, {
         CallExpression: (n) => {
-          if (
-            n.callee.type === 'MemberExpression' &&
-            n.callee.property.name === 'execute'
-          )
+          if (n.callee.type === 'MemberExpression' && n.callee.property.name === 'execute')
             usesUseCase = true;
         },
       });
@@ -472,8 +390,8 @@ export function checkAuthorizationCategories(project) {
         violation(
           'authorization',
           e.file,
-          `\`${e.name}\` is protected (it has no \`@authorization\` tag) but \`execute\` does not start with authorization (requireInTenant / loadAuthorized*). Authorize first, or tag the class \`@authorization public <reason>\` / \`@authorization system <reason>\` if it deliberately has no actor.`
-        )
+          `\`${e.name}\` is protected (it has no \`@authorization\` tag) but \`execute\` does not start with authorization (requireInTenant / loadAuthorized*). Authorize first, or tag the class \`@authorization public <reason>\` / \`@authorization system <reason>\` if it deliberately has no actor.`,
+        ),
       );
     } else if (e.kind === 'action') {
       out.push(
@@ -481,21 +399,21 @@ export function checkAuthorizationCategories(project) {
           ? violation(
               'authorization',
               e.file,
-              `Server Action \`${e.name}\` calls a \`system\` use case. System use cases have no authorization and must only be called by other modules' adapters.`
+              `Server Action \`${e.name}\` calls a \`system\` use case. System use cases have no authorization and must only be called by other modules' adapters.`,
             )
           : violation(
               'authorization',
               e.file,
-              `Server Action \`${e.name}\` does not resolve to a use case in the module's composition root, so its authorization category is unknown.`
-            )
+              `Server Action \`${e.name}\` does not resolve to a use case in the module's composition root, so its authorization category is unknown.`,
+            ),
       );
     } else {
       out.push(
         violation(
           'authorization',
           e.file,
-          `Route handler ${e.name} needs a JSDoc \`@authorization <protected|public|none> <reason>\` and, when protected, must call a use case.`
-        )
+          `Route handler ${e.name} needs a JSDoc \`@authorization <protected|public|none> <reason>\` and, when protected, must call a use case.`,
+        ),
       );
     }
   }
@@ -503,30 +421,16 @@ export function checkAuthorizationCategories(project) {
 }
 
 /** Pure check over message data, so it runs on the real module and on fixtures alike. */
-export function verifyMessageMap({
-  module,
-  codes,
-  keyByCode,
-  genericKey,
-  catalogs,
-}) {
+export function verifyMessageMap({ module, codes, keyByCode, genericKey, catalogs }) {
   const out = [];
   const resolve = (catalog, key) =>
     key
       .split('.')
-      .reduce(
-        (node, part) =>
-          node && typeof node === 'object' ? node[part] : undefined,
-        catalog
-      );
+      .reduce((node, part) => (node && typeof node === 'object' ? node[part] : undefined), catalog);
   for (const code of codes) {
     if (!Object.hasOwn(keyByCode, code))
       out.push(
-        violation(
-          'messages',
-          module,
-          `Code '${code}' has no entry in MESSAGE_KEY_BY_CODE.`
-        )
+        violation('messages', module, `Code '${code}' has no entry in MESSAGE_KEY_BY_CODE.`),
       );
   }
   for (const code of Object.keys(keyByCode)) {
@@ -535,8 +439,8 @@ export function verifyMessageMap({
         violation(
           'messages',
           module,
-          `MESSAGE_KEY_BY_CODE maps '${code}', which is not an error or validation code of this module.`
-        )
+          `MESSAGE_KEY_BY_CODE maps '${code}', which is not an error or validation code of this module.`,
+        ),
       );
   }
   const keys = new Set([...Object.values(keyByCode), genericKey]);
@@ -547,8 +451,8 @@ export function verifyMessageMap({
           violation(
             'messages',
             module,
-            `Translation key '${key}' is missing in the '${locale}' catalog.`
-          )
+            `Translation key '${key}' is missing in the '${locale}' catalog.`,
+          ),
         );
     }
   }
@@ -559,7 +463,7 @@ export function flattenKeys(object, prefix = '') {
   return Object.entries(object).flatMap(([key, value]) =>
     value !== null && typeof value === 'object'
       ? flattenKeys(value, `${prefix}${key}.`)
-      : [`${prefix}${key}`]
+      : [`${prefix}${key}`],
   );
 }
 
@@ -573,12 +477,10 @@ export function checkTranslationOwnership(project) {
   for (const name of project.modules) {
     const dir = `src/modules/${name}/presentation/i18n/`;
     const jsonPaths = [...project.json.keys()].filter(
-      (p) => p.startsWith(dir) && p.endsWith('.json')
+      (p) => p.startsWith(dir) && p.endsWith('.json'),
     );
     if (jsonPaths.length === 0) continue;
-    const moduleLocales = jsonPaths.map((p) =>
-      stripFileExtension(p.slice(dir.length))
-    );
+    const moduleLocales = jsonPaths.map((p) => stripFileExtension(p.slice(dir.length)));
     const parsed = {};
     for (const [i, p] of jsonPaths.entries()) {
       try {
@@ -588,8 +490,8 @@ export function checkTranslationOwnership(project) {
           violation(
             'translations',
             p,
-            `Not valid JSON (${error.message}). Bundlers parse catalogs strictly: no trailing commas or comments.`
-          )
+            `Not valid JSON (${error.message}). Bundlers parse catalogs strictly: no trailing commas or comments.`,
+          ),
         );
       }
     }
@@ -602,9 +504,9 @@ export function checkTranslationOwnership(project) {
             'translations',
             dir,
             `Module '${name}' has no '${locale}' translations (the app supports: ${locales.join(
-              ', '
-            )}).`
-          )
+              ', ',
+            )}).`,
+          ),
         );
     }
     for (const locale of moduleLocales) {
@@ -613,8 +515,8 @@ export function checkTranslationOwnership(project) {
           violation(
             'translations',
             `${dir}${locale}.json`,
-            `'${locale}' is not a supported locale (${locales.join(', ')}).`
-          )
+            `'${locale}' is not a supported locale (${locales.join(', ')}).`,
+          ),
         );
     }
     for (const locale of moduleLocales) {
@@ -627,13 +529,13 @@ export function checkTranslationOwnership(project) {
             `${dir}${locale}.json`,
             `The catalog must have exactly one top-level namespace named after the module ('${namespace}'); found: ${
               top.join(', ') || 'none'
-            }.`
-          )
+            }.`,
+          ),
         );
     }
     // A key must exist in every locale: report it against each locale that lacks it.
     const keysByLocale = Object.fromEntries(
-      moduleLocales.map((l) => [l, new Set(flattenKeys(parsed[l]))])
+      moduleLocales.map((l) => [l, new Set(flattenKeys(parsed[l]))]),
     );
     const union = new Set(moduleLocales.flatMap((l) => [...keysByLocale[l]]));
     for (const locale of [...moduleLocales].sort()) {
@@ -647,8 +549,8 @@ export function checkTranslationOwnership(project) {
           violation(
             'translations',
             `${dir}${locale}.json`,
-            `Missing key '${key}' in '${locale}' (present in: ${present}).`
-          )
+            `Missing key '${key}' in '${locale}' (present in: ${present}).`,
+          ),
         );
       }
     }
@@ -669,8 +571,8 @@ export function checkTranslationOwnership(project) {
           violation(
             'translations',
             registry.path,
-            `Module '${name}' translations are not registered: import its '${locale}…' catalog from '@modules/${name}' in this file.`
-          )
+            `Module '${name}' translations are not registered: import its '${locale}…' catalog from '@modules/${name}' in this file.`,
+          ),
         );
         continue;
       }
@@ -681,8 +583,8 @@ export function checkTranslationOwnership(project) {
             index.path,
             `The module public API must export ${registered
               .map((n) => `\`${n}\``)
-              .join(', ')} (registered in src/i18n/locales/${locale}.ts).`
-          )
+              .join(', ')} (registered in src/i18n/locales/${locale}.ts).`,
+          ),
         );
       }
     }
@@ -697,8 +599,8 @@ export function checkTranslationOwnership(project) {
         violation(
           'translations',
           path,
-          `'${m[2]}' is a module: its translations belong in src/modules/${m[2]}/presentation/i18n, not in the global catalog.`
-        )
+          `'${m[2]}' is a module: its translations belong in src/modules/${m[2]}/presentation/i18n, not in the global catalog.`,
+        ),
       );
     let parsedGlobal = {};
     try {
@@ -708,8 +610,8 @@ export function checkTranslationOwnership(project) {
         violation(
           'translations',
           path,
-          `Not valid JSON (${error.message}). Bundlers parse catalogs strictly: no trailing commas or comments.`
-        )
+          `Not valid JSON (${error.message}). Bundlers parse catalogs strictly: no trailing commas or comments.`,
+        ),
       );
     }
     for (const top of Object.keys(parsedGlobal)) {
@@ -718,8 +620,8 @@ export function checkTranslationOwnership(project) {
           violation(
             'translations',
             path,
-            `Top-level key '${top}' is a module namespace; keep module text inside the module.`
-          )
+            `Top-level key '${top}' is a module namespace; keep module text inside the module.`,
+          ),
         );
     }
   }

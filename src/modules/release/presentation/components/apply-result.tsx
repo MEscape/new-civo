@@ -4,7 +4,6 @@ import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { PAGE_OUTCOME_MESSAGE_KEYS } from '../messages/message-keys';
 
 import { PagePathLabel } from './page-path-label';
@@ -27,9 +26,7 @@ export function ApplyResult({ result }: ApplyResultProps) {
   return (
     <Alert variant={isApplied ? 'success' : 'warning'} role="status">
       <AlertTitle>
-        {t(
-          isApplied ? 'migration.result.applied' : 'migration.result.incomplete'
-        )}
+        {t(isApplied ? 'migration.result.applied' : 'migration.result.incomplete')}
       </AlertTitle>
       <AlertDescription>
         {t('migration.result.summary', {

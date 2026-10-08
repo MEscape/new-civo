@@ -1,15 +1,5 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 import { ContentLink } from '@components/ui/content-link';
 import { Mail, Phone } from '@components/ui/icons';
 
@@ -36,11 +26,7 @@ export interface ContactCardComponentProps {
 }
 
 /** Contact persons of a bound dataset. */
-export async function ContactCard({
-  props,
-  context,
-  loadContent,
-}: ContactCardComponentProps) {
+export async function ContactCard({ props, context, loadContent }: ContactCardComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -71,9 +57,7 @@ export async function ContactCard({
               <Card className="h-full">
                 <CardHeader>
                   <CardTitle>{contact.name}</CardTitle>
-                  {contact.role !== undefined && (
-                    <CardDescription>{contact.role}</CardDescription>
-                  )}
+                  {contact.role !== undefined && <CardDescription>{contact.role}</CardDescription>}
                   <div className="mt-3 flex flex-col gap-1.5 text-sm">
                     {contact.email !== undefined && (
                       <ContentLink

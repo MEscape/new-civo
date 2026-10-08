@@ -53,23 +53,17 @@ const pages = new PrismaPageRepository(systemClock);
  * Both platform queries are infallible (`AppResult<_, never>`), so the error
  * branch has type `never` and needs no handling.
  */
-const platformCatalog = componentPlatformQueries.listComponentCatalog
-  .execute()
-  .match(
-    (view) => view.components,
-    (error) => error
-  );
+const platformCatalog = componentPlatformQueries.listComponentCatalog.execute().match(
+  (view) => view.components,
+  (error) => error,
+);
 const components = createComponentCatalog(
-  new ComponentPlatformDescriptorProvider(
-    platformCatalog,
-    (parentType, childType) =>
-      componentPlatformQueries.canNestComponent
-        .execute({ parentType, childType })
-        .match(
-          (allowed) => allowed,
-          (error) => error
-        )
-  ).listDescriptors()
+  new ComponentPlatformDescriptorProvider(platformCatalog, (parentType, childType) =>
+    componentPlatformQueries.canNestComponent.execute({ parentType, childType }).match(
+      (allowed) => allowed,
+      (error) => error,
+    ),
+  ).listDescriptors(),
 );
 
 const dependencies: PageDependencies = {
@@ -110,14 +104,14 @@ const listPagesForReleaseQuery = new ListPagesForRelease({ pages });
 
 /** Seeds a page for a website a trusted module just created. */
 export function createSystemPage(
-  input: CreateSystemPageInput
+  input: CreateSystemPageInput,
 ): AppResultAsync<PageSummaryView, CreateSystemPageError> {
   return createSystemPageCommand.execute(input);
 }
 
 /** Every page of a website with its latest saved configuration, for publishing. */
 export function listPagesForRelease(
-  websiteId: string
+  websiteId: string,
 ): AppResultAsync<readonly ReleasePageView[], ListPagesForReleaseError> {
   return listPagesForReleaseQuery.execute(websiteId);
 }
@@ -129,7 +123,7 @@ export function listPagesForRelease(
  * valid tree is, so no module keeps its own tree reader or its own limits.
  */
 export function restoreStoredPageConfig(
-  stored: unknown
+  stored: unknown,
 ): AppResult<PageConfigView, UnexpectedAppError> {
   return restorePageConfig(stored);
 }
@@ -140,7 +134,7 @@ export function restoreStoredPageConfig(
  * editor's save, so a trusted module never writes around the builder.
  */
 export function savePageDraft(
-  input: SavePageConfigInput
+  input: SavePageConfigInput,
 ): AppResultAsync<SavedRevisionView, SavePageConfigError> {
   return builderCommands.savePageConfig.execute(input);
 }

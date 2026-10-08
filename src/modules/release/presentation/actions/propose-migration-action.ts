@@ -18,13 +18,10 @@ import type { MigrationProposalDto } from '../dto/migration-plan-dto';
  * to revalidate: no page an editor is looking at changes.
  */
 export async function proposeMigrationAction(
-  input: unknown
+  input: unknown,
 ): Promise<ActionResult<MigrationProposalDto>> {
-  const result = await parseReleaseInput(
-    proposeMigrationSchema,
-    input
-  ).asyncAndThen((command) =>
-    releaseCommands.proposeMigration.execute(command)
+  const result = await parseReleaseInput(proposeMigrationSchema, input).asyncAndThen((command) =>
+    releaseCommands.proposeMigration.execute(command),
   );
 
   return toActionResult(result.map(toMigrationProposalDto));

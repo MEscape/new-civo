@@ -16,7 +16,9 @@ const VARIANT_CLASS = {
  * information from `DragAnnouncer`.
  */
 export function DropIndicator({ rect }: DropIndicatorProps) {
-  if (rect === null) {return null;}
+  if (rect === null) {
+    return null;
+  }
   return (
     <div
       aria-hidden="true"

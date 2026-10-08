@@ -27,25 +27,80 @@ export class PrismaShopRepository {
 ruleTester.run('architecture/persistence-failures', rules['persistence-failures']!, {
   valid: [
     valid(REPO, GOOD_REPO),
-    valid(MAPPER, "import type { ShopRecord } from './types';\nexport function toShop(record: ShopRecord) { return record; }"),
+    valid(
+      MAPPER,
+      "import type { ShopRecord } from './types';\nexport function toShop(record: ShopRecord) { return record; }",
+    ),
     valid('src/modules/shop/application/x.ts', "import { mapPrismaError } from '@lib/db';"), // layer rules, not this rule, police other layers
   ],
   invalid: [
-    invalid(REPO, GOOD_REPO.replace("const failures = createPersistenceFailures({ module: 'shop.persistence', code: 'shop.failed', subject: 'Shop' });", ''), /must create its failure mapper/),
-    invalid(REPO, GOOD_REPO.replace("failures.infraOnly('findById')", '(e) => toInfra(e)'), /Pass `failures\.infraOnly/),
     invalid(
       REPO,
-      GOOD_REPO.replace('findById(id: ShopId, tenantId: TenantId) {', 'findById(id: ShopId, tenantId: TenantId) { return db.orm.public.Shop.first({ id });'),
-      /Database calls must run inside `fromThrowableAsync/
+      GOOD_REPO.replace(
+        "const failures = createPersistenceFailures({ module: 'shop.persistence', code: 'shop.failed', subject: 'Shop' });",
+        '',
+      ),
+      /must create its failure mapper/,
     ),
-    invalid(REPO, GOOD_REPO.replace("failures.orConflict('create', shopSlugTaken)", "failures.infraOnly('findById')"), /already used in this repository/),
-    invalid(REPO, GOOD_REPO.replace("failures.infraOnly('findById')", 'failures.infraOnly(name)'), /Operation names are stable string literals/),
-    invalid(REPO, GOOD_REPO.replace("failures.orConflict('create', shopSlugTaken)", "failures.orConflict('create')"), /takes the domain error factory as its second argument/),
-    invalid(REPO, `import { mapPrismaError } from '@lib/db';\n${GOOD_REPO}`, /Do not map Prisma errors locally/),
-    invalid(REPO, `import { ok } from 'neverthrow';\n${GOOD_REPO}`, /Import result helpers from '@lib\/result'/),
-    invalid(REPO, `${GOOD_REPO}\nconst isUnique = (e) => e.code === 'P2002';`, /Do not branch on Prisma\/ORM error code 'P2002'/),
-    invalid(REPO, `${GOOD_REPO}\nconst isMissing = (e) => e.code === 'ORM.MUTATION_ROW_MISSING';`, /Do not branch on Prisma\/ORM error code/),
-    invalid(MAPPER, "import { db } from '@lib/db';\nexport function toShop() { return db; }", /Record mappers are pure conversions/),
+    invalid(
+      REPO,
+      GOOD_REPO.replace("failures.infraOnly('findById')", '(e) => toInfra(e)'),
+      /Pass `failures\.infraOnly/,
+    ),
+    invalid(
+      REPO,
+      GOOD_REPO.replace(
+        'findById(id: ShopId, tenantId: TenantId) {',
+        'findById(id: ShopId, tenantId: TenantId) { return db.orm.public.Shop.first({ id });',
+      ),
+      /Database calls must run inside `fromThrowableAsync/,
+    ),
+    invalid(
+      REPO,
+      GOOD_REPO.replace(
+        "failures.orConflict('create', shopSlugTaken)",
+        "failures.infraOnly('findById')",
+      ),
+      /already used in this repository/,
+    ),
+    invalid(
+      REPO,
+      GOOD_REPO.replace("failures.infraOnly('findById')", 'failures.infraOnly(name)'),
+      /Operation names are stable string literals/,
+    ),
+    invalid(
+      REPO,
+      GOOD_REPO.replace(
+        "failures.orConflict('create', shopSlugTaken)",
+        "failures.orConflict('create')",
+      ),
+      /takes the domain error factory as its second argument/,
+    ),
+    invalid(
+      REPO,
+      `import { mapPrismaError } from '@lib/db';\n${GOOD_REPO}`,
+      /Do not map Prisma errors locally/,
+    ),
+    invalid(
+      REPO,
+      `import { ok } from 'neverthrow';\n${GOOD_REPO}`,
+      /Import result helpers from '@lib\/result'/,
+    ),
+    invalid(
+      REPO,
+      `${GOOD_REPO}\nconst isUnique = (e) => e.code === 'P2002';`,
+      /Do not branch on Prisma\/ORM error code 'P2002'/,
+    ),
+    invalid(
+      REPO,
+      `${GOOD_REPO}\nconst isMissing = (e) => e.code === 'ORM.MUTATION_ROW_MISSING';`,
+      /Do not branch on Prisma\/ORM error code/,
+    ),
+    invalid(
+      MAPPER,
+      "import { db } from '@lib/db';\nexport function toShop() { return db; }",
+      /Record mappers are pure conversions/,
+    ),
   ],
 });
 
@@ -59,14 +114,46 @@ ruleTester.run('architecture/audit-adapter', rules['audit-adapter']!, {
   valid: [
     valid(AUDIT, GOOD_AUDIT),
     valid('src/modules/shop/infrastructure/logging/logger-shop-audit-log.ts', GOOD_AUDIT), // established alias of audit/
-    valid('src/modules/shop/infrastructure/prisma/prisma-shop.repository.ts', 'export class NotAnAdapter {}'),
+    valid(
+      'src/modules/shop/infrastructure/prisma/prisma-shop.repository.ts',
+      'export class NotAnAdapter {}',
+    ),
   ],
   invalid: [
-    invalid(AUDIT, GOOD_AUDIT.replace(" as const satisfies Record<ShopEvent['type'], 'info' | 'warn'>", ' as const'), /exhaustive|event→level map/i),
-    invalid(AUDIT, GOOD_AUDIT.replace("satisfies Record<ShopEvent['type'], 'info' | 'warn'>", "satisfies Record<ShopEvent['type'], string>"), /event→level map/),
-    invalid(AUDIT, GOOD_AUDIT.replace("createAuditLog('shop.audit', LEVEL_BY_EVENT)", '{ record() {} }'), /exactly one `createAuditLog/),
+    invalid(
+      AUDIT,
+      GOOD_AUDIT.replace(
+        " as const satisfies Record<ShopEvent['type'], 'info' | 'warn'>",
+        ' as const',
+      ),
+      /exhaustive|event→level map/i,
+    ),
+    invalid(
+      AUDIT,
+      GOOD_AUDIT.replace(
+        "satisfies Record<ShopEvent['type'], 'info' | 'warn'>",
+        "satisfies Record<ShopEvent['type'], string>",
+      ),
+      /event→level map/,
+    ),
+    invalid(
+      AUDIT,
+      GOOD_AUDIT.replace("createAuditLog('shop.audit', LEVEL_BY_EVENT)", '{ record() {} }'),
+      /exactly one `createAuditLog/,
+    ),
     invalid(AUDIT, GOOD_AUDIT.replace("'shop.audit'", "'shop'"), /module-scoped logger name/),
-    invalid(AUDIT, GOOD_AUDIT.replace("createAuditLog('shop.audit', LEVEL_BY_EVENT)", "createAuditLog('shop.audit', { 'shop.created': 'info' })"), /Pass `LEVEL_BY_EVENT` as the levels/),
-    invalid(AUDIT, `${GOOD_AUDIT}\nexport class LoggerShopAuditLog { record() {} }`, /Do not hand-write the audit mechanism/),
+    invalid(
+      AUDIT,
+      GOOD_AUDIT.replace(
+        "createAuditLog('shop.audit', LEVEL_BY_EVENT)",
+        "createAuditLog('shop.audit', { 'shop.created': 'info' })",
+      ),
+      /Pass `LEVEL_BY_EVENT` as the levels/,
+    ),
+    invalid(
+      AUDIT,
+      `${GOOD_AUDIT}\nexport class LoggerShopAuditLog { record() {} }`,
+      /Do not hand-write the audit mechanism/,
+    ),
   ],
 });

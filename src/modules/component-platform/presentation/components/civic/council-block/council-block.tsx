@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { Badge } from '@components/ui/badge';
 import { Card, CardContent } from '@components/ui/card';
 
@@ -26,11 +22,7 @@ export interface CouncilBlockComponentProps {
 }
 
 /** Council bodies with their member rosters. */
-export async function CouncilBlock({
-  props,
-  context,
-  loadContent,
-}: CouncilBlockComponentProps) {
+export async function CouncilBlock({ props, context, loadContent }: CouncilBlockComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -60,13 +52,9 @@ export async function CouncilBlock({
             <li key={body.id}>
               <Card>
                 <CardContent className="pt-5">
-                  <h3 className="font-heading text-lg text-copy">
-                    {body.name}
-                  </h3>
+                  <h3 className="font-heading text-lg text-copy">{body.name}</h3>
                   {body.description !== undefined && (
-                    <p className="mt-1 text-sm text-copy-muted">
-                      {body.description}
-                    </p>
+                    <p className="mt-1 text-sm text-copy-muted">{body.description}</p>
                   )}
                   <ul className="mt-4 flex flex-col divide-y divide-border">
                     {body.members.map((member) => (
@@ -75,13 +63,9 @@ export async function CouncilBlock({
                         className="flex items-center justify-between gap-3 py-2.5"
                       >
                         <div>
-                          <p className="text-sm font-medium text-copy">
-                            {member.name}
-                          </p>
+                          <p className="text-sm font-medium text-copy">{member.name}</p>
                           {member.role !== undefined && (
-                            <p className="text-xs text-copy-muted">
-                              {member.role}
-                            </p>
+                            <p className="text-xs text-copy-muted">{member.role}</p>
                           )}
                         </div>
                         {member.party !== undefined && (

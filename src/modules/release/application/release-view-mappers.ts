@@ -1,10 +1,6 @@
 import { pick } from '@lib/utils';
 
-import {
-  countNodesByStatus,
-  isUpToDate,
-  requiresReview,
-} from '../domain/models/migration-plan';
+import { countNodesByStatus, isUpToDate, requiresReview } from '../domain/models/migration-plan';
 import { canActivate } from '../domain/models/release';
 
 import type {
@@ -19,15 +15,11 @@ import type {
 import type { ReleaseId } from '../domain/models/ids';
 import type { Migration, MigrationSummary } from '../domain/models/migration';
 import type { MigrationPlan } from '../domain/models/migration-plan';
-import type {
-  Release,
-  ReleaseHistory,
-  ReleaseSummary,
-} from '../domain/models/release';
+import type { Release, ReleaseHistory, ReleaseSummary } from '../domain/models/release';
 
 export function toReleaseSummaryView(
   summary: ReleaseSummary,
-  activeReleaseId: ReleaseId | null
+  activeReleaseId: ReleaseId | null,
 ): ReleaseSummaryView {
   return {
     id: summary.id,
@@ -41,20 +33,16 @@ export function toReleaseSummaryView(
   };
 }
 
-export function toReleaseHistoryView(
-  history: ReleaseHistory
-): ReleaseHistoryView {
+export function toReleaseHistoryView(history: ReleaseHistory): ReleaseHistoryView {
   return {
     activeReleaseId: history.activeReleaseId,
     releases: history.releases.map((summary) =>
-      toReleaseSummaryView(summary, history.activeReleaseId)
+      toReleaseSummaryView(summary, history.activeReleaseId),
     ),
   };
 }
 
-export function toPublishedSnapshotView(
-  release: Release
-): PublishedSnapshotView {
+export function toPublishedSnapshotView(release: Release): PublishedSnapshotView {
   const { snapshot } = release;
   return {
     releaseId: release.id,
@@ -75,9 +63,7 @@ export function toMigrationPlanView(plan: MigrationPlan): MigrationPlanView {
   };
 }
 
-export function toMigrationSummaryView(
-  summary: MigrationSummary
-): MigrationSummaryView {
+export function toMigrationSummaryView(summary: MigrationSummary): MigrationSummaryView {
   return {
     id: summary.id,
     websiteId: summary.websiteId,
@@ -88,9 +74,7 @@ export function toMigrationSummaryView(
   };
 }
 
-export function toMigrationDetailView(
-  migration: Migration
-): MigrationDetailView {
+export function toMigrationDetailView(migration: Migration): MigrationDetailView {
   return {
     ...toMigrationSummaryView(migration),
     plan: toMigrationPlanView(migration.plan),

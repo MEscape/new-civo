@@ -6,24 +6,24 @@
 import { isPlainObject } from './object';
 
 export class JsonParseError extends Error {
-    constructor(public override readonly cause: unknown) {
-        super('Failed to parse JSON');
-        this.name = 'JsonParseError';
-    }
+  constructor(public override readonly cause: unknown) {
+    super('Failed to parse JSON');
+    this.name = 'JsonParseError';
+  }
 }
 
 export class JsonStringifyError extends Error {
-    constructor(message: string, public override readonly cause?: unknown) {
-        super(`Failed to stringify JSON: ${message}`);
-        this.name = 'JsonStringifyError';
-    }
+  constructor(
+    message: string,
+    public override readonly cause?: unknown,
+  ) {
+    super(`Failed to stringify JSON: ${message}`);
+    this.name = 'JsonStringifyError';
+  }
 }
 
 export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue =
-    | JsonPrimitive
-    | JsonValue[]
-    | { [key: string]: JsonValue };
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
 
 /**
  * Parses JSON. Returns `unknown` instead of `any` to force caller validation.
@@ -31,11 +31,11 @@ export type JsonValue =
  * from other SyntaxErrors in the call stack.
  */
 export function parseJson(text: string): unknown {
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new JsonParseError(error);
-    }
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    throw new JsonParseError(error);
+  }
 }
 
 /**
@@ -44,21 +44,21 @@ export function parseJson(text: string): unknown {
  * failing silently.
  */
 export function stringifyJson(value: unknown, space?: number): string {
-    let text: string | undefined;
+  let text: string | undefined;
 
-    try {
-        text = JSON.stringify(value, null, space);
-    } catch (error) {
-        // Catches cycles and BigInts
-        throw new JsonStringifyError('Exception during serialization', error);
-    }
+  try {
+    text = JSON.stringify(value, null, space);
+  } catch (error) {
+    // Catches cycles and BigInts
+    throw new JsonStringifyError('Exception during serialization', error);
+  }
 
-    if ((text as string | undefined) === undefined) {
-        // Catches values JSON.stringify silently ignores
-        throw new JsonStringifyError('Value is not serializable');
-    }
+  if ((text as string | undefined) === undefined) {
+    // Catches values JSON.stringify silently ignores
+    throw new JsonStringifyError('Value is not serializable');
+  }
 
-    return text;
+  return text;
 }
 
 /**
@@ -77,20 +77,20 @@ export function stringifyJson(value: unknown, space?: number): string {
  *   cycle throws a raw error (`TypeError`, or a stack overflow for cycles).
  */
 export function stableStringify(value: unknown): string {
-    if (Array.isArray(value)) {return `[${value.map(stableStringify).join(',')}]`;}
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`;
+  }
 
-    if (isPlainObject(value)) {
-        const entries = Object.keys(value)
-            .sort()
-            .flatMap((key) => {
-                const entry = value[key];
-                return entry === undefined
-                    ? []
-                    : [`${JSON.stringify(key)}:${stableStringify(entry)}`];
-            });
-        return `{${entries.join(',')}}`;
-    }
+  if (isPlainObject(value)) {
+    const entries = Object.keys(value)
+      .sort()
+      .flatMap((key) => {
+        const entry = value[key];
+        return entry === undefined ? [] : [`${JSON.stringify(key)}:${stableStringify(entry)}`];
+      });
+    return `{${entries.join(',')}}`;
+  }
 
-    const result = JSON.stringify(value) as string | undefined;
-    return result ?? 'null';
+  const result = JSON.stringify(value) as string | undefined;
+  return result ?? 'null';
 }

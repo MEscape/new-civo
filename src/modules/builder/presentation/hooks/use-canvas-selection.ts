@@ -12,7 +12,7 @@ import type { PageNodeId } from '../../application/contracts/editor-model';
  */
 export function useCanvasSelection(
   onSelect: (nodeId: PageNodeId | null) => void,
-  onHover: (nodeId: PageNodeId | null) => void
+  onHover: (nodeId: PageNodeId | null) => void,
 ) {
   return {
     onClickCapture(event: MouseEvent<HTMLElement>): void {

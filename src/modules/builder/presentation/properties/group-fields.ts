@@ -14,9 +14,7 @@ export interface GroupedFields {
   readonly groups: readonly FieldGroup[];
 }
 
-export function groupFields(
-  fields: readonly PropFieldDescriptor[]
-): GroupedFields {
+export function groupFields(fields: readonly PropFieldDescriptor[]): GroupedFields {
   return {
     ungrouped: fields.filter((field) => field.group === null),
     groups: PROP_GROUPS.map((group) => ({

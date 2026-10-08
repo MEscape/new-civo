@@ -34,10 +34,7 @@ function lookup(messages: unknown, key: string): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-export function createComponentText(
-  messages: unknown,
-  catalog: ComponentCatalog
-): ComponentText {
+export function createComponentText(messages: unknown, catalog: ComponentCatalog): ComponentText {
   return {
     componentLabel: (type) => {
       const descriptor = catalog.describe(type);
@@ -49,13 +46,10 @@ export function createComponentText(
     },
     fieldLabel: (field) => lookup(messages, field.labelKey) ?? field.key,
     fieldPlaceholder: (field) =>
-      field.placeholderKey === null
-        ? undefined
-        : lookup(messages, field.placeholderKey),
+      field.placeholderKey === null ? undefined : lookup(messages, field.placeholderKey),
     optionLabel: (option) =>
       (option.labelKey === null ? undefined : lookup(messages, option.labelKey)) ??
       String(option.value),
-    itemFieldLabel: (itemField) =>
-      lookup(messages, itemField.labelKey) ?? itemField.key,
+    itemFieldLabel: (itemField) => lookup(messages, itemField.labelKey) ?? itemField.key,
   };
 }

@@ -3,7 +3,6 @@
 import { useId, useState, useTransition } from 'react';
 import type { ChangeEvent } from 'react';
 
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -77,14 +76,10 @@ export function CreatePageForm({ websiteId }: CreatePageFormProps) {
     startTransition(async () => {
       const result = await createPageAction(values);
       if (result.ok) {
-        router.push(
-          builderRoutes.editor(result.data.websiteId, result.data.id)
-        );
+        router.push(builderRoutes.editor(result.data.websiteId, result.data.id));
         return;
       }
-      setFormErrorCode(
-        applyActionError(result.error, form.setError, CODE_FIELDS)
-      );
+      setFormErrorCode(applyActionError(result.error, form.setError, CODE_FIELDS));
     });
   }
 
@@ -131,9 +126,7 @@ export function CreatePageForm({ websiteId }: CreatePageFormProps) {
       )}
 
       <Button type="submit" disabled={isPending}>
-        {isPending
-          ? t('pages.createForm.submitting')
-          : t('pages.createForm.submit')}
+        {isPending ? t('pages.createForm.submitting') : t('pages.createForm.submit')}
       </Button>
     </form>
   );

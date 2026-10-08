@@ -3,10 +3,7 @@ import { nextCookies } from 'better-auth/next-js';
 
 import { I18N_CONFIG } from '@i18n';
 
-import {
-    AUTH_LINK_LIFETIME_SECONDS,
-    CREDENTIAL_LIMITS,
-} from '../../domain/models/credentials';
+import { AUTH_LINK_LIFETIME_SECONDS, CREDENTIAL_LIMITS } from '../../domain/models/credentials';
 import { toActorId } from '../../domain/models/ids';
 
 import { createSecurityAuditOptions } from './create-security-audit-options';
@@ -19,21 +16,21 @@ import type { Pool } from 'pg';
 
 /** What `createAuth` needs, already validated. The composition root maps env to this. */
 export interface AuthSettings {
-    readonly baseUrl: string;
-    readonly secret: string;
-    readonly isProduction: boolean;
-    readonly trustedProxies: readonly string[];
-    readonly session: {
-        readonly expiresInSeconds: number;
-        readonly updateAgeSeconds: number;
-        readonly freshAgeSeconds: number;
-    };
+  readonly baseUrl: string;
+  readonly secret: string;
+  readonly isProduction: boolean;
+  readonly trustedProxies: readonly string[];
+  readonly session: {
+    readonly expiresInSeconds: number;
+    readonly updateAgeSeconds: number;
+    readonly freshAgeSeconds: number;
+  };
 }
 
 export interface AuthDeps {
-    readonly pool: Pool;
-    readonly mailer: AuthMailer;
-    readonly audit: SecurityAuditLog;
+  readonly pool: Pool;
+  readonly mailer: AuthMailer;
+  readonly audit: SecurityAuditLog;
 }
 
 /**
@@ -61,100 +58,100 @@ export interface AuthDeps {
  *    on the next Server Action or Route Handler request.
  */
 export function createAuth(settings: AuthSettings, deps: AuthDeps) {
-    const options = {
-        baseURL: settings.baseUrl, // Explicit: an unset baseURL is the basePath-poisoning DoS (GHSA-569q-mpph-wgww).
-        secret: settings.secret,
-        database: deps.pool,
-        trustedOrigins: [settings.baseUrl],
+  const options = {
+    baseURL: settings.baseUrl, // Explicit: an unset baseURL is the basePath-poisoning DoS (GHSA-569q-mpph-wgww).
+    secret: settings.secret,
+    database: deps.pool,
+    trustedOrigins: [settings.baseUrl],
 
-        emailAndPassword: {
-            enabled: true,
-            requireEmailVerification: true,
-            minPasswordLength: CREDENTIAL_LIMITS.passwordMin,
-            maxPasswordLength: CREDENTIAL_LIMITS.passwordMax,
-            resetPasswordTokenExpiresIn: AUTH_LINK_LIFETIME_SECONDS,
-            revokeSessionsOnPasswordReset: true,
-            sendResetPassword: async ({ user, url }) => {
-                const locale = await resolveMailLocale();
-                return deliverAuthEmail(
-                    deps.mailer.sendPasswordReset({ to: user.email, url, locale }),
-                    'password_reset'
-                );
-            },
-            onPasswordReset: ({ user }) => {
-                deps.audit.record({
-                    type: 'authentication.password_reset_completed',
-                    actorId: toActorId(user.id),
-                });
-                return Promise.resolve();
-            },
-            // Sign-up answers identically for known and unknown addresses, so
-            // the real owner is told by email instead.
-            // SECURITY: Always use the default locale here. If we used the request
-            // locale, an attacker could spoof the email language by changing their
-            // Accept-Language header to confuse the real owner.
-            onExistingUserSignUp: async ({ user }) => {
-                return deliverAuthEmail(
-                    deps.mailer.sendExistingAccountNotice({
-                        to: user.email,
-                        locale: I18N_CONFIG.defaultLocale,
-                    }),
-                    'existing_account'
-                );
-            },
-        },
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: true,
+      minPasswordLength: CREDENTIAL_LIMITS.passwordMin,
+      maxPasswordLength: CREDENTIAL_LIMITS.passwordMax,
+      resetPasswordTokenExpiresIn: AUTH_LINK_LIFETIME_SECONDS,
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: async ({ user, url }) => {
+        const locale = await resolveMailLocale();
+        return deliverAuthEmail(
+          deps.mailer.sendPasswordReset({ to: user.email, url, locale }),
+          'password_reset',
+        );
+      },
+      onPasswordReset: ({ user }) => {
+        deps.audit.record({
+          type: 'authentication.password_reset_completed',
+          actorId: toActorId(user.id),
+        });
+        return Promise.resolve();
+      },
+      // Sign-up answers identically for known and unknown addresses, so
+      // the real owner is told by email instead.
+      // SECURITY: Always use the default locale here. If we used the request
+      // locale, an attacker could spoof the email language by changing their
+      // Accept-Language header to confuse the real owner.
+      onExistingUserSignUp: async ({ user }) => {
+        return deliverAuthEmail(
+          deps.mailer.sendExistingAccountNotice({
+            to: user.email,
+            locale: I18N_CONFIG.defaultLocale,
+          }),
+          'existing_account',
+        );
+      },
+    },
 
-        emailVerification: {
-            sendVerificationEmail: async ({ user, url }) => {
-                const locale = await resolveMailLocale();
-                return deliverAuthEmail(
-                    deps.mailer.sendVerification({ to: user.email, url, locale }),
-                    'verification'
-                );
-            },
-            sendOnSignUp: true,
-            // Reached only after the password was verified, so it cannot be abused
-            // to probe addresses, and it is the only way an unverified user learns what to do.
-            sendOnSignIn: true,
-            expiresIn: AUTH_LINK_LIFETIME_SECONDS,
-        },
+    emailVerification: {
+      sendVerificationEmail: async ({ user, url }) => {
+        const locale = await resolveMailLocale();
+        return deliverAuthEmail(
+          deps.mailer.sendVerification({ to: user.email, url, locale }),
+          'verification',
+        );
+      },
+      sendOnSignUp: true,
+      // Reached only after the password was verified, so it cannot be abused
+      // to probe addresses, and it is the only way an unverified user learns what to do.
+      sendOnSignIn: true,
+      expiresIn: AUTH_LINK_LIFETIME_SECONDS,
+    },
 
-        session: {
-            expiresIn: settings.session.expiresInSeconds,
-            updateAge: settings.session.updateAgeSeconds,
-            // Gates password/email changes; see AUTH_SESSION_FRESH_AGE_SECONDS.
-            freshAge: settings.session.freshAgeSeconds,
-            // Pinned off. A cookie cache would let a revoked session keep working
-            // until the cache expires, which defeats logout and revocation.
-            cookieCache: { enabled: false },
-        },
+    session: {
+      expiresIn: settings.session.expiresInSeconds,
+      updateAge: settings.session.updateAgeSeconds,
+      // Gates password/email changes; see AUTH_SESSION_FRESH_AGE_SECONDS.
+      freshAge: settings.session.freshAgeSeconds,
+      // Pinned off. A cookie cache would let a revoked session keep working
+      // until the cache expires, which defeats logout and revocation.
+      cookieCache: { enabled: false },
+    },
 
-        // Applies only to requests that arrive through Better Auth's HTTP
-        // handler (verification and reset links). Direct `auth.api.*` calls from
-        // Server Actions do NOT pass it; those are throttled by `AuthRateLimiter`
-        // in the application layer. Memory storage is per-process and
-        // ineffective on serverless or multi-instance hosting; `database` is shared.
-        rateLimit: {
-            enabled: true,
-            storage: 'database',
-        },
+    // Applies only to requests that arrive through Better Auth's HTTP
+    // handler (verification and reset links). Direct `auth.api.*` calls from
+    // Server Actions do NOT pass it; those are throttled by `AuthRateLimiter`
+    // in the application layer. Memory storage is per-process and
+    // ineffective on serverless or multi-instance hosting; `database` is shared.
+    rateLimit: {
+      enabled: true,
+      storage: 'database',
+    },
 
-        advanced: {
-            useSecureCookies: settings.isProduction,
-            defaultCookieAttributes: { httpOnly: true, sameSite: 'lax' },
-            ipAddress: {
-                trustedProxies: [...settings.trustedProxies],
-            },
-        },
+    advanced: {
+      useSecureCookies: settings.isProduction,
+      defaultCookieAttributes: { httpOnly: true, sameSite: 'lax' },
+      ipAddress: {
+        trustedProxies: [...settings.trustedProxies],
+      },
+    },
 
-        ...createSecurityAuditOptions(deps.audit),
+    ...createSecurityAuditOptions(deps.audit),
 
-        // Must stay LAST: a plugin after it that sets cookies in an after-hook
-        // would have those cookies dropped instead of forwarded to Next.
-        plugins: [nextCookies()],
-    } satisfies BetterAuthOptions;
+    // Must stay LAST: a plugin after it that sets cookies in an after-hook
+    // would have those cookies dropped instead of forwarded to Next.
+    plugins: [nextCookies()],
+  } satisfies BetterAuthOptions;
 
-    return betterAuth(options);
+  return betterAuth(options);
 }
 
 export type BetterAuthInstance = ReturnType<typeof createAuth>;

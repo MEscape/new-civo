@@ -8,8 +8,8 @@ import { applyMapping } from '../../domain/mapping/apply-mapping';
 import type { DatasetMapping } from '../../domain/mapping/dataset-mapping';
 import type { DataSource } from '../../domain/models/data-source';
 import type {
-    ConnectorError,
-    DataSourceConnector,
+  ConnectorError,
+  DataSourceConnector,
 } from '../../domain/ports/data-source-connector.port';
 
 export type DryRunError = ConnectorError;
@@ -20,16 +20,14 @@ export type DryRunError = ConnectorError;
  * the check that gates persistence. It always goes to the external system.
  */
 export function dryRunMapping(
-    connector: DataSourceConnector,
-    source: DataSource,
-    mapping: DatasetMapping
+  connector: DataSourceConnector,
+  source: DataSource,
+  mapping: DatasetMapping,
 ): AppResultAsync<Record<string, unknown>, DryRunError> {
-    return connector
-        .fetchBody(source)
-        .andThen((body): AppResult<Record<string, unknown>, DryRunError> => {
-            const [sample] = toSampleRecords(body);
-            return sample === undefined
-                ? err(noSampleRecords())
-                : applyMapping(mapping, sample);
-        });
+  return connector
+    .fetchBody(source)
+    .andThen((body): AppResult<Record<string, unknown>, DryRunError> => {
+      const [sample] = toSampleRecords(body);
+      return sample === undefined ? err(noSampleRecords()) : applyMapping(mapping, sample);
+    });
 }

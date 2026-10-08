@@ -5,7 +5,6 @@ import type { Locale, Namespace } from '@i18n';
 
 import { getLocale, getMessages, getTimeZone } from '@i18n/server';
 
-
 import { serverEnv } from '@lib/config';
 import { pick, unique } from '@lib/utils';
 
@@ -40,10 +39,7 @@ export async function I18nProvider({
   return (
     <I18nClientProvider
       locale={locale}
-      messages={pick(
-        messages,
-        unique([...CLIENT_SHELL_NAMESPACES, ...namespaces])
-      )}
+      messages={pick(messages, unique([...CLIENT_SHELL_NAMESPACES, ...namespaces]))}
       timeZone={timeZone}
       isDevelopment={serverEnv.NODE_ENV !== 'production'}
     >

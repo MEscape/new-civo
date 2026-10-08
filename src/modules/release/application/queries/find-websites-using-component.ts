@@ -27,7 +27,7 @@ export class FindWebsitesUsingComponent {
   constructor(private readonly deps: ReleaseDependencies) {}
 
   execute(
-    input: FindWebsitesUsingComponentInput
+    input: FindWebsitesUsingComponentInput,
   ): AppResultAsync<readonly ComponentUsageView[], FindUsagesError> {
     const componentType = trimToNull(input.componentType);
 
@@ -36,19 +36,15 @@ export class FindWebsitesUsingComponent {
       .andThen((actor) =>
         componentType === null
           ? okAsync([])
-          : this.deps.releases.listPublishedDependencies(
-              actor.tenantId,
-              MAX_SCANNED_WEBSITES
-            )
+          : this.deps.releases.listPublishedDependencies(actor.tenantId, MAX_SCANNED_WEBSITES),
       )
       .map((published) =>
         published.flatMap((entry) => {
           const dependency = entry.dependencies.find(
-            (candidate) => candidate.type === componentType
+            (candidate) => candidate.type === componentType,
           );
           const matchesVersion =
-            input.version === undefined ||
-            dependency?.version === input.version;
+            input.version === undefined || dependency?.version === input.version;
           if (dependency === undefined || !matchesVersion) {
             return [];
           }
@@ -59,7 +55,7 @@ export class FindWebsitesUsingComponent {
               componentVersion: dependency.version,
             },
           ];
-        })
+        }),
       );
   }
 }

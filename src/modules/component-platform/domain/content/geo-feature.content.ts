@@ -10,13 +10,7 @@ import {
 import { CONTENT_LIMITS as LIMITS } from './content-limits';
 import { defineContent } from './define-content';
 import { sampleInstant } from './sample-instant';
-import {
-  label,
-  optionalLinkTarget,
-  recordId,
-  shortText,
-  title,
-} from './shared-fields';
+import { label, optionalLinkTarget, recordId, shortText, title } from './shared-fields';
 
 /**
  * One located thing on a map: a point, a line or an area. The contract is
@@ -31,7 +25,7 @@ import {
  */
 /** Sample positions are written as named longitude/latitude pairs; GeoJSON wants `[lng, lat]`. */
 function positions(
-  points: ReadonlyArray<{ readonly lng: number; readonly lat: number }>
+  points: ReadonlyArray<{ readonly lng: number; readonly lat: number }>,
 ): Array<[number, number]> {
   return points.map(({ lng, lat }) => [lng, lat]);
 }
@@ -40,10 +34,7 @@ export const geoFeatureContent = defineContent({
   shape: {
     id: recordId(),
     name: title(),
-    geometry: withFallback(
-      optional(opaqueRecord({ maxNodes: LIMITS.geometryNodes })),
-      undefined
-    ),
+    geometry: withFallback(optional(opaqueRecord({ maxNodes: LIMITS.geometryNodes })), undefined),
     latitude: optional(number({ min: -90, max: 90 })),
     longitude: optional(number({ min: -180, max: 180 })),
     category: label(),
@@ -59,9 +50,9 @@ export const geoFeatureContent = defineContent({
           maxEntries: LIMITS.propertyEntries,
           maxKeyLength: LIMITS.propertyKey,
           maxTextLength: LIMITS.label,
-        })
+        }),
       ),
-      undefined
+      undefined,
     ),
   },
   rule: {

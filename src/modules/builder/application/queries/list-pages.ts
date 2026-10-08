@@ -2,14 +2,10 @@ import type { AuthorizationError } from '@modules/auth';
 
 import type { InfrastructureAppError, ValidationAppError } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
-import {clamp, isDefined} from '@lib/utils';
+import { clamp, isDefined } from '@lib/utils';
 
 import { parseWebsiteId } from '../../domain/models/ids';
-import {
-  DEFAULT_PAGE_LIST_LIMIT,
-  MAX_PAGE_LIST_LIMIT,
-  MIN_PAGE_LIST_LIMIT,
-} from '../list-limits';
+import { DEFAULT_PAGE_LIST_LIMIT, MAX_PAGE_LIST_LIMIT, MIN_PAGE_LIST_LIMIT } from '../list-limits';
 import { toPageSummaryView } from '../page-view-mappers';
 
 import type { ListPagesInput, PageSummaryView } from '../contracts/page-views';
@@ -24,7 +20,7 @@ export class ListPages {
   constructor(private readonly deps: PageAccessDependencies) {}
 
   execute(
-    input: ListPagesInput
+    input: ListPagesInput,
   ): AppResultAsync<
     readonly PageSummaryView[],
     AuthorizationError | ValidationAppError | InfrastructureAppError
@@ -39,8 +35,8 @@ export class ListPages {
       .requireInTenant('page.read')
       .andThen((actor) =>
         parseWebsiteId(input.websiteId).asyncAndThen((websiteId) =>
-          this.deps.pages.listByWebsite(websiteId, actor.tenantId, limit)
-        )
+          this.deps.pages.listByWebsite(websiteId, actor.tenantId, limit),
+        ),
       )
       .map((summaries) => summaries.map(toPageSummaryView));
   }

@@ -36,11 +36,7 @@ export interface ServiceFinderClientProps {
   readonly labels: ServiceFinderLabels;
 }
 
-function matches(
-  service: ServiceFinderItem,
-  query: string,
-  category: string
-): boolean {
+function matches(service: ServiceFinderItem, query: string, category: string): boolean {
   if (category !== '' && service.category !== category) {
     return false;
   }
@@ -50,10 +46,7 @@ function matches(
   return (
     service.title.toLowerCase().includes(query) ||
     (service.description?.toLowerCase().includes(query) ?? false) ||
-    (service.keywords?.some((keyword) =>
-      keyword.toLowerCase().includes(query)
-    ) ??
-      false)
+    (service.keywords?.some((keyword) => keyword.toLowerCase().includes(query)) ?? false)
   );
 }
 
@@ -91,13 +84,11 @@ export function ServiceFinderClient({
     new Set(
       services
         .map((service) => service.category)
-        .filter((value): value is string => value !== undefined && value !== '')
-    )
+        .filter((value): value is string => value !== undefined && value !== ''),
+    ),
   );
   const normalizedQuery = query.trim().toLowerCase();
-  const filtered = services.filter((service) =>
-    matches(service, normalizedQuery, category)
-  );
+  const filtered = services.filter((service) => matches(service, normalizedQuery, category));
 
   return (
     <div className="flex flex-col gap-6">
@@ -164,9 +155,7 @@ export function ServiceFinderClient({
                     {service.title}
                   </p>
                   {service.description !== undefined && (
-                    <p className="mt-0.5 text-sm text-copy-muted">
-                      {service.description}
-                    </p>
+                    <p className="mt-0.5 text-sm text-copy-muted">{service.description}</p>
                   )}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {service.department !== undefined && (

@@ -20,22 +20,13 @@ export interface FeatureDetailsProps {
 }
 
 /** Attributes shown first, in this order; everything else follows in data order. */
-const LEADING_ATTRIBUTES = [
-  'status',
-  'category',
-  'value',
-  'observedAt',
-] as const;
+const LEADING_ATTRIBUTES = ['status', 'category', 'value', 'observedAt'] as const;
 
-function orderedAttributes(
-  feature: MapFeature
-): Array<[string, string | number | boolean]> {
+function orderedAttributes(feature: MapFeature): Array<[string, string | number | boolean]> {
   const entries = Object.entries(feature.attributes);
-  const leading = LEADING_ATTRIBUTES.flatMap((key) =>
-    entries.filter(([name]) => name === key)
-  );
+  const leading = LEADING_ATTRIBUTES.flatMap((key) => entries.filter(([name]) => name === key));
   const rest = entries.filter(
-    ([name]) => !(LEADING_ATTRIBUTES as readonly string[]).includes(name)
+    ([name]) => !(LEADING_ATTRIBUTES as readonly string[]).includes(name),
   );
   return [...leading, ...rest];
 }
@@ -65,9 +56,7 @@ export function FeatureDetails({ feature, onClose }: FeatureDetailsProps) {
       }}
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-heading text-lg font-semibold text-copy">
-          {feature.label}
-        </h3>
+        <h3 className="font-heading text-lg font-semibold text-copy">{feature.label}</h3>
         <Button
           type="button"
           variant="ghost"
@@ -90,9 +79,7 @@ export function FeatureDetails({ feature, onClose }: FeatureDetailsProps) {
                 <dt className="text-copy-muted">{label(key)}</dt>
                 <dd className="text-copy">
                   {format(value)}
-                  {key === 'value' && typeof unit === 'string'
-                    ? ` ${unit}`
-                    : ''}
+                  {key === 'value' && typeof unit === 'string' ? ` ${unit}` : ''}
                 </dd>
               </div>
             ))}
@@ -101,10 +88,7 @@ export function FeatureDetails({ feature, onClose }: FeatureDetailsProps) {
       {feature.href !== undefined && (
         <Link
           href={feature.href}
-          className={cn(
-            buttonVariants({ variant: 'outline', size: 'sm' }),
-            'mt-4'
-          )}
+          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'mt-4')}
           aria-label={t('details.openLink', { name: feature.label })}
         >
           <ExternalLink aria-hidden="true" />

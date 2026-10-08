@@ -31,12 +31,9 @@ describe('isRelativePath', () => {
     expect(isRelativePath('/news')).toBe(true);
   });
 
-  it.each(['//evil.com', 'https://evil.com', '/\\evil.com', 'news'])(
-    'rejects %s',
-    (value) => {
-      expect(isRelativePath(value)).toBe(false);
-    }
-  );
+  it.each(['//evil.com', 'https://evil.com', '/\\evil.com', 'news'])('rejects %s', (value) => {
+    expect(isRelativePath(value)).toBe(false);
+  });
 });
 
 describe('trailing slash helpers', () => {
@@ -62,9 +59,7 @@ describe('joinPath', () => {
 
 describe('buildQueryString', () => {
   it('skips null and undefined and repeats array keys', () => {
-    expect(
-      buildQueryString({ a: 1, b: undefined, c: null, d: ['x', 'y'] })
-    ).toBe('?a=1&d=x&d=y');
+    expect(buildQueryString({ a: 1, b: undefined, c: null, d: ['x', 'y'] })).toBe('?a=1&d=x&d=y');
   });
 
   it('returns an empty string when no params remain', () => {
@@ -72,8 +67,6 @@ describe('buildQueryString', () => {
   });
 
   it('stringifies booleans and numbers', () => {
-    expect(buildQueryString({ active: true, count: 0 })).toBe(
-      '?active=true&count=0'
-    );
+    expect(buildQueryString({ active: true, count: 0 })).toBe('?active=true&count=0');
   });
 });

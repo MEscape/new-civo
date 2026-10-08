@@ -11,4 +11,5 @@ Rules define what is allowed. Conventions define how recurring tasks are perform
 When working on a recurring task, read the relevant convention and follow its checklist. Do not restate or invent project rules. If documentation conflicts, the rules win and the documentation must be corrected.
 
 ## Semantic Discovery Protocol
-* Always execute the `jg` (`jevgrep`) command line tool over basic file grepping or brute-force code searches when locating specific files, functions, or architectural logic based on natural language intent.
+
+- Always execute the `jg` (`jevgrep`) command line tool over basic file grepping or brute-force code searches when locating specific files, functions, or architectural logic based on natural language intent.

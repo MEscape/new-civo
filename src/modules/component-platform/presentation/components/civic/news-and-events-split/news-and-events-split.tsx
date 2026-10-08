@@ -1,14 +1,5 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { getAppFormatters, getTranslations } from '@i18n/server';
 
@@ -59,8 +50,7 @@ export async function NewsAndEventsSplit({
       limit: props.eventsLimit,
     }),
   ]);
-  const heading =
-    trimToNull(props.heading) ?? t('newsAndEventsSplit.defaultHeading');
+  const heading = trimToNull(props.heading) ?? t('newsAndEventsSplit.defaultHeading');
 
   if (newsResult.isErr() && eventsResult.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -81,9 +71,7 @@ export async function NewsAndEventsSplit({
               {t('newsAndEventsSplit.newsHeading')}
             </h3>
             {newsResult.isErr() ? (
-              <p className="text-sm text-copy-muted">
-                {t('render.sectionUnavailable')}
-              </p>
+              <p className="text-sm text-copy-muted">{t('render.sectionUnavailable')}</p>
             ) : (
               <>
                 <ContentOriginBadge origin={newsResult.value.origin} />
@@ -93,9 +81,7 @@ export async function NewsAndEventsSplit({
                       <Card>
                         <CardHeader>
                           {item.category !== undefined && (
-                            <p className="text-xs font-medium text-accent-copy">
-                              {item.category}
-                            </p>
+                            <p className="text-xs font-medium text-accent-copy">{item.category}</p>
                           )}
                           <CardTitle>{item.title}</CardTitle>
                           {item.excerpt !== undefined && (
@@ -115,9 +101,7 @@ export async function NewsAndEventsSplit({
               {t('newsAndEventsSplit.eventsHeading')}
             </h3>
             {eventsResult.isErr() ? (
-              <p className="text-sm text-copy-muted">
-                {t('render.sectionUnavailable')}
-              </p>
+              <p className="text-sm text-copy-muted">{t('render.sectionUnavailable')}</p>
             ) : (
               <>
                 <ContentOriginBadge origin={eventsResult.value.origin} />
@@ -136,9 +120,7 @@ export async function NewsAndEventsSplit({
                             <div>
                               <CardTitle>{event.title}</CardTitle>
                               {event.location !== undefined && (
-                                <p className="mt-1 text-xs text-copy-muted">
-                                  {event.location}
-                                </p>
+                                <p className="mt-1 text-xs text-copy-muted">{event.location}</p>
                               )}
                             </div>
                           </div>

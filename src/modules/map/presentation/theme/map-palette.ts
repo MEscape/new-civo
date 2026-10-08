@@ -3,7 +3,6 @@ import { toHexColor } from '@lib/utils';
 import type { PALETTE_SIZE } from '../../application/contracts/map-constraints';
 import type { ResolvedPalette } from '../mapbox/mapbox-layers';
 
-
 /**
  * The design system's chart tokens (see `globals.css`), by palette slot. DOM
  * elements such as legend swatches use these directly; the Mapbox canvas

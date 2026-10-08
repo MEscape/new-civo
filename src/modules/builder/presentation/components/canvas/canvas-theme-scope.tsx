@@ -16,11 +16,7 @@ export interface CanvasThemeScopeProps {
  * CSS custom properties on a wrapper. The values come from stored data, so
  * inline style is the mechanism here, not a shortcut.
  */
-export function CanvasThemeScope({
-  themeStyle,
-  className,
-  children,
-}: CanvasThemeScopeProps) {
+export function CanvasThemeScope({ themeStyle, className, children }: CanvasThemeScopeProps) {
   return (
     <div
       style={{ ...themeStyle, fontFamily: 'var(--civo-font-body)' }}

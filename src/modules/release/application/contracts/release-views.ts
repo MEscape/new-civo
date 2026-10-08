@@ -1,9 +1,6 @@
 import type { ConflictResolutionsInput } from '../../domain/models/conflict-resolution';
 import type { MigrationStatus } from '../../domain/models/migration';
-import type {
-  NodeMigrationPlan,
-  NodeStatusCounts,
-} from '../../domain/models/migration-plan';
+import type { NodeMigrationPlan, NodeStatusCounts } from '../../domain/models/migration-plan';
 import type { PageOutcome } from '../../domain/models/page-draft';
 import type { ReleaseStatus } from '../../domain/models/release';
 import type {
@@ -83,12 +80,7 @@ export interface FindWebsitesUsingComponentInput {
  * Migrations: bringing a published release's components up to today's
  * versions, as new drafts. Same module, same views file.
  */
-export type {
-  ConflictResolutionsInput,
-  MigrationStatus,
-  PageOutcome,
-  FieldConflict,
-};
+export type { ConflictResolutionsInput, MigrationStatus, PageOutcome, FieldConflict };
 
 /** Plain, serializable and fully resolved, as consumers see it. */
 export type NodeMigrationView = NodeMigrationPlan;

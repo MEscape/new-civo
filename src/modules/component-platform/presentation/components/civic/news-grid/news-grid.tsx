@@ -1,15 +1,5 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { getTranslations } from '@i18n/server';
 
@@ -31,11 +21,7 @@ export interface NewsGridComponentProps {
 }
 
 /** The latest news of a bound dataset. */
-export async function NewsGrid({
-  props,
-  context,
-  loadContent,
-}: NewsGridComponentProps) {
+export async function NewsGrid({ props, context, loadContent }: NewsGridComponentProps) {
   const [t, result] = await Promise.all([
     getTranslations('componentPlatform'),
     loadContent({
@@ -68,22 +54,14 @@ export async function NewsGrid({
               <Card className="h-full overflow-hidden">
                 {item.imageUrl !== undefined && (
                   // eslint-disable-next-line @next/next/no-img-element -- the URL comes from municipal content on any host; next/image would need each host allow-listed
-                  <img
-                    src={item.imageUrl}
-                    alt=""
-                    className="h-40 w-full object-cover"
-                  />
+                  <img src={item.imageUrl} alt="" className="h-40 w-full object-cover" />
                 )}
                 <CardHeader>
                   {item.category !== undefined && (
-                    <p className="text-xs font-medium text-accent-copy">
-                      {item.category}
-                    </p>
+                    <p className="text-xs font-medium text-accent-copy">{item.category}</p>
                   )}
                   <CardTitle>{item.title}</CardTitle>
-                  {item.excerpt !== undefined && (
-                    <CardDescription>{item.excerpt}</CardDescription>
-                  )}
+                  {item.excerpt !== undefined && <CardDescription>{item.excerpt}</CardDescription>}
                 </CardHeader>
               </Card>
             </li>

@@ -42,9 +42,7 @@ export function isWithinDepthLimit(depth: number): boolean {
 export type PageNodeProps = Readonly<Record<string, JsonValue>>;
 
 /** A prop edit: `undefined` removes the key (clearing a field), anything else sets it. */
-export type PageNodePropsPatch = Readonly<
-  Record<string, JsonValue | undefined>
->;
+export type PageNodePropsPatch = Readonly<Record<string, JsonValue | undefined>>;
 
 /**
  * One node of a page. `type` names a component in the catalog; whether the
@@ -108,12 +106,16 @@ class NodeForestParser {
         ? []
         : this.parseChildren(raw['children'], fieldPath(path, 'children'), depth + 1);
 
-    if (id === null || type === null || props === null) {return null;}
+    if (id === null || type === null || props === null) {
+      return null;
+    }
     return { id, type, props, children };
   }
 
   private reportNodeLimitOnce(path: string): void {
-    if (this.hasReportedNodeLimit) {return;}
+    if (this.hasReportedNodeLimit) {
+      return;
+    }
     this.hasReportedNodeLimit = true;
     this.bag.add(path, CODES.nodeLimitExceeded);
   }
@@ -149,10 +151,7 @@ class NodeForestParser {
       return null;
     }
     this.contentLength += jsonWeight(value);
-    if (
-      this.contentLength > PAGE_TREE_LIMITS.maxContentLength &&
-      !this.hasReportedSizeLimit
-    ) {
+    if (this.contentLength > PAGE_TREE_LIMITS.maxContentLength && !this.hasReportedSizeLimit) {
       this.hasReportedSizeLimit = true;
       this.bag.add(path, CODES.configTooLarge);
     }
@@ -167,7 +166,7 @@ class NodeForestParser {
 export function parseNodeForest(
   raw: unknown,
   path: string,
-  bag: FieldErrorBag
+  bag: FieldErrorBag,
 ): readonly PageNode[] {
   return new NodeForestParser(bag).parseChildren(raw, path, 0);
 }

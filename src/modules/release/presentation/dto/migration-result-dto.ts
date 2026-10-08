@@ -42,9 +42,7 @@ export interface ApplyMigrationResultDto {
  * Converts the application-layer apply result into the JSON-safe DTO returned
  * by the apply-migration Server Action.
  */
-export function toApplyMigrationResultDto(
-  view: ApplyMigrationResultView
-): ApplyMigrationResultDto {
+export function toApplyMigrationResultDto(view: ApplyMigrationResultView): ApplyMigrationResultDto {
   return {
     migrationId: view.migrationId,
     websiteId: view.websiteId,

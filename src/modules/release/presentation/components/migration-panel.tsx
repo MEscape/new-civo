@@ -2,8 +2,6 @@
 
 import { useId, useState, useTransition } from 'react';
 
-
-
 import { FieldMessage } from '@components/shared/field-message';
 import { Alert, AlertDescription } from '@components/ui/alert';
 import { Button } from '@components/ui/button';
@@ -88,9 +86,7 @@ export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
           <h2 id={`${id}-title`} className="text-xl font-semibold text-copy">
             {t('migration.panel.title')}
           </h2>
-          <p className="text-sm text-copy-muted">
-            {t('migration.panel.description')}
-          </p>
+          <p className="text-sm text-copy-muted">{t('migration.panel.description')}</p>
         </div>
 
         <FieldMessage
@@ -101,9 +97,7 @@ export function MigrationPanel({ websiteId, history }: MigrationPanelProps) {
 
         <Button type="button" disabled={isPending} onClick={handleCheck}>
           {isPending && <Spinner className="mr-2" aria-hidden="true" />}
-          {isPending
-            ? t('migration.panel.checking')
-            : t('migration.panel.check')}
+          {isPending ? t('migration.panel.checking') : t('migration.panel.check')}
         </Button>
 
         {proposal?.plan.isUpToDate === true && (

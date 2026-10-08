@@ -2,7 +2,6 @@
 
 import { useId, useState, useTransition } from 'react';
 
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -23,7 +22,11 @@ import {
   THEME_SPACING_SCALES,
 } from '../../application/contracts/website-constraints';
 import { updateWebsiteThemeAction } from '../actions/update-website-theme-action';
-import { RADIUS_MESSAGE_KEYS, SPACING_MESSAGE_KEYS, messageKeyForCode } from '../messages/message-keys';
+import {
+  RADIUS_MESSAGE_KEYS,
+  SPACING_MESSAGE_KEYS,
+  messageKeyForCode,
+} from '../messages/message-keys';
 import { themeSettingsSchema } from '../schemas/theme-settings-schema';
 import { toPreviewTheme } from '../theme/preview-theme';
 
@@ -38,10 +41,7 @@ export interface ThemeSettingsFormProps {
   readonly initialTheme: WebsiteThemeView;
 }
 
-export function ThemeSettingsForm({
-  websiteId,
-  initialTheme,
-}: ThemeSettingsFormProps) {
+export function ThemeSettingsForm({ websiteId, initialTheme }: ThemeSettingsFormProps) {
   const t = useTranslations('website');
   /** A field's error code as text in this module's language; `undefined` while the field is valid. */
   const errorText = (code: string | undefined) =>
@@ -58,10 +58,7 @@ export function ThemeSettingsForm({
     defaultValues: initialTheme,
   });
   const { errors, isDirty } = form.formState;
-  const previewTheme = toPreviewTheme(
-    useWatch({ control: form.control }),
-    initialTheme
-  );
+  const previewTheme = toPreviewTheme(useWatch({ control: form.control }), initialTheme);
 
   // Derived, not stored: the confirmation disappears as soon as the user edits again.
   const showSaved = hasSaved && !isDirty;
@@ -87,10 +84,7 @@ export function ThemeSettingsForm({
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
       <section aria-labelledby={`${id}-title`}>
-        <h2
-          id={`${id}-title`}
-          className="mb-6 text-xl font-semibold text-copy"
-        >
+        <h2 id={`${id}-title`} className="mb-6 text-xl font-semibold text-copy">
           {t('themeSettings.title')}
         </h2>
         <form
@@ -100,9 +94,7 @@ export function ThemeSettingsForm({
           className="space-y-6 rounded-token border border-border bg-surface p-6"
         >
           <fieldset className="space-y-4">
-            <legend className="text-sm font-medium text-copy">
-              {t('themeSettings.colors')}
-            </legend>
+            <legend className="text-sm font-medium text-copy">{t('themeSettings.colors')}</legend>
             <div className="grid grid-cols-3 gap-4">
               <ColorField
                 control={form.control}
@@ -155,9 +147,7 @@ export function ThemeSettingsForm({
           </fieldset>
 
           <fieldset className="space-y-4">
-            <legend className="text-sm font-medium text-copy">
-              {t('themeSettings.layout')}
-            </legend>
+            <legend className="text-sm font-medium text-copy">{t('themeSettings.layout')}</legend>
             <div className="grid grid-cols-2 gap-4">
               <SelectField
                 id={`${id}-radius`}
@@ -200,9 +190,7 @@ export function ThemeSettingsForm({
           )}
 
           <Button type="submit" disabled={isPending}>
-            {isPending
-              ? t('themeSettings.submitting')
-              : t('themeSettings.submit')}
+            {isPending ? t('themeSettings.submitting') : t('themeSettings.submit')}
           </Button>
         </form>
       </section>

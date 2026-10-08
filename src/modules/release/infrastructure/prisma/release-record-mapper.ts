@@ -12,13 +12,11 @@ import { releaseSnapshotCorrupted } from '../../domain/errors/release-errors';
 import { toReleaseId, toWebsiteId } from '../../domain/models/ids';
 import { RELEASE_SNAPSHOT_SCHEMA_VERSION } from '../../domain/models/release-snapshot';
 
+import type { Release, ReleaseStatus, ReleaseSummary } from '../../domain/models/release';
 import type {
-  Release,
-  ReleaseStatus,
-  ReleaseSummary,
-} from '../../domain/models/release';
-import type { ReleaseComponentDependency, ReleaseSnapshot } from '../../domain/models/release-snapshot';
-
+  ReleaseComponentDependency,
+  ReleaseSnapshot,
+} from '../../domain/models/release-snapshot';
 
 /**
  * Persistence shapes. They mirror the columns the module reads and
@@ -38,7 +36,9 @@ export interface ReleaseRecord extends ReleaseSummaryRecord {
   readonly snapshot: unknown;
 }
 
-const pageConfigSchema = z.custom<Readonly<Record<string, JsonValue>>>((value) => isJsonRecord(value));
+const pageConfigSchema = z.custom<Readonly<Record<string, JsonValue>>>((value) =>
+  isJsonRecord(value),
+);
 
 const dependencySchema = z.object({
   type: z.string(),
@@ -77,7 +77,9 @@ export type StoredReleaseSnapshot = z.infer<typeof storedReleaseSnapshotSchema>;
 /** Only the dependency records of a stored snapshot; a snapshot without valid ones has none worth reporting. */
 const storedDependenciesSchema = z.object({ dependencies: z.array(dependencySchema) });
 
-export function toStoredDependencies(snapshot: unknown): readonly ReleaseComponentDependency[] | null {
+export function toStoredDependencies(
+  snapshot: unknown,
+): readonly ReleaseComponentDependency[] | null {
   const parsed = storedDependenciesSchema.safeParse(snapshot);
   return parsed.success ? parsed.data.dependencies : null;
 }
@@ -161,9 +163,7 @@ function toSnapshot(stored: StoredReleaseSnapshot): ReleaseSnapshot {
 }
 
 /** The inverse of `toSnapshot`: the flat shape that is written to the JSON column. */
-export function toStoredSnapshot(
-  snapshot: ReleaseSnapshot
-): StoredReleaseSnapshot {
+export function toStoredSnapshot(snapshot: ReleaseSnapshot): StoredReleaseSnapshot {
   return {
     schemaVersion: snapshot.schemaVersion,
     website: { ...snapshot.website },
@@ -189,9 +189,7 @@ export function toStoredSnapshot(
  * that fails is corrupted (or from a schema version this build does not
  * understand) and must never be partially rendered.
  */
-export function toRelease(
-  record: ReleaseRecord
-): AppResult<Release, UnexpectedAppError> {
+export function toRelease(record: ReleaseRecord): AppResult<Release, UnexpectedAppError> {
   const parsed = storedReleaseSnapshotSchema.safeParse(record.snapshot);
   return parsed.success
     ? ok({ ...toReleaseSummary(record), snapshot: toSnapshot(parsed.data) })

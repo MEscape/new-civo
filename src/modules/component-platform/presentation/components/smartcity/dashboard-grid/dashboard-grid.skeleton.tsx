@@ -1,10 +1,6 @@
 import { Card, CardContent } from '@components/ui/card';
 
-import {
-  CardGridSkeleton,
-  ChartSkeleton,
-  SectionSkeleton,
-} from '../../shared/skeleton-blocks';
+import { CardGridSkeleton, ChartSkeleton, SectionSkeleton } from '../../shared/skeleton-blocks';
 
 export function DashboardGridSkeleton() {
   return (

@@ -114,17 +114,13 @@ function mergeField(versions: FieldVersions): FieldMerge {
 export function threeWayMergeProps(
   base: NodeProps,
   local: NodeProps,
-  next: NodeProps
+  next: NodeProps,
 ): ThreeWayMergeResult {
   const merged: Record<string, JsonValue> = {};
   const conflicts: FieldConflict[] = [];
   const addedFields: string[] = [];
 
-  const keys = unique([
-    ...Object.keys(base),
-    ...Object.keys(local),
-    ...Object.keys(next),
-  ]);
+  const keys = unique([...Object.keys(base), ...Object.keys(local), ...Object.keys(next)]);
 
   for (const key of keys) {
     const outcome = mergeField({

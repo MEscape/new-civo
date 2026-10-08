@@ -1,4 +1,4 @@
-import type { ValidationAppError , FieldErrorBag } from '@lib/errors';
+import type { ValidationAppError, FieldErrorBag } from '@lib/errors';
 import { fieldPath } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
@@ -14,12 +14,7 @@ const CODES = WEBSITE_VALIDATION_CODES;
  * matching loaded font and a CSS stack in presentation (`theme-css.ts`,
  * which is typed `Record<ThemeFontFamily, ...>` so a gap fails to compile).
  */
-export const THEME_FONT_FAMILIES = [
-  'Source Serif 4',
-  'Inter',
-  'DM Sans',
-  'Geist',
-] as const;
+export const THEME_FONT_FAMILIES = ['Source Serif 4', 'Inter', 'DM Sans', 'Geist'] as const;
 export type ThemeFontFamily = (typeof THEME_FONT_FAMILIES)[number];
 
 /** Body copy excludes the serif display face. */
@@ -33,11 +28,7 @@ export type BodyFontFamily = (typeof BODY_FONT_FAMILIES)[number];
 export const THEME_RADII = ['none', 'sm', 'md', 'lg'] as const;
 export type ThemeRadius = (typeof THEME_RADII)[number];
 
-export const THEME_SPACING_SCALES = [
-  'compact',
-  'comfortable',
-  'spacious',
-] as const;
+export const THEME_SPACING_SCALES = ['compact', 'comfortable', 'spacious'] as const;
 export type ThemeSpacingScale = (typeof THEME_SPACING_SCALES)[number];
 
 export const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
@@ -113,19 +104,19 @@ interface Rejection {
 function narrow<T extends string>(
   value: string,
   guard: (candidate: string) => candidate is T,
-  { path, code, bag }: Rejection
+  { path, code, bag }: Rejection,
 ): T | null {
-  if (guard(value)) {return value;}
+  if (guard(value)) {
+    return value;
+  }
   bag.add(path, code);
   return null;
 }
 
-function checkColor(
-  value: string,
-  path: string,
-  bag: FieldErrorBag
-): string | null {
-  if (HEX_COLOR_PATTERN.test(value)) {return value;}
+function checkColor(value: string, path: string, bag: FieldErrorBag): string | null {
+  if (HEX_COLOR_PATTERN.test(value)) {
+    return value;
+  }
   bag.add(path, CODES.colorInvalid);
   return null;
 }
@@ -135,7 +126,7 @@ function checkColor(
  * This is the only way new theme values enter the system.
  */
 export function createWebsiteTheme(
-  input: WebsiteThemeInput
+  input: WebsiteThemeInput,
 ): AppResult<WebsiteTheme, ValidationAppError> {
   const bag = createWebsiteErrorBag();
 
@@ -191,7 +182,7 @@ function colorOr(value: string | null | undefined, fallback: string): string {
 function valueOr<T extends string>(
   value: string | null | undefined,
   guard: (candidate: string) => candidate is T,
-  fallback: T
+  fallback: T,
 ): T {
   return isDefined(value) && guard(value) ? value : fallback;
 }
@@ -201,9 +192,7 @@ function valueOr<T extends string>(
  * field. Unlike `createWebsiteTheme` this never fails: a row saved before
  * a font was removed from the curated list must still render.
  */
-export function restoreWebsiteTheme(
-  stored: StoredWebsiteTheme | null | undefined
-): WebsiteTheme {
+export function restoreWebsiteTheme(stored: StoredWebsiteTheme | null | undefined): WebsiteTheme {
   const fallback = DEFAULT_WEBSITE_THEME;
   const { colors = {}, typography = {}, radius, spacingScale } = stored ?? {};
   return {
@@ -213,7 +202,11 @@ export function restoreWebsiteTheme(
       accent: colorOr(colors.accent, fallback.colors.accent),
     },
     typography: {
-      headingFont: valueOr(typography.headingFont, isThemeFontFamily, fallback.typography.headingFont),
+      headingFont: valueOr(
+        typography.headingFont,
+        isThemeFontFamily,
+        fallback.typography.headingFont,
+      ),
       bodyFont: valueOr(typography.bodyFont, isBodyFontFamily, fallback.typography.bodyFont),
     },
     radius: valueOr(radius, isThemeRadius, fallback.radius),

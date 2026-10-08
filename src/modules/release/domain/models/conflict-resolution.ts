@@ -56,10 +56,7 @@ export interface ConflictResolutionInput {
 }
 
 export type ConflictResolutionsInput = Readonly<
-  Record<
-    string,
-    Readonly<Record<string, Readonly<Record<string, ConflictResolutionInput>>>>
-  >
+  Record<string, Readonly<Record<string, Readonly<Record<string, ConflictResolutionInput>>>>>
 >;
 
 const HOME_PAGE_FIELD = 'home';
@@ -79,17 +76,13 @@ function conflictsOf(plan: MigrationPlan): ConflictsByPage {
             ? [
                 [
                   node.nodeId,
-                  new Map(
-                    node.conflicts.map(
-                      (conflict) => [conflict.key, conflict] as const
-                    )
-                  ),
+                  new Map(node.conflicts.map((conflict) => [conflict.key, conflict] as const)),
                 ] as const,
               ]
-            : []
-        )
+            : [],
+        ),
       ),
-    ])
+    ]),
   );
 }
 
@@ -102,7 +95,7 @@ interface FieldReport {
 function parseResolution(
   input: ConflictResolutionInput,
   conflict: FieldConflict,
-  { field, bag }: FieldReport
+  { field, bag }: FieldReport,
 ): ConflictResolution | null {
   if (!isResolutionAction(input.action)) {
     bag.add(field, CODES.resolutionActionInvalid);
@@ -127,7 +120,7 @@ function parseResolution(
 function parseNodeResolutions(
   fields: Readonly<Record<string, ConflictResolutionInput>>,
   known: ConflictsByField,
-  { field: nodeField, bag }: FieldReport
+  { field: nodeField, bag }: FieldReport,
 ): NodeResolutions {
   const parsed: Record<string, ConflictResolution> = {};
 
@@ -149,7 +142,7 @@ function parseNodeResolutions(
 function parsePageResolutions(
   nodes: ConflictResolutionsInput[string],
   known: ConflictsByNode,
-  { field: pageField, bag }: FieldReport
+  { field: pageField, bag }: FieldReport,
 ): PageResolutions {
   const parsed: Record<string, NodeResolutions> = {};
 
@@ -175,17 +168,14 @@ function parsePageResolutions(
  */
 export function parseConflictResolutions(
   input: ConflictResolutionsInput,
-  plan: MigrationPlan
+  plan: MigrationPlan,
 ): AppResult<ConflictResolutions, ValidationAppError> {
   const bag = createReleaseValidationBag();
   const known = conflictsOf(plan);
   const parsed: Record<string, PageResolutions> = {};
 
   for (const [path, nodes] of Object.entries(input)) {
-    const field = fieldPath(
-      'resolutions',
-      path === '' ? HOME_PAGE_FIELD : path
-    );
+    const field = fieldPath('resolutions', path === '' ? HOME_PAGE_FIELD : path);
     const knownNodes = known.get(path);
     if (knownNodes === undefined) {
       bag.add(field, CODES.resolutionPageUnknown);
@@ -198,8 +188,6 @@ export function parseConflictResolutions(
 }
 
 /** The plain JSON form of the chosen resolutions, for the audit column. */
-export function serializeConflictResolutions(
-  resolutions: ConflictResolutions
-): JsonValue {
+export function serializeConflictResolutions(resolutions: ConflictResolutions): JsonValue {
   return toStoredJson(resolutions);
 }

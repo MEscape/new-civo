@@ -12,33 +12,31 @@ import type { FieldPath, FieldValues, UseFormSetError } from 'react-hook-form';
  * form-level message, or `null` when the error was placed on a field.
  */
 export function applyActionError<TValues extends FieldValues>(
-    error: SerializedActionError,
-    setError: UseFormSetError<TValues>,
-    codeFields: Readonly<Record<string, FieldPath<TValues>>> = {}
+  error: SerializedActionError,
+  setError: UseFormSetError<TValues>,
+  codeFields: Readonly<Record<string, FieldPath<TValues>>> = {},
 ): string | null {
-    const routedField = codeFields[error.code];
-    if (routedField !== undefined) {
-        setError(
-            routedField,
-            { type: 'server', message: error.code },
-            { shouldFocus: true }
-        );
-        return null;
+  const routedField = codeFields[error.code];
+  if (routedField !== undefined) {
+    setError(routedField, { type: 'server', message: error.code }, { shouldFocus: true });
+    return null;
+  }
+
+  const fieldEntries = Object.entries(error.fieldErrors ?? {}).filter(
+    ([path]) => path !== ROOT_FIELD,
+  );
+  fieldEntries.forEach(([path, codes], index) => {
+    const [first] = codes;
+    if (first === undefined) {
+      return;
     }
-
-    const fieldEntries = Object.entries(error.fieldErrors ?? {}).filter(
-        ([path]) => path !== ROOT_FIELD
+    // The server names fields by dotted path; react-hook-form cannot verify that at compile time.
+    setError(
+      path as FieldPath<TValues>,
+      { type: 'server', message: first },
+      { shouldFocus: index === 0 },
     );
-    fieldEntries.forEach(([path, codes], index) => {
-        const [first] = codes;
-        if (first === undefined) {return;}
-        // The server names fields by dotted path; react-hook-form cannot verify that at compile time.
-        setError(
-            path as FieldPath<TValues>,
-            { type: 'server', message: first },
-            { shouldFocus: index === 0 }
-        );
-    });
+  });
 
-    return fieldEntries.length > 0 ? null : error.code;
+  return fieldEntries.length > 0 ? null : error.code;
 }

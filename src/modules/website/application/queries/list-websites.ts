@@ -2,7 +2,7 @@ import type { AuthorizationError } from '@modules/auth';
 
 import type { InfrastructureAppError } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
-import {clamp, isDefined} from '@lib/utils';
+import { clamp, isDefined } from '@lib/utils';
 
 import {
   DEFAULT_WEBSITE_LIST_LIMIT,
@@ -23,11 +23,8 @@ export class ListWebsites {
   constructor(private readonly deps: WebsiteDependencies) {}
 
   execute(
-    options: ListWebsitesOptions = {}
-  ): AppResultAsync<
-    readonly WebsiteSummaryView[],
-    AuthorizationError | InfrastructureAppError
-  > {
+    options: ListWebsitesOptions = {},
+  ): AppResultAsync<readonly WebsiteSummaryView[], AuthorizationError | InfrastructureAppError> {
     const requested =
       isDefined(options.limit) && Number.isInteger(options.limit)
         ? options.limit
@@ -36,9 +33,7 @@ export class ListWebsites {
 
     return this.deps.authorization
       .requireInTenant('website.read')
-      .andThen((actor) =>
-        this.deps.websites.listByTenant(actor.tenantId, limit)
-      )
+      .andThen((actor) => this.deps.websites.listByTenant(actor.tenantId, limit))
       .map((summaries) => summaries.map(toWebsiteSummaryView));
   }
 }

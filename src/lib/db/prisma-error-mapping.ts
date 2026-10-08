@@ -1,17 +1,9 @@
-import {
-  isUniqueConstraintViolation,
-  SqlConnectionError,
-} from '@prisma/orm-family-sql/errors';
+import { isUniqueConstraintViolation, SqlConnectionError } from '@prisma/orm-family-sql/errors';
 
-import {
-  conflictError,
-  infrastructureError,
-  type AppError,
-} from '@lib/errors';
+import { conflictError, infrastructureError, type AppError } from '@lib/errors';
 import { logger } from '@lib/logger';
 
 const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
-
 
 /**
  * Returns the thrown value and its direct cause. The runtime may hand a
@@ -20,9 +12,7 @@ const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
  * chain.
  */
 function withCause(thrown: unknown): readonly unknown[] {
-  return thrown instanceof Error && thrown.cause !== undefined
-    ? [thrown, thrown.cause]
-    : [thrown];
+  return thrown instanceof Error && thrown.cause !== undefined ? [thrown, thrown.cause] : [thrown];
 }
 
 /**
@@ -61,7 +51,7 @@ function withCause(thrown: unknown): readonly unknown[] {
  */
 export function mapPrismaError(
   thrown: unknown,
-  context: { code: string; message: string }
+  context: { code: string; message: string },
 ): AppError {
   if (typeof thrown === 'object' && thrown !== null && 'kind' in thrown) {
     return thrown as AppError;

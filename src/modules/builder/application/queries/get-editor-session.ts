@@ -18,13 +18,12 @@ export class GetEditorSession {
   constructor(private readonly deps: PageDependencies) {}
 
   execute(pageId: string): AppResultAsync<EditorSessionView, LoadPageError> {
-    return loadAuthorizedPage(this.deps, pageId, 'page.update').map(
-      ({ actor, page }) =>
-        toEditorSessionView({
-          page,
-          editorMode: resolveEditorMode(actor),
-          catalog: this.deps.components,
-        })
+    return loadAuthorizedPage(this.deps, pageId, 'page.update').map(({ actor, page }) =>
+      toEditorSessionView({
+        page,
+        editorMode: resolveEditorMode(actor),
+        catalog: this.deps.components,
+      }),
     );
   }
 }

@@ -89,9 +89,7 @@ export const overrides = [
       'no-restricted-syntax': [
         'error',
         PROCESS_ENV,
-        ...UI_PRIMITIVES.filter(
-          (entry) => !entry.selector.includes("'button'")
-        ),
+        ...UI_PRIMITIVES.filter((entry) => !entry.selector.includes("'button'")),
       ],
     },
   },
@@ -103,8 +101,6 @@ export const overrides = [
     .map(([name, legacy]) => ({
       name: `legacy-module/${name}`,
       files: [`src/modules/${name}/**/*.{ts,tsx}`],
-      rules: Object.fromEntries(
-        (legacy.relax ?? []).map((rule) => [rule, 'off'])
-      ),
+      rules: Object.fromEntries((legacy.relax ?? []).map((rule) => [rule, 'off'])),
     })),
 ];

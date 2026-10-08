@@ -19,7 +19,9 @@ export function makeTree(files: Record<string, string>): string {
 }
 
 afterAll(() => {
-  for (const root of created) {rmSync(root, { recursive: true, force: true });}
+  for (const root of created) {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 export interface Violation {
@@ -30,5 +32,7 @@ export interface Violation {
 }
 
 export function describeViolations(violations: readonly Violation[]): string {
-  return violations.map((v) => `[${v.group ?? v.check}] ${v.file ?? ''}\n    ${v.message}`).join('\n');
+  return violations
+    .map((v) => `[${v.group ?? v.check}] ${v.file ?? ''}\n    ${v.message}`)
+    .join('\n');
 }

@@ -4,13 +4,7 @@ import { defineContent } from './define-content';
 import { sampleInstant } from './sample-instant';
 import { compareText, label, recordId } from './shared-fields';
 
-export const WASTE_TYPES = [
-  'restmuell',
-  'biomuell',
-  'papier',
-  'gelberSack',
-  'sperrmuell',
-] as const;
+export const WASTE_TYPES = ['restmuell', 'biomuell', 'papier', 'gelberSack', 'sperrmuell'] as const;
 
 const DATE_LENGTH = 10;
 
@@ -28,8 +22,7 @@ export const wasteCollectionEntryContent = defineContent({
     district: label(),
   },
   rule: {
-    isRelevant: (entry, now) =>
-      entry.date.slice(0, DATE_LENGTH) >= now.slice(0, DATE_LENGTH),
+    isRelevant: (entry, now) => entry.date.slice(0, DATE_LENGTH) >= now.slice(0, DATE_LENGTH),
     compare: (first, second) => compareText(first.date, second.date),
     categoryOf: (entry) => entry.district,
   },

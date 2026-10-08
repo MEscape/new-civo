@@ -110,13 +110,8 @@ describe('Database infrastructure adapter', () => {
 
       (db.close as any).mockRejectedValueOnce(error);
 
-      await expect(disconnectDb()).rejects.toThrow(
-        'Connection unexpectedly lost'
-      );
-      expect(dbLogger.error).toHaveBeenCalledWith(
-        'db.disconnect_failed',
-        error
-      );
+      await expect(disconnectDb()).rejects.toThrow('Connection unexpectedly lost');
+      expect(dbLogger.error).toHaveBeenCalledWith('db.disconnect_failed', error);
     });
   });
 });

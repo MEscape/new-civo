@@ -15,11 +15,9 @@ import { themeUpdateSchema } from '../schemas/theme-update-schema';
 
 import type { WebsiteDto } from '../dto/website-dto';
 
-export async function updateWebsiteThemeAction(
-  input: unknown
-): Promise<ActionResult<WebsiteDto>> {
-  const result = await parseWebsiteInput(themeUpdateSchema, input).asyncAndThen(
-    (command) => websiteCommands.updateWebsiteTheme.execute(command)
+export async function updateWebsiteThemeAction(input: unknown): Promise<ActionResult<WebsiteDto>> {
+  const result = await parseWebsiteInput(themeUpdateSchema, input).asyncAndThen((command) =>
+    websiteCommands.updateWebsiteTheme.execute(command),
   );
 
   if (result.isOk()) {

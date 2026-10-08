@@ -4,11 +4,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { getMessageFallback, type Locale } from '@i18n';
 
-import {
-  NextIntlClientProvider,
-  type AbstractIntlMessages,
-  type IntlError,
-} from '@i18n/client';
+import { NextIntlClientProvider, type AbstractIntlMessages, type IntlError } from '@i18n/client';
 
 import { noop } from '@lib/utils';
 

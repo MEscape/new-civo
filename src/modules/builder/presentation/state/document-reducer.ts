@@ -19,10 +19,7 @@ import {
   snapshotCommitted,
 } from './builder-actions';
 
-import type {
-  DocumentHistory,
-  PageConfig,
-} from '../../application/contracts/editor-model';
+import type { DocumentHistory, PageConfig } from '../../application/contracts/editor-model';
 import type { UnknownAction } from '@reduxjs/toolkit';
 
 export interface DocumentState {
@@ -57,7 +54,7 @@ const EMPTY_DOCUMENT_STATE = createDocumentState({
  */
 export function documentReducer(
   state: DocumentState = EMPTY_DOCUMENT_STATE,
-  action: UnknownAction
+  action: UnknownAction,
 ): DocumentState {
   if (snapshotCommitted.match(action)) {
     return { ...state, history: commitSnapshot(state.history, action.payload) };
@@ -77,10 +74,12 @@ export function documentReducer(
       history: selectNodeInHistory(state.history, action.payload),
     };
   }
-  if (editUndone.match(action))
-    {return { ...state, history: undoEdit(state.history) };}
-  if (editRedone.match(action))
-    {return { ...state, history: redoEdit(state.history) };}
+  if (editUndone.match(action)) {
+    return { ...state, history: undoEdit(state.history) };
+  }
+  if (editRedone.match(action)) {
+    return { ...state, history: redoEdit(state.history) };
+  }
   if (saveSucceeded.match(action)) {
     return {
       ...state,

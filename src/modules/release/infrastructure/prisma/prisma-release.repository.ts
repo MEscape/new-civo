@@ -32,11 +32,7 @@ import {
 
 import type { ReleaseRecord } from './release-record-mapper';
 import type { ReleaseId, WebsiteId } from '../../domain/models/ids';
-import type {
-  Release,
-  ReleaseHistory,
-  ReleaseSummary,
-} from '../../domain/models/release';
+import type { Release, ReleaseHistory, ReleaseSummary } from '../../domain/models/release';
 import type {
   Activation,
   NewRelease,
@@ -59,10 +55,10 @@ const persistenceLogger = logger.withContext({ module: MODULE });
  * A corrupted snapshot is an anomaly operations must see, so it is logged
  * here, where it is detected, with ids only.
  */
-function restore(
-  record: ReleaseRecord | null
-): AppResultAsync<Release | null, UnexpectedAppError> {
-  if (record === null) {return okAsync(null);}
+function restore(record: ReleaseRecord | null): AppResultAsync<Release | null, UnexpectedAppError> {
+  if (record === null) {
+    return okAsync(null);
+  }
 
   const restored = toRelease(record);
   if (restored.isErr()) {
@@ -92,23 +88,20 @@ function restore(
 export class PrismaReleaseRepository implements ReleaseRepository {
   findHistory(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<ReleaseHistory, InfrastructureAppError> {
-    return fromThrowableAsync(
-      async () => {
-        const website = await db.orm.public.Website.where({ id: websiteId })
-          .select('publishedReleaseId')
-          .first();
-        const records = await db.orm.public.WebsiteRelease.where({ websiteId })
-          .select(...RELEASE_SUMMARY_SELECT)
-          // The release number is unique per website, so the order is stable.
-          .orderBy([(r) => r.releaseNumber.desc()])
-          .limit(limit)
-          .all();
-        return [website, records] as const;
-      },
-      failures.infraOnly('findHistory')
-    ).map(([website, records]) => {
+    return fromThrowableAsync(async () => {
+      const website = await db.orm.public.Website.where({ id: websiteId })
+        .select('publishedReleaseId')
+        .first();
+      const records = await db.orm.public.WebsiteRelease.where({ websiteId })
+        .select(...RELEASE_SUMMARY_SELECT)
+        // The release number is unique per website, so the order is stable.
+        .orderBy([(r) => r.releaseNumber.desc()])
+        .limit(limit)
+        .all();
+      return [website, records] as const;
+    }, failures.infraOnly('findHistory')).map(([website, records]) => {
       const activeId = website?.publishedReleaseId ?? null;
       return {
         activeReleaseId: activeId === null ? null : toReleaseId(activeId),
@@ -117,34 +110,29 @@ export class PrismaReleaseRepository implements ReleaseRepository {
     });
   }
 
-  findById(
-    websiteId: WebsiteId,
-    id: ReleaseId
-  ): AppResultAsync<Release | null, ReleaseReadError> {
+  findById(websiteId: WebsiteId, id: ReleaseId): AppResultAsync<Release | null, ReleaseReadError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.WebsiteRelease.where({ id, websiteId })
           .select(...RELEASE_SELECT)
           .first(),
-      failures.infraOnly('findById')
+      failures.infraOnly('findById'),
     ).andThen(restore);
   }
 
-  findPublished(
-    websiteId: WebsiteId
-  ): AppResultAsync<Release | null, ReleaseReadError> {
+  findPublished(websiteId: WebsiteId): AppResultAsync<Release | null, ReleaseReadError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.Website.where({ id: websiteId })
           .include('publishedRelease', (r) => r.select(...RELEASE_SELECT))
           .first(),
-      failures.infraOnly('findPublished')
+      failures.infraOnly('findPublished'),
     ).andThen((website) => restore(website?.publishedRelease ?? null));
   }
 
   listPublishedDependencies(
     tenantId: TenantId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly PublishedDependencies[], InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
@@ -156,13 +144,17 @@ export class PrismaReleaseRepository implements ReleaseRepository {
           .orderBy([(w) => w.id.asc()])
           .limit(limit)
           .all(),
-      failures.infraOnly('listPublishedDependencies')
+      failures.infraOnly('listPublishedDependencies'),
     ).map((websites) =>
       websites.flatMap((website) => {
         const release = website.publishedRelease;
-        if (release === null) {return [];}
+        if (release === null) {
+          return [];
+        }
         const dependencies = toStoredDependencies(release.snapshot);
-        if (dependencies === null) {return [];}
+        if (dependencies === null) {
+          return [];
+        }
 
         return [
           {
@@ -171,12 +163,12 @@ export class PrismaReleaseRepository implements ReleaseRepository {
             dependencies,
           },
         ];
-      })
+      }),
     );
   }
 
   publish(
-    input: NewRelease
+    input: NewRelease,
   ): AppResultAsync<ReleaseSummary, ConflictAppError | InfrastructureAppError> {
     const { websiteId, snapshot, publishedAt } = input;
     const stored = toStoredSnapshot(snapshot);
@@ -193,7 +185,9 @@ export class PrismaReleaseRepository implements ReleaseRepository {
           // The unique (websiteId, releaseNumber) constraint turns a
           // concurrent publish into a conflict instead of two releases
           // sharing a number.
-          const created = await tx.orm.public.WebsiteRelease.select(...RELEASE_SUMMARY_SELECT).create({
+          const created = await tx.orm.public.WebsiteRelease.select(
+            ...RELEASE_SUMMARY_SELECT,
+          ).create({
             websiteId,
             releaseNumber: nextReleaseNumber(latest?.releaseNumber ?? null),
             status: RECORD_STATUS.published,
@@ -209,7 +203,7 @@ export class PrismaReleaseRepository implements ReleaseRepository {
 
           return created;
         }),
-      failures.orConflict('publish', releaseNumberConflict)
+      failures.orConflict('publish', releaseNumberConflict),
     ).map(toReleaseSummary);
   }
 
@@ -240,7 +234,9 @@ export class PrismaReleaseRepository implements ReleaseRepository {
               status: RECORD_STATUS.published,
             });
 
-          if (!activated) {return null;}
+          if (!activated) {
+            return null;
+          }
 
           await tx.orm.public.Website.where({ id: websiteId }).update({
             publishedReleaseId: releaseId,
@@ -248,9 +244,11 @@ export class PrismaReleaseRepository implements ReleaseRepository {
 
           return { activated, previous };
         }),
-      failures.infraOnly('activate')
+      failures.infraOnly('activate'),
     ).andThen((result) => {
-      if (result === null) {return errAsync(releaseNotFound());}
+      if (result === null) {
+        return errAsync(releaseNotFound());
+      }
       const { activated, previous } = result;
       return okAsync({
         release: toReleaseSummary(activated),

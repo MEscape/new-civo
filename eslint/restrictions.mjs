@@ -22,13 +22,11 @@ const LOCALE_WRAPPERS = {
     },
     {
       name: 'next-intl/server',
-      message:
-        "Import server translation helpers from '@i18n/server', not 'next-intl/server'.",
+      message: "Import server translation helpers from '@i18n/server', not 'next-intl/server'.",
     },
     {
       name: 'next/link',
-      message:
-        "Use the locale-aware `Link` from '@i18n'; 'next/link' drops the locale prefix.",
+      message: "Use the locale-aware `Link` from '@i18n'; 'next/link' drops the locale prefix.",
     },
     {
       name: 'next/navigation',
@@ -51,8 +49,7 @@ const MODULE_ALIAS = {
   patterns: [
     {
       group: ['@/modules', '@/modules/**'],
-      message:
-        "Import modules through the '@modules/<name>' alias, not '@/modules/…'.",
+      message: "Import modules through the '@modules/<name>' alias, not '@/modules/…'.",
     },
   ],
 };
@@ -68,12 +65,21 @@ const MODULE_PACKAGES = {
 };
 
 /** Components format through the request locale (docs/rules/i18n.md), never by handing a locale to @lib/utils. */
-const LOCALE_FORMATTERS = ['formatDate', 'formatDateTime', 'formatRelativeTime', 'formatNumber', 'formatPercent', 'formatMoney', 'formatBytes'];
+const LOCALE_FORMATTERS = [
+  'formatDate',
+  'formatDateTime',
+  'formatRelativeTime',
+  'formatNumber',
+  'formatPercent',
+  'formatMoney',
+  'formatBytes',
+];
 const FORMATTERS = {
   paths: ['@lib/utils', '@lib/utils/date', '@lib/utils/number'].map((name) => ({
     name,
     importNames: LOCALE_FORMATTERS,
-    message: "Format through getAppFormatters ('@i18n/server') or useAppFormatters ('@i18n/client'): they bind the request locale and time zone.",
+    message:
+      "Format through getAppFormatters ('@i18n/server') or useAppFormatters ('@i18n/client'): they bind the request locale and time zone.",
   })),
 };
 
@@ -100,10 +106,7 @@ export const restrictions = [
     files: ['src/modules/**/*.{ts,tsx}'],
     ignores: ['src/i18n/**'],
     rules: {
-      'no-restricted-imports': [
-        'error',
-        merge(LOCALE_WRAPPERS, MODULE_ALIAS, MODULE_PACKAGES),
-      ],
+      'no-restricted-imports': ['error', merge(LOCALE_WRAPPERS, MODULE_ALIAS, MODULE_PACKAGES)],
     },
   },
 
@@ -126,12 +129,7 @@ export const restrictions = [
             'Domain code must not read process.env; import from @lib/config instead (AI_RULES.md §11).',
         },
       ],
-      'no-restricted-syntax': [
-        'error',
-        PROCESS_ENV,
-        ...CLOCK_READS,
-        ...RANDOMNESS,
-      ],
+      'no-restricted-syntax': ['error', PROCESS_ENV, ...CLOCK_READS, ...RANDOMNESS],
     },
   },
   // --- application: same determinism rules, no HTTP objects, no raw FormData ---
@@ -156,13 +154,7 @@ export const restrictions = [
             'Application code must not read process.env; import from @lib/config instead (AI_RULES.md §11).',
         },
       ],
-      'no-restricted-syntax': [
-        'error',
-        PROCESS_ENV,
-        FORM_DATA,
-        ...CLOCK_READS,
-        ...RANDOMNESS,
-      ],
+      'no-restricted-syntax': ['error', PROCESS_ENV, FORM_DATA, ...CLOCK_READS, ...RANDOMNESS],
     },
   },
   // --- presentation & pages: approved UI primitives --------------------------
@@ -172,14 +164,21 @@ export const restrictions = [
   },
   // --- error boundaries never show the failure itself ------------------------
   {
-    files: ['src/app/**/error.tsx', 'src/app/**/global-error.tsx', 'src/components/shared/route-error-panel.tsx'],
+    files: [
+      'src/app/**/error.tsx',
+      'src/app/**/global-error.tsx',
+      'src/components/shared/route-error-panel.tsx',
+    ],
     rules: { 'no-restricted-syntax': ['error', PROCESS_ENV, ...UI_PRIMITIVES, ERROR_DETAILS] },
   },
   // --- UI formats through the request locale ---------------------------------
   {
     files: ['src/modules/*/presentation/**/*.{ts,tsx}'],
     rules: {
-      'no-restricted-imports': ['error', merge(LOCALE_WRAPPERS, MODULE_ALIAS, MODULE_PACKAGES, FORMATTERS)],
+      'no-restricted-imports': [
+        'error',
+        merge(LOCALE_WRAPPERS, MODULE_ALIAS, MODULE_PACKAGES, FORMATTERS),
+      ],
     },
   },
   {

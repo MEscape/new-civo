@@ -10,14 +10,12 @@ import { StatusNotice } from './status-notice';
  * token (an incomplete link, or a hand-typed URL). A Server Component.
  */
 export async function ResetPasswordLinkMissing() {
-    const t = await getTranslations('auth');
+  const t = await getTranslations('auth');
 
-    return (
-        <StatusNotice title={t('resetPassword.missingTokenTitle')}>
-            <p>{t('resetPassword.missingToken')}</p>
-            <AuthLink href={authRoutes.forgotPassword()}>
-                {t('resetPassword.requestNew')}
-            </AuthLink>
-        </StatusNotice>
-    );
+  return (
+    <StatusNotice title={t('resetPassword.missingTokenTitle')}>
+      <p>{t('resetPassword.missingToken')}</p>
+      <AuthLink href={authRoutes.forgotPassword()}>{t('resetPassword.requestNew')}</AuthLink>
+    </StatusNotice>
+  );
 }

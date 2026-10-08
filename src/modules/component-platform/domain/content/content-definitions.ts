@@ -50,9 +50,7 @@ export type ContentKind = keyof typeof CONTENT_DEFINITIONS;
 
 /** The record shape one kind validates to. */
 export type ContentOf<K extends ContentKind> =
-  (typeof CONTENT_DEFINITIONS)[K] extends ContentDefinition<infer R>
-    ? R
-    : never;
+  (typeof CONTENT_DEFINITIONS)[K] extends ContentDefinition<infer R> ? R : never;
 
 /** Narrows untrusted text (a stored component dependency, a request value) to a known kind. */
 export function isContentKind(value: string): value is ContentKind {
@@ -68,9 +66,7 @@ export const CONTENT_KINDS: readonly ContentKind[] =
  * generic key to the per-key record type; this is the one place that says so.
  */
 export function getContentDefinition<K extends ContentKind>(
-  kind: K
+  kind: K,
 ): ContentDefinition<ContentOf<K>> {
-  return CONTENT_DEFINITIONS[kind] as unknown as ContentDefinition<
-    ContentOf<K>
-  >;
+  return CONTENT_DEFINITIONS[kind] as unknown as ContentDefinition<ContentOf<K>>;
 }

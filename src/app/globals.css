@@ -1,6 +1,6 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 /* `animate-in` / `animate-out` used by Radix-based primitives (select). */
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 /*
  * Civo design tokens.
@@ -114,10 +114,18 @@
 [data-civo-theme] {
   --civo-chart-1: var(--civo-color-primary-copy);
   --civo-chart-2: var(--civo-color-accent-copy);
-  --civo-chart-3: color-mix(in oklab, var(--civo-color-primary-copy) 45%, var(--civo-color-surface));
+  --civo-chart-3: color-mix(
+    in oklab,
+    var(--civo-color-primary-copy) 45%,
+    var(--civo-color-surface)
+  );
   --civo-chart-4: color-mix(in oklab, var(--civo-color-accent-copy) 45%, var(--civo-color-surface));
   --civo-chart-5: var(--civo-color-secondary-copy);
-  --civo-chart-6: color-mix(in oklab, var(--civo-color-secondary-copy) 45%, var(--civo-color-surface));
+  --civo-chart-6: color-mix(
+    in oklab,
+    var(--civo-color-secondary-copy) 45%,
+    var(--civo-color-surface)
+  );
 }
 
 /*
@@ -208,7 +216,6 @@
  * still override it.
  */
 @layer base {
-
   h1,
   h2,
   h3,
@@ -258,7 +265,6 @@ h4 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {

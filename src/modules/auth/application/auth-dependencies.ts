@@ -9,11 +9,11 @@ import type { SecurityAuditLog } from '../domain/ports/security-audit-log.port';
  * the rate limiter takes its place as the gate.
  */
 export interface AuthenticationDependencies {
-    readonly authenticator: Authenticator;
-    readonly rateLimiter: AuthRateLimiter;
-    readonly audit: SecurityAuditLog;
+  readonly authenticator: Authenticator;
+  readonly rateLimiter: AuthRateLimiter;
+  readonly audit: SecurityAuditLog;
 }
 
 export interface CurrentActorDependencies {
-    readonly currentActor: CurrentActorProvider;
+  readonly currentActor: CurrentActorProvider;
 }

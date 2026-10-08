@@ -22,15 +22,16 @@ export class GetPublicWebsiteBySlug {
   constructor(private readonly deps: PublicWebsiteDependencies) {}
 
   execute(
-    slug: string
+    slug: string,
   ): AppResultAsync<PublicWebsiteView, NotFoundAppError | InfrastructureAppError> {
-    if (!isValidSlug(slug)) {return errAsync(websiteNotFound());}
+    if (!isValidSlug(slug)) {
+      return errAsync(websiteNotFound());
+    }
 
     return this.deps.websites
       .findBySlug(slug)
-      .andThen(
-        (website): AppResultAsync<Website, NotFoundAppError> =>
-          website === null ? errAsync(websiteNotFound()) : okAsync(website)
+      .andThen((website): AppResultAsync<Website, NotFoundAppError> =>
+        website === null ? errAsync(websiteNotFound()) : okAsync(website),
       )
       .map(toPublicWebsiteView);
   }

@@ -14,9 +14,7 @@ import type { SavedRevisionDto } from '../dto/page-dto';
 /** What thunks may use. Injected, so tests run them with fakes. */
 export interface BuilderThunkExtra {
   readonly catalog: ComponentCatalog;
-  readonly savePageConfig: (
-    input: unknown
-  ) => Promise<ActionResult<SavedRevisionDto>>;
+  readonly savePageConfig: (input: unknown) => Promise<ActionResult<SavedRevisionDto>>;
   /** Seeds derived node ids; the domain never generates randomness itself. */
   readonly createIdSeed: () => string;
 }
@@ -25,18 +23,14 @@ export interface BuilderThunkExtra {
  * One isolated store per editing session, seeded from the server's
  * session. Nothing is shared between sessions or requests.
  */
-export function createBuilderStore(
-  session: EditorSessionDto,
-  extra: BuilderThunkExtra
-) {
+export function createBuilderStore(session: EditorSessionDto, extra: BuilderThunkExtra) {
   return configureStore({
     reducer: { document: documentReducer, save: saveReducer, ui: uiReducer },
     preloadedState: {
       document: createDocumentState(session.page),
       ui: createUiState(session.editorMode),
     },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({ thunk: { extraArgument: extra } }),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({ thunk: { extraArgument: extra } }),
   });
 }
 

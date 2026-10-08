@@ -19,7 +19,13 @@ async function lintFiles(files: Record<string, string>): Promise<Record<string, 
     cwd: root,
     overrideConfigFile: true,
     overrideConfig: [
-      { files: ['**/*.{ts,tsx}'], languageOptions: { parser: tseslint.parser, parserOptions: { ecmaFeatures: { jsx: true } } } },
+      {
+        files: ['**/*.{ts,tsx}'],
+        languageOptions: {
+          parser: tseslint.parser,
+          parserOptions: { ecmaFeatures: { jsx: true } },
+        },
+      },
       ...restrictions,
       ...style,
       ...react,
@@ -28,7 +34,12 @@ async function lintFiles(files: Record<string, string>): Promise<Record<string, 
     ],
   });
   const results = await eslint.lintFiles(['src/**/*.{ts,tsx}']);
-  return Object.fromEntries(results.map((r) => [r.filePath.replace(`${root}/`, ''), r.messages.map((m) => `[${m.ruleId}] ${m.message}`)]));
+  return Object.fromEntries(
+    results.map((r) => [
+      r.filePath.replace(`${root}/`, ''),
+      r.messages.map((m) => `[${m.ruleId}] ${m.message}`),
+    ]),
+  );
 }
 
 const COMPONENT = 'src/modules/shop/presentation/components/card.tsx';
@@ -53,14 +64,19 @@ export const x = [useTranslations, getTranslations, Link, redirect, usePathname,
   });
 
   it('allows the wrappers themselves (src/i18n) to import next-intl', async () => {
-    const out = await lintFiles({ 'src/i18n/client.ts': "export { useTranslations } from 'next-intl';\n", 'src/i18n/config.ts': "import { createNavigation } from 'next-intl/navigation';\nexport const n = createNavigation;\n" });
+    const out = await lintFiles({
+      'src/i18n/client.ts': "export { useTranslations } from 'next-intl';\n",
+      'src/i18n/config.ts':
+        "import { createNavigation } from 'next-intl/navigation';\nexport const n = createNavigation;\n",
+    });
     expect(out['src/i18n/client.ts']).toEqual([]);
     expect(out['src/i18n/config.ts']).toEqual([]);
   });
 
   it("requires the '@modules' alias and the result wrapper inside modules", async () => {
     const out = await lintFiles({
-      'src/modules/shop/application/x.ts': "import type { A } from '@/modules/auth';\nimport { ok } from 'neverthrow';\nexport const v = [ok];\nexport type T = A;\n",
+      'src/modules/shop/application/x.ts':
+        "import type { A } from '@/modules/auth';\nimport { ok } from 'neverthrow';\nexport const v = [ok];\nexport type T = A;\n",
     });
     const text = out['src/modules/shop/application/x.ts']!.join('\n');
     expect(text).toMatch(/'@modules\/<name>' alias/);
@@ -82,16 +98,23 @@ describe('configuration hygiene and layer-specific syntax', () => {
 
   it('keeps the domain free of clock and randomness, and the application free of HTTP objects', async () => {
     const out = await lintFiles({
-      'src/modules/shop/domain/models/a.ts': 'export const r = Math.random();\nexport const t = Date.now();\n',
-      'src/modules/shop/application/commands/b.ts': 'export const f = () => new Response("x");\nexport const d = (x: FormData) => x;\n',
+      'src/modules/shop/domain/models/a.ts':
+        'export const r = Math.random();\nexport const t = Date.now();\n',
+      'src/modules/shop/application/commands/b.ts':
+        'export const f = () => new Response("x");\nexport const d = (x: FormData) => x;\n',
     });
-    expect(out['src/modules/shop/domain/models/a.ts']!.join('\n')).toMatch(/randomness \(Math\.random\(\)\)[\s\S]*clock \(Date\.now\(\)\)/);
-    expect(out['src/modules/shop/application/commands/b.ts']!.join('\n')).toMatch(/HTTP responses are a presentation concern[\s\S]*raw FormData/);
+    expect(out['src/modules/shop/domain/models/a.ts']!.join('\n')).toMatch(
+      /randomness \(Math\.random\(\)\)[\s\S]*clock \(Date\.now\(\)\)/,
+    );
+    expect(out['src/modules/shop/application/commands/b.ts']!.join('\n')).toMatch(
+      /HTTP responses are a presentation concern[\s\S]*raw FormData/,
+    );
   });
 
   it('rejects `new Date()` in application code (the clock is injected) but allows it in composition and with an argument', async () => {
     const out = await lintFiles({
-      'src/modules/shop/application/commands/b.ts': 'export const now = () => new Date();\nexport const at = (s: string) => new Date(s);\n',
+      'src/modules/shop/application/commands/b.ts':
+        'export const now = () => new Date();\nexport const at = (s: string) => new Date(s);\n',
       'src/modules/shop/composition.ts': 'export const clock = () => new Date();\n',
     });
     const text = out['src/modules/shop/application/commands/b.ts']!.join('\n');
@@ -102,14 +125,20 @@ describe('configuration hygiene and layer-specific syntax', () => {
 
   it('rejects focused tests anywhere', async () => {
     const out = await lintFiles({
-      'src/modules/shop/domain/models/a.test.ts': "declare const it: { only: (n: string, f: () => void) => void };\nit.only('x', () => undefined);\n",
+      'src/modules/shop/domain/models/a.test.ts':
+        "declare const it: { only: (n: string, f: () => void) => void };\nit.only('x', () => undefined);\n",
     });
     expect(out['src/modules/shop/domain/models/a.test.ts']!.join('\n')).toMatch(/Remove `\.only`/);
   });
 
-  it('keeps each layer\'s syntax restrictions in one block (a later block must not silently drop the earlier selectors)', async () => {
-    const out = await lintFiles({ 'src/modules/shop/domain/models/a.ts': 'export const a = process.env.X;\nexport const r = Math.random();\n' });
-    expect(out['src/modules/shop/domain/models/a.ts']!.filter((m) => m.includes('no-restricted-syntax'))).toHaveLength(2);
+  it("keeps each layer's syntax restrictions in one block (a later block must not silently drop the earlier selectors)", async () => {
+    const out = await lintFiles({
+      'src/modules/shop/domain/models/a.ts':
+        'export const a = process.env.X;\nexport const r = Math.random();\n',
+    });
+    expect(
+      out['src/modules/shop/domain/models/a.ts']!.filter((m) => m.includes('no-restricted-syntax')),
+    ).toHaveLength(2);
   });
 });
 
@@ -126,8 +155,10 @@ export const B = () => { const t = useTranslations('shop'); return <p>{t('title'
 
   it('rejects locale formatting outside the request-bound formatters', async () => {
     const out = await lintFiles({
-      [COMPONENT]: "import { formatDate } from '@lib/utils';\nexport const f = (d: Date) => formatDate(d, 'en', 'UTC');\n",
-      'src/app/[locale]/page.tsx': "import { formatNumber } from '@lib/utils/number';\nexport const f = (n: number) => formatNumber(n, 'en');\n",
+      [COMPONENT]:
+        "import { formatDate } from '@lib/utils';\nexport const f = (d: Date) => formatDate(d, 'en', 'UTC');\n",
+      'src/app/[locale]/page.tsx':
+        "import { formatNumber } from '@lib/utils/number';\nexport const f = (n: number) => formatNumber(n, 'en');\n",
     });
     expect(out[COMPONENT]!.join('\n')).toMatch(/Format through getAppFormatters/);
     expect(out['src/app/[locale]/page.tsx']!.join('\n')).toMatch(/Format through getAppFormatters/);
@@ -135,7 +166,8 @@ export const B = () => { const t = useTranslations('shop'); return <p>{t('title'
 
   it('keeps the error message, stack and cause out of error boundaries', async () => {
     const out = await lintFiles({
-      'src/app/[locale]/error.tsx': "'use client';\nexport default function E({ error }: { error: Error }) { return <p>{error.message}</p>; }\n",
+      'src/app/[locale]/error.tsx':
+        "'use client';\nexport default function E({ error }: { error: Error }) { return <p>{error.message}</p>; }\n",
     });
     expect(out['src/app/[locale]/error.tsx']!.join('\n')).toMatch(/never render the error message/);
   });
@@ -143,7 +175,10 @@ export const B = () => { const t = useTranslations('shop'); return <p>{t('title'
 
 describe('React, accessibility and Next.js rules', () => {
   it('rejects raw primitives where an approved component exists', async () => {
-    const out = await lintFiles({ [COMPONENT]: "export const A = () => (<div><button type=\"button\">x</button><select /><a href=\"/x\">y</a></div>);\n" });
+    const out = await lintFiles({
+      [COMPONENT]:
+        'export const A = () => (<div><button type="button">x</button><select /><a href="/x">y</a></div>);\n',
+    });
     const text = out[COMPONENT]!.join('\n');
     expect(text).toMatch(/Use `Button` from '@components\/ui\/button'/);
     expect(text).toMatch(/Use `Select` from '@components\/ui\/select'/);
@@ -163,7 +198,10 @@ describe('React, accessibility and Next.js rules', () => {
   });
 
   it('lets the primitives themselves use raw elements', async () => {
-    const out = await lintFiles({ 'src/components/ui/button.tsx': "export const B = ({ label }: { label: string }) => <button type=\"button\">{label}</button>;\n" });
+    const out = await lintFiles({
+      'src/components/ui/button.tsx':
+        'export const B = ({ label }: { label: string }) => <button type="button">{label}</button>;\n',
+    });
     expect(out['src/components/ui/button.tsx']).toEqual([]);
   });
 
@@ -205,12 +243,19 @@ export const A = () => (
   });
 
   it('keeps the strict jsx-a11y rules active', async () => {
-    const out = await lintFiles({ [COMPONENT]: "export const A = () => (<div onClick={() => undefined}>x</div>);\n" });
-    expect(out[COMPONENT]!.join('\n')).toMatch(/jsx-a11y\/(?:click-events-have-key-events|no-static-element-interactions)/);
+    const out = await lintFiles({
+      [COMPONENT]: 'export const A = () => (<div onClick={() => undefined}>x</div>);\n',
+    });
+    expect(out[COMPONENT]!.join('\n')).toMatch(
+      /jsx-a11y\/(?:click-events-have-key-events|no-static-element-interactions)/,
+    );
   });
 
   it('applies the React Hooks rules', async () => {
-    const out = await lintFiles({ [COMPONENT]: "import { useState } from 'react';\nexport function A({ ok }: { ok: boolean }) { if (ok) { useState(0); } return null; }\n" });
+    const out = await lintFiles({
+      [COMPONENT]:
+        "import { useState } from 'react';\nexport function A({ ok }: { ok: boolean }) { if (ok) { useState(0); } return null; }\n",
+    });
     expect(out[COMPONENT]!.join('\n')).toMatch(/react-hooks\/rules-of-hooks/);
   });
 });
@@ -218,14 +263,19 @@ export const A = () => (
 describe('ESLint core correctness rules', () => {
   it('reports eval, new Function, loose equality, debugger and missing braces', async () => {
     const out = await lintFiles({
-      'src/lib/utils/x.ts': 'export function f(a: unknown) {\n  debugger;\n  if (a == null) return 1;\n  eval("1");\n  return new Function("return 1");\n}\n',
+      'src/lib/utils/x.ts':
+        'export function f(a: unknown) {\n  debugger;\n  if (a == null) return 1;\n  eval("1");\n  return new Function("return 1");\n}\n',
     });
     const text = out['src/lib/utils/x.ts']!.join('\n');
-    for (const rule of ['no-debugger', 'eqeqeq', 'curly', 'no-eval', 'no-new-func']) {expect(text).toContain(`[${rule}]`);}
+    for (const rule of ['no-debugger', 'eqeqeq', 'curly', 'no-eval', 'no-new-func']) {
+      expect(text).toContain(`[${rule}]`);
+    }
   });
 
   it('keeps `curly` enabled AFTER eslint-config-prettier (which would otherwise switch it off)', async () => {
-    const config = (await import('../../eslint.config.mjs')).default as Array<{ rules?: Record<string, unknown> }>;
+    const config = (await import('../../eslint.config.mjs')).default as Array<{
+      rules?: Record<string, unknown>;
+    }>;
     const lastCurly = [...config].reverse().find((block) => block.rules && 'curly' in block.rules);
     expect(lastCurly?.rules?.['curly']).toEqual(['error', 'all']);
   });

@@ -18,32 +18,20 @@ describe('formatRelativeTime', () => {
   const now = '2026-06-15T12:00:00Z';
 
   it('formats past and future distances', () => {
-    expect(formatRelativeTime('2026-06-13T12:00:00Z', now, 'en-US')).toBe(
-      '2 days ago'
-    );
-    expect(formatRelativeTime('2026-06-15T15:00:00Z', now, 'en-US')).toBe(
-      'in 3 hours'
-    );
+    expect(formatRelativeTime('2026-06-13T12:00:00Z', now, 'en-US')).toBe('2 days ago');
+    expect(formatRelativeTime('2026-06-15T15:00:00Z', now, 'en-US')).toBe('in 3 hours');
   });
 
   it('is deterministic because `now` is injected', () => {
-    expect(formatRelativeTime(now, now, 'en-US')).toBe(
-      formatRelativeTime(now, now, 'en-US')
-    );
+    expect(formatRelativeTime(now, now, 'en-US')).toBe(formatRelativeTime(now, now, 'en-US'));
   });
 });
 
 describe('isSameDay', () => {
   it('compares calendar days in a given time zone', () => {
-    expect(
-      isSameDay('2026-01-01T23:30:00Z', '2026-01-01T01:00:00Z', 'UTC')
-    ).toBe(true);
-    expect(
-      isSameDay('2026-01-01T23:30:00Z', '2026-01-02T00:30:00Z', 'Europe/Berlin')
-    ).toBe(true);
-    expect(
-      isSameDay('2026-01-01T12:00:00Z', '2026-01-02T12:00:00Z', 'UTC')
-    ).toBe(false);
+    expect(isSameDay('2026-01-01T23:30:00Z', '2026-01-01T01:00:00Z', 'UTC')).toBe(true);
+    expect(isSameDay('2026-01-01T23:30:00Z', '2026-01-02T00:30:00Z', 'Europe/Berlin')).toBe(true);
+    expect(isSameDay('2026-01-01T12:00:00Z', '2026-01-02T12:00:00Z', 'UTC')).toBe(false);
   });
 });
 

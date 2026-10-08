@@ -17,7 +17,7 @@ export const fieldErrorBagOwner = defineRule({
           report(
             context,
             node,
-            "Construct `FieldErrorBag` only in the module's domain/errors/<module>-errors.ts (as `create<Module>ErrorBag()`), and call that factory here."
+            "Construct `FieldErrorBag` only in the module's domain/errors/<module>-errors.ts (as `create<Module>ErrorBag()`), and call that factory here.",
           );
         }
       },

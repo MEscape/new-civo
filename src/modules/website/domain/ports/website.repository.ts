@@ -1,20 +1,10 @@
 import type { TenantId } from '@modules/auth';
 
-import type {
-  ConflictAppError,
-  InfrastructureAppError,
-  NotFoundAppError,
-} from '@lib/errors';
+import type { ConflictAppError, InfrastructureAppError, NotFoundAppError } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
 
-
 import type { WebsiteId } from '../models/ids';
-import type {
-  Website,
-  WebsiteChanges,
-  WebsiteDraft,
-  WebsiteSummary,
-} from '../models/website';
+import type { Website, WebsiteChanges, WebsiteDraft, WebsiteSummary } from '../models/website';
 import type { WebsiteTheme } from '../models/website-theme';
 
 export interface NewWebsite {
@@ -36,38 +26,31 @@ export interface NewWebsite {
 export interface WebsiteRepository {
   findById(
     id: WebsiteId,
-    tenantId: TenantId
+    tenantId: TenantId,
   ): AppResultAsync<Website | null, InfrastructureAppError>;
 
-  findBySlug(
-    slug: string
-  ): AppResultAsync<Website | null, InfrastructureAppError>;
+  findBySlug(slug: string): AppResultAsync<Website | null, InfrastructureAppError>;
 
   /** Bounded: never returns more than `limit` items (performance.md). */
   listByTenant(
     tenantId: TenantId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly WebsiteSummary[], InfrastructureAppError>;
 
-  create(
-    input: NewWebsite
-  ): AppResultAsync<Website, ConflictAppError | InfrastructureAppError>;
+  create(input: NewWebsite): AppResultAsync<Website, ConflictAppError | InfrastructureAppError>;
 
   update(
     id: WebsiteId,
     tenantId: TenantId,
-    changes: WebsiteChanges
+    changes: WebsiteChanges,
   ): AppResultAsync<Website, NotFoundAppError | InfrastructureAppError>;
 
   updateTheme(
     id: WebsiteId,
     tenantId: TenantId,
-    theme: WebsiteTheme
+    theme: WebsiteTheme,
   ): AppResultAsync<Website, NotFoundAppError | InfrastructureAppError>;
 
   /** Idempotent: deleting a website that is already gone succeeds. */
-  deleteById(
-    id: WebsiteId,
-    tenantId: TenantId
-  ): AppResultAsync<void, InfrastructureAppError>;
+  deleteById(id: WebsiteId, tenantId: TenantId): AppResultAsync<void, InfrastructureAppError>;
 }

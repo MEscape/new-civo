@@ -1,44 +1,33 @@
-"use client";
+'use client';
 
-import { useState, useTransition } from "react";
+import { useState, useTransition } from 'react';
 
+import { FieldMessage } from '@components/shared/field-message';
+import { Button } from '@components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
+import { useRouter } from '@i18n';
 
+import { useNow, useTranslations, useAppFormatters } from '@i18n/client';
 
-import { FieldMessage } from "@components/shared/field-message";
-import { Button } from "@components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@components/ui/card";
+import { deleteDataSourceAction } from '../actions/delete-data-source-action';
+import { testDataSourceConnectionAction } from '../actions/test-data-source-connection-action';
+import { KIND_MESSAGE_KEYS, MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
 
-import { useRouter } from "@i18n";
+import { DataSourceStatusBadge } from './data-source-status-badge';
+import { DatasetManagementPanel } from './dataset-management-panel';
 
-import { useNow, useTranslations , useAppFormatters } from "@i18n/client";
-
-
-import { deleteDataSourceAction } from "../actions/delete-data-source-action";
-import { testDataSourceConnectionAction } from "../actions/test-data-source-connection-action";
-import { KIND_MESSAGE_KEYS, MESSAGE_PARAMS, messageKeyForCode } from "../messages/message-keys";
-
-import { DataSourceStatusBadge } from "./data-source-status-badge";
-import { DatasetManagementPanel } from "./dataset-management-panel";
-
-import type { DataSourceDto } from "../dto/data-source-dto";
+import type { DataSourceDto } from '../dto/data-source-dto';
 
 export interface ConfiguredSourceCardProps {
   readonly source: DataSourceDto;
 }
 
 type TestMessage =
-  | { readonly kind: "healthy" }
-  | { readonly kind: "failed"; readonly code: string };
+  { readonly kind: 'healthy' } | { readonly kind: 'failed'; readonly code: string };
 
 export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
-  const t = useTranslations("dataSources");
+  const t = useTranslations('dataSources');
 
   const format = useAppFormatters();
   // `useNow` is hydration-safe, unlike `new Date()` in render.
@@ -46,22 +35,18 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [testMessage, setTestMessage] = useState<TestMessage | null>(null);
-  const [deleteErrorCode, setDeleteErrorCode] = useState<string | undefined>(
-    undefined,
-  );
+  const [deleteErrorCode, setDeleteErrorCode] = useState<string | undefined>(undefined);
 
   function handleTestConnection() {
     setTestMessage(null);
     startTransition(async () => {
       const result = await testDataSourceConnectionAction(source.id);
       if (!result.ok) {
-        setTestMessage({ kind: "failed", code: result.error.code });
+        setTestMessage({ kind: 'failed', code: result.error.code });
       } else {
         const { outcome } = result.data;
         setTestMessage(
-          outcome.isHealthy
-            ? { kind: "healthy" }
-            : { kind: "failed", code: outcome.errorCode },
+          outcome.isHealthy ? { kind: 'healthy' } : { kind: 'failed', code: outcome.errorCode },
         );
       }
       router.refresh();
@@ -69,7 +54,9 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
   }
 
   function handleDelete() {
-    if (!window.confirm(t("sourceCard.confirmDelete"))) {return;}
+    if (!window.confirm(t('sourceCard.confirmDelete'))) {
+      return;
+    }
     setDeleteErrorCode(undefined);
 
     startTransition(async () => {
@@ -88,7 +75,7 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
         <div>
           <CardTitle>{source.name}</CardTitle>
           <CardDescription className="mt-1">
-            {source.endpoint ?? t("sourceCard.unknownEndpoint")}
+            {source.endpoint ?? t('sourceCard.unknownEndpoint')}
           </CardDescription>
         </div>
         <DataSourceStatusBadge status={source.status} />
@@ -97,26 +84,20 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
         <div className="space-y-4">
           <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-copy-muted">
-                {t("sourceCard.kind")}
-              </dt>
-              <dd className="text-copy">
-                {t(KIND_MESSAGE_KEYS[source.kind])}
-              </dd>
+              <dt className="text-copy-muted">{t('sourceCard.kind')}</dt>
+              <dd className="text-copy">{t(KIND_MESSAGE_KEYS[source.kind])}</dd>
             </div>
             <div>
-              <dt className="text-copy-muted">
-                {t("sourceCard.lastChecked")}
-              </dt>
+              <dt className="text-copy-muted">{t('sourceCard.lastChecked')}</dt>
               <dd className="text-copy">
                 {source.lastCheckedAt
                   ? format.relativeTime(source.lastCheckedAt, now)
-                  : t("sourceCard.never")}
+                  : t('sourceCard.never')}
               </dd>
             </div>
           </dl>
 
-          {source.status === "ERROR" && source.lastErrorCode && (
+          {source.status === 'ERROR' && source.lastErrorCode && (
             <div className="rounded-token border border-danger/20 bg-danger/10 px-3 py-2">
               <FieldMessage
                 id={`${source.id}-last-error`}
@@ -126,12 +107,12 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
             </div>
           )}
 
-          {testMessage?.kind === "healthy" && (
+          {testMessage?.kind === 'healthy' && (
             <p role="status" className="text-sm text-copy">
-              {t("sourceCard.testHealthy")}
+              {t('sourceCard.testHealthy')}
             </p>
           )}
-          {testMessage?.kind === "failed" && (
+          {testMessage?.kind === 'failed' && (
             <FieldMessage
               id={`${source.id}-test-error`}
               message={t(messageKeyForCode(testMessage.code), MESSAGE_PARAMS)}
@@ -140,7 +121,9 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
           )}
           <FieldMessage
             id={`${source.id}-delete-error`}
-            message={deleteErrorCode ? t(messageKeyForCode(deleteErrorCode), MESSAGE_PARAMS) : undefined}
+            message={
+              deleteErrorCode ? t(messageKeyForCode(deleteErrorCode), MESSAGE_PARAMS) : undefined
+            }
             className="text-sm"
           />
 
@@ -152,7 +135,7 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
               onClick={handleTestConnection}
               disabled={isPending}
             >
-              {isPending ? t("sourceCard.testing") : t("sourceCard.test")}
+              {isPending ? t('sourceCard.testing') : t('sourceCard.test')}
             </Button>
             <Button
               type="button"
@@ -161,7 +144,7 @@ export function ConfiguredSourceCard({ source }: ConfiguredSourceCardProps) {
               onClick={handleDelete}
               disabled={isPending}
             >
-              {t("sourceCard.remove")}
+              {t('sourceCard.remove')}
             </Button>
           </div>
         </div>

@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import {
   Accordion,
   AccordionContent,

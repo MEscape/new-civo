@@ -81,8 +81,8 @@ Ports are defined in the domain and implemented in infrastructure. Enforced impo
 
 ## Rule ownership
 
-| Concern                                   | Rule                                     |
-| ----------------------------------------- | ---------------------------------------- |
+| Concern                                   | Rule                                   |
+| ----------------------------------------- | -------------------------------------- |
 | Overall architecture                      | [`architecture.md`](architecture.md)   |
 | Import/dependency boundaries              | [`boundaries.md`](boundaries.md)       |
 | Module structure                          | [`modules.md`](modules.md)             |

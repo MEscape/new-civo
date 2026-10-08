@@ -16,11 +16,7 @@ export interface BuilderToolbarProps {
   readonly links: EditorLinks;
 }
 
-export function BuilderToolbar({
-  websiteName,
-  pageTitle,
-  links,
-}: BuilderToolbarProps) {
+export function BuilderToolbar({ websiteName, pageTitle, links }: BuilderToolbarProps) {
   const editorMode = useBuilderSelector(selectEditorMode);
 
   return (
@@ -35,9 +31,7 @@ export function BuilderToolbar({
         <ToolbarViewportControls />
         <ToolbarModeLinks
           publicSiteHref={links.publicSite}
-          settingsHref={
-            hasCapability(editorMode, 'manageTheme') ? links.settings : null
-          }
+          settingsHref={hasCapability(editorMode, 'manageTheme') ? links.settings : null}
         />
         <SaveControls />
       </div>

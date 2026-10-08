@@ -22,7 +22,13 @@ export const DOCS_URL = 'docs/architecture/eslint-architecture.md';
  * message whose text is produced by the rule so it can name the violated
  * convention and the approved alternative.
  */
-export function defineRule({ description, schema = [], create, extraMessages = {}, type = 'problem' }) {
+export function defineRule({
+  description,
+  schema = [],
+  create,
+  extraMessages = {},
+  type = 'problem',
+}) {
   return {
     meta: {
       type,
@@ -45,19 +51,25 @@ export function report(context, node, detail) {
  * `names` is the list of imported/exported names or `null` for namespace/side-effect forms.
  */
 export function moduleSpecifierVisitors(onSpecifier) {
-  const literal = (node) => (node && node.type === 'Literal' && typeof node.value === 'string' ? node.value : null);
+  const literal = (node) =>
+    node && node.type === 'Literal' && typeof node.value === 'string' ? node.value : null;
   return {
     ImportDeclaration(node) {
       const specifier = literal(node.source);
       if (specifier === null) return;
       const named = node.specifiers.filter((s) => s.type === 'ImportSpecifier');
-      const allInlineType = node.specifiers.length > 0 && node.specifiers.every((s) => s.type === 'ImportSpecifier' && s.importKind === 'type');
+      const allInlineType =
+        node.specifiers.length > 0 &&
+        node.specifiers.every((s) => s.type === 'ImportSpecifier' && s.importKind === 'type');
       onSpecifier({
         node,
         specifier,
         kind: 'import',
         isTypeOnly: node.importKind === 'type' || allInlineType,
-        names: node.specifiers.length === named.length && named.length > 0 ? named.map((s) => s.imported.name ?? s.imported.value) : null,
+        names:
+          node.specifiers.length === named.length && named.length > 0
+            ? named.map((s) => s.imported.name ?? s.imported.value)
+            : null,
       });
     },
     ExportNamedDeclaration(node) {
@@ -67,26 +79,45 @@ export function moduleSpecifierVisitors(onSpecifier) {
         node,
         specifier,
         kind: 'export',
-        isTypeOnly: node.exportKind === 'type' || (node.specifiers.length > 0 && node.specifiers.every((s) => s.exportKind === 'type')),
+        isTypeOnly:
+          node.exportKind === 'type' ||
+          (node.specifiers.length > 0 && node.specifiers.every((s) => s.exportKind === 'type')),
         names: node.specifiers.map((s) => s.local.name ?? s.local.value),
       });
     },
     ExportAllDeclaration(node) {
       const specifier = literal(node.source);
-      if (specifier !== null) onSpecifier({ node, specifier, kind: 'export-all', isTypeOnly: node.exportKind === 'type', names: null });
+      if (specifier !== null)
+        onSpecifier({
+          node,
+          specifier,
+          kind: 'export-all',
+          isTypeOnly: node.exportKind === 'type',
+          names: null,
+        });
     },
     ImportExpression(node) {
       const specifier = literal(node.source);
-      if (specifier !== null) onSpecifier({ node, specifier, kind: 'dynamic', isTypeOnly: false, names: null });
+      if (specifier !== null)
+        onSpecifier({ node, specifier, kind: 'dynamic', isTypeOnly: false, names: null });
     },
     TSImportType(node) {
-      const arg = node.argument?.type === 'TSLiteralType' ? literal(node.argument.literal) : literal(node.argument);
-      if (arg !== null) onSpecifier({ node, specifier: arg, kind: 'import-type', isTypeOnly: true, names: null });
+      const arg =
+        node.argument?.type === 'TSLiteralType'
+          ? literal(node.argument.literal)
+          : literal(node.argument);
+      if (arg !== null)
+        onSpecifier({ node, specifier: arg, kind: 'import-type', isTypeOnly: true, names: null });
     },
     CallExpression(node) {
-      if (node.callee.type === 'Identifier' && node.callee.name === 'require' && node.arguments.length === 1) {
+      if (
+        node.callee.type === 'Identifier' &&
+        node.callee.name === 'require' &&
+        node.arguments.length === 1
+      ) {
         const specifier = literal(node.arguments[0]);
-        if (specifier !== null) onSpecifier({ node, specifier, kind: 'require', isTypeOnly: false, names: null });
+        if (specifier !== null)
+          onSpecifier({ node, specifier, kind: 'require', isTypeOnly: false, names: null });
       }
     },
   };
@@ -99,7 +130,8 @@ export function resolveFrom(repoPath, specifier) {
 /** True when the program starts with the given directive (`'use client'`, `'use server'`). */
 export function hasDirective(program, name) {
   for (const statement of program.body) {
-    if (statement.type !== 'ExpressionStatement' || typeof statement.directive !== 'string') return false;
+    if (statement.type !== 'ExpressionStatement' || typeof statement.directive !== 'string')
+      return false;
     if (statement.directive === name) return true;
   }
   return false;
@@ -116,7 +148,12 @@ export function findAncestor(node, predicate) {
 /** Name of an Identifier / `a.b` member chain's last property, else null. */
 export function calleeName(callee) {
   if (callee.type === 'Identifier') return callee.name;
-  if (callee.type === 'MemberExpression' && !callee.computed && callee.property.type === 'Identifier') return callee.property.name;
+  if (
+    callee.type === 'MemberExpression' &&
+    !callee.computed &&
+    callee.property.type === 'Identifier'
+  )
+    return callee.property.name;
   return null;
 }
 
@@ -134,7 +171,9 @@ export function memberPath(node) {
 export function isNumericLiteral(node) {
   return (
     (node.type === 'Literal' && typeof node.value === 'number') ||
-    (node.type === 'UnaryExpression' && node.argument.type === 'Literal' && typeof node.argument.value === 'number')
+    (node.type === 'UnaryExpression' &&
+      node.argument.type === 'Literal' &&
+      typeof node.argument.value === 'number')
   );
 }
 

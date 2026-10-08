@@ -14,11 +14,7 @@ async function SignedInGate({ children }: { readonly children: ReactNode }) {
   return children;
 }
 
-export default function ProtectedLayout({
-  children,
-}: {
-  readonly children: ReactNode;
-}) {
+export default function ProtectedLayout({ children }: { readonly children: ReactNode }) {
   return (
     <Suspense fallback={null}>
       <SignedInGate>{children}</SignedInGate>

@@ -18,20 +18,20 @@ import type { AppResult } from '@lib/result';
  * Pages call this instead of each choosing their own error handling.
  */
 export async function orFail<T, E extends AppError>(
-    pending: AppResult<T, E> | PromiseLike<AppResult<T, E>>
+  pending: AppResult<T, E> | PromiseLike<AppResult<T, E>>,
 ): Promise<T> {
-    const result = await pending;
-    if (result.isOk()) {
-        return result.value;
-    }
-    const locale = await getLocale();
-    return matchAppError(result.error, {
-        validation: () => notFound(),
-        not_found: () => notFound(),
-        forbidden: () => notFound(),
-        conflict: () => notFound(),
-        unauthorized: () => redirect({ href: authRoutes.signIn(), locale }),
-        infrastructure: (cause) => escalate(cause),
-        unexpected: (cause) => escalate(cause),
-    });
+  const result = await pending;
+  if (result.isOk()) {
+    return result.value;
+  }
+  const locale = await getLocale();
+  return matchAppError(result.error, {
+    validation: () => notFound(),
+    not_found: () => notFound(),
+    forbidden: () => notFound(),
+    conflict: () => notFound(),
+    unauthorized: () => redirect({ href: authRoutes.signIn(), locale }),
+    infrastructure: (cause) => escalate(cause),
+    unexpected: (cause) => escalate(cause),
+  });
 }

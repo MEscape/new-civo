@@ -10,14 +10,22 @@ type Shortcut = 'save' | 'undo' | 'redo' | 'deselect' | 'delete';
 
 /** Ctrl/Cmd combinations. */
 function modifiedShortcut(key: string, shiftKey: boolean): Shortcut | null {
-  if (key === 's') {return 'save';}
-  if (key === 'z') {return shiftKey ? 'redo' : 'undo';}
-  if (key === 'y') {return 'redo';}
+  if (key === 's') {
+    return 'save';
+  }
+  if (key === 'z') {
+    return shiftKey ? 'redo' : 'undo';
+  }
+  if (key === 'y') {
+    return 'redo';
+  }
   return null;
 }
 
 function plainShortcut(event: KeyboardEvent, canEditStructure: boolean): Shortcut | null {
-  if (event.key === 'Escape') {return 'deselect';}
+  if (event.key === 'Escape') {
+    return 'deselect';
+  }
   const isDeleteKey = event.key === 'Delete' || event.key === 'Backspace';
   return canEditStructure && isDeleteKey && event.target === document.body ? 'delete' : null;
 }
@@ -33,11 +41,21 @@ export function useEditorShortcuts(canEditStructure: boolean): void {
 
   useEffect(() => {
     const actions: Record<Shortcut, () => void> = {
-      save: () => { void dispatch(saveDraft()); },
-      undo: () => { dispatch(editUndone()); },
-      redo: () => { dispatch(editRedone()); },
-      deselect: () => { dispatch(nodeSelected(null)); },
-      delete: () => { dispatch(removeSelectedNode()); },
+      save: () => {
+        void dispatch(saveDraft());
+      },
+      undo: () => {
+        dispatch(editUndone());
+      },
+      redo: () => {
+        dispatch(editRedone());
+      },
+      deselect: () => {
+        dispatch(nodeSelected(null));
+      },
+      delete: () => {
+        dispatch(removeSelectedNode());
+      },
     };
 
     function handleKeyDown(event: KeyboardEvent): void {
@@ -45,14 +63,22 @@ export function useEditorShortcuts(canEditStructure: boolean): void {
       const shortcut =
         (hasModifier ? modifiedShortcut(event.key.toLowerCase(), event.shiftKey) : null) ??
         plainShortcut(event, canEditStructure);
-      if (shortcut === null) {return;}
-      if (shortcut !== 'save' && isEditableTarget(event.target)) {return;}
+      if (shortcut === null) {
+        return;
+      }
+      if (shortcut !== 'save' && isEditableTarget(event.target)) {
+        return;
+      }
       // Escape keeps its default so open browser UI still closes.
-      if (shortcut !== 'deselect') {event.preventDefault();}
+      if (shortcut !== 'deselect') {
+        event.preventDefault();
+      }
       actions[shortcut]();
     }
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => { window.removeEventListener('keydown', handleKeyDown); };
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [dispatch, canEditStructure]);
 }

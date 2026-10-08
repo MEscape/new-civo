@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useTranslations } from "@i18n/client";
+import { useTranslations } from '@i18n/client';
 
-import { DataSourceMappingRow } from "./data-source-mapping-row";
+import { DataSourceMappingRow } from './data-source-mapping-row';
 
-import type { CanonicalTargetField } from "../../application/contracts/data-source-constraints";
-import type { DiscoveredFieldView } from "../../application/contracts/data-source-views";
+import type { CanonicalTargetField } from '../../application/contracts/data-source-constraints';
+import type { DiscoveredFieldView } from '../../application/contracts/data-source-views';
 
 export interface DataSourceMappingTableProps {
   readonly fields: readonly DiscoveredFieldView[];
@@ -24,26 +24,26 @@ export function DataSourceMappingTable({
   targetsUsedElsewhere,
   onAssign,
 }: DataSourceMappingTableProps) {
-  const t = useTranslations("dataSources");
+  const t = useTranslations('dataSources');
 
   if (fields.length === 0) {
-    return <p className="text-sm text-copy-muted">{t("mapping.noFields")}</p>;
+    return <p className="text-sm text-copy-muted">{t('mapping.noFields')}</p>;
   }
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <caption className="sr-only">{t("mapping.tableCaption")}</caption>
+        <caption className="sr-only">{t('mapping.tableCaption')}</caption>
         <thead>
           <tr className="border-b border-border text-left text-copy-muted">
             <th scope="col" className="py-1.5 pr-3 font-medium">
-              {t("mapping.externalField")}
+              {t('mapping.externalField')}
             </th>
             <th scope="col" className="py-1.5 pr-3 font-medium">
-              {t("mapping.sampleValue")}
+              {t('mapping.sampleValue')}
             </th>
             <th scope="col" className="py-1.5 font-medium">
-              {t("mapping.targetField")}
+              {t('mapping.targetField')}
             </th>
           </tr>
         </thead>
@@ -52,7 +52,7 @@ export function DataSourceMappingTable({
             <DataSourceMappingRow
               key={field.path}
               field={field}
-              value={assignments[field.path] ?? ""}
+              value={assignments[field.path] ?? ''}
               targets={targets}
               usedTargets={targetsUsedElsewhere(field.path)}
               onAssign={onAssign}

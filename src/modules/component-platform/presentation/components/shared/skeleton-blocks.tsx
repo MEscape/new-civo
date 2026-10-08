@@ -7,11 +7,10 @@ import { Skeleton } from '@components/ui/skeleton';
 
 import { useTranslations } from '@i18n/client';
 
-
 const MAX_PLACEHOLDERS = 8;
 const PLACEHOLDER_KEYS = Array.from(
   { length: MAX_PLACEHOLDERS },
-  (_, index) => `placeholder-${String(index)}`
+  (_, index) => `placeholder-${String(index)}`,
 );
 
 function placeholderKeys(count: number): readonly string[] {
@@ -95,10 +94,6 @@ export function RowListSkeleton({ rows = 4 }: { readonly rows?: number }) {
   );
 }
 
-export function ChartSkeleton({
-  className = 'h-72',
-}: {
-  readonly className?: string;
-}) {
+export function ChartSkeleton({ className = 'h-72' }: { readonly className?: string }) {
   return <Skeleton className={`w-full ${className}`} />;
 }

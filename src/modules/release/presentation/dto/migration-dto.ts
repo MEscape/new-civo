@@ -40,9 +40,7 @@ export interface MigrationDetailDto extends MigrationSummaryDto {
  * Converts an application-layer migration summary view into the JSON-safe
  * DTO exposed to the UI.
  */
-export function toMigrationSummaryDto(
-  view: MigrationSummaryView
-): MigrationSummaryDto {
+export function toMigrationSummaryDto(view: MigrationSummaryView): MigrationSummaryDto {
   return {
     id: view.id,
     websiteId: view.websiteId,
@@ -57,9 +55,7 @@ export function toMigrationSummaryDto(
  * Converts an application-layer migration detail view into the JSON-safe
  * DTO exposed to the UI.
  */
-export function toMigrationDetailDto(
-  view: MigrationDetailView
-): MigrationDetailDto {
+export function toMigrationDetailDto(view: MigrationDetailView): MigrationDetailDto {
   return {
     id: view.id,
     websiteId: view.websiteId,

@@ -16,7 +16,10 @@ describe('createAuditLog', () => {
     const info = vi.fn();
     const warn = vi.fn();
     vi.spyOn(logger, 'withContext').mockReturnValue({ debug: vi.fn(), info, warn, error: vi.fn() });
-    const audit = createAuditLog<ShopEvent['type']>('shop.audit', { 'shop.created': 'info', 'shop.failed': 'warn' });
+    const audit = createAuditLog<ShopEvent['type']>('shop.audit', {
+      'shop.created': 'info',
+      'shop.failed': 'warn',
+    });
 
     const created: ShopEvent = { type: 'shop.created', shopId: 's1' };
     const failed: ShopEvent = { type: 'shop.failed', reason: 'boom' };
@@ -32,8 +35,16 @@ describe('createAuditLog', () => {
     const failing = () => {
       throw new Error('sink down');
     };
-    vi.spyOn(logger, 'withContext').mockReturnValue({ debug: failing, info: failing, warn: failing, error: failing });
-    const audit = createAuditLog<ShopEvent['type']>('shop.audit', { 'shop.created': 'info', 'shop.failed': 'warn' });
+    vi.spyOn(logger, 'withContext').mockReturnValue({
+      debug: failing,
+      info: failing,
+      warn: failing,
+      error: failing,
+    });
+    const audit = createAuditLog<ShopEvent['type']>('shop.audit', {
+      'shop.created': 'info',
+      'shop.failed': 'warn',
+    });
 
     const created: ShopEvent = { type: 'shop.created', shopId: 's1' };
     expect(() => {

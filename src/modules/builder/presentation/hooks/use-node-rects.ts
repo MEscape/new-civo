@@ -3,10 +3,7 @@ import type { RefObject } from 'react';
 
 import { measureAllNodeRects } from '../dom/node-dom';
 
-import type {
-  PageNodeId,
-  Rect,
-} from '../../application/contracts/editor-model';
+import type { PageNodeId, Rect } from '../../application/contracts/editor-model';
 
 const NO_RECTS: ReadonlyMap<PageNodeId, Rect> = new Map();
 
@@ -18,19 +15,25 @@ const NO_RECTS: ReadonlyMap<PageNodeId, Rect> = new Map();
  */
 export function useNodeRects(
   containerRef: RefObject<HTMLElement | null>,
-  renderedContent: unknown
+  renderedContent: unknown,
 ): ReadonlyMap<PageNodeId, Rect> {
   const [rects, setRects] = useState(NO_RECTS);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (container === null) {return undefined;}
+    if (container === null) {
+      return undefined;
+    }
 
-    const update = () => { setRects(measureAllNodeRects(container)); };
+    const update = () => {
+      setRects(measureAllNodeRects(container));
+    };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(container);
-    return () => { observer.disconnect(); };
+    return () => {
+      observer.disconnect();
+    };
   }, [containerRef, renderedContent]);
 
   return rects;

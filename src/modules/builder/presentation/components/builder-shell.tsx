@@ -6,18 +6,13 @@ import { useBeforeUnloadGuard } from '@hooks/use-before-unload-guard';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { cn } from '@lib/utils';
 
 import { hasCapability } from '../../application/contracts/editor-model';
 import { useCanvasDnd } from '../hooks/use-canvas-dnd';
 import { useEditorShortcuts } from '../hooks/use-editor-shortcuts';
 import { useBuilderSelector } from '../state/builder-hooks';
-import {
-  selectEditorMode,
-  selectIsDirty,
-  selectMode,
-} from '../state/builder-selectors';
+import { selectEditorMode, selectIsDirty, selectMode } from '../state/builder-selectors';
 
 import { BuilderCanvas } from './canvas/builder-canvas';
 import { DragAnnouncer } from './canvas/drag-announcer';
@@ -42,12 +37,7 @@ export interface BuilderShellProps {
 const PANEL = 'shrink-0 overflow-y-auto bg-surface';
 
 /** Composes the three-column editor. Capability-gated panels are omitted, not hidden. */
-export function BuilderShell({
-  website,
-  pageTitle,
-  themeStyle,
-  links,
-}: BuilderShellProps) {
+export function BuilderShell({ website, pageTitle, themeStyle, links }: BuilderShellProps) {
   const t = useTranslations('builder');
   const mode = useBuilderSelector(selectMode);
   const editorMode = useBuilderSelector(selectEditorMode);
@@ -61,11 +51,7 @@ export function BuilderShell({
 
   return (
     <div className="flex h-app-body flex-col">
-      <BuilderToolbar
-        websiteName={website.name}
-        pageTitle={pageTitle}
-        links={links}
-      />
+      <BuilderToolbar websiteName={website.name} pageTitle={pageTitle} links={links} />
       <EditNotice />
 
       {mode === 'preview' ? (
@@ -86,11 +72,7 @@ export function BuilderShell({
             aria-label={t('canvas.label')}
             className="min-w-0 flex-1 overflow-y-auto bg-canvas p-6"
           >
-            <BuilderCanvas
-              themeStyle={themeStyle}
-              containerRef={canvasRef}
-              dnd={dnd}
-            />
+            <BuilderCanvas themeStyle={themeStyle} containerRef={canvasRef} dnd={dnd} />
           </section>
           <aside
             aria-label={t('properties.label')}

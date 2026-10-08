@@ -133,7 +133,7 @@ export async function DashboardGrid(input: DashboardGridComponentProps) {
   const trend = valueOrNull(observations);
   const breakdown = valueOrNull(parts);
   const sample: ContentOrigin | undefined = [origin, trend?.origin, breakdown?.origin].find(
-    (entry) => entry?.kind === 'sample'
+    (entry) => entry?.kind === 'sample',
   );
 
   return (

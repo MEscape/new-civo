@@ -1,8 +1,4 @@
-import {
-  Container,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
+import { Container, Section, SectionHeading } from '@components/layout/layout-primitives';
 import { Badge } from '@components/ui/badge';
 import { Card, CardContent } from '@components/ui/card';
 import { Trash2 } from '@components/ui/icons';
@@ -14,7 +10,8 @@ import { trimToNull } from '@lib/utils';
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
 
-import type { WASTE_TYPES ,
+import type {
+  WASTE_TYPES,
   ComponentProps,
   RenderContext,
 } from '../../../../application/contracts/component-platform-constraints';
@@ -43,11 +40,7 @@ export interface WasteCalendarComponentProps {
 }
 
 /** The next waste collections, colour-coded by waste type. */
-export async function WasteCalendar({
-  props,
-  context,
-  loadContent,
-}: WasteCalendarComponentProps) {
+export async function WasteCalendar({ props, context, loadContent }: WasteCalendarComponentProps) {
   const [t, format, result] = await Promise.all([
     getTranslations('componentPlatform'),
     getAppFormatters(),
@@ -60,8 +53,7 @@ export async function WasteCalendar({
       limit: props.limit,
     }),
   ]);
-  const heading =
-    trimToNull(props.heading) ?? t('wasteCalendar.defaultHeading');
+  const heading = trimToNull(props.heading) ?? t('wasteCalendar.defaultHeading');
 
   if (result.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -85,18 +77,13 @@ export async function WasteCalendar({
                   className="flex items-center justify-between gap-3 py-2.5 text-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <Trash2
-                      className="h-4 w-4 shrink-0 text-copy-muted"
-                      aria-hidden="true"
-                    />
+                    <Trash2 className="h-4 w-4 shrink-0 text-copy-muted" aria-hidden="true" />
                     <div>
                       <time dateTime={entry.date} className="text-copy">
                         {format.date(entry.date, DATE_FORMAT)}
                       </time>
                       {entry.district !== undefined && (
-                        <p className="text-xs text-copy-muted">
-                          {entry.district}
-                        </p>
+                        <p className="text-xs text-copy-muted">{entry.district}</p>
                       )}
                     </div>
                   </div>

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  JsonParseError,
-  JsonStringifyError,
-  parseJson,
-  stringifyJson,
-} from '@lib/utils/json';
+import { JsonParseError, JsonStringifyError, parseJson, stringifyJson } from '@lib/utils/json';
 
 describe('parseJson', () => {
   it('parses valid JSON strings', () => {
@@ -49,7 +44,7 @@ describe('stringifyJson', () => {
     assertion1.toThrow(JsonStringifyError);
     assertion1.toThrow('Value is not serializable');
 
-    const assertion2 = expect(() => stringifyJson(() => { }));
+    const assertion2 = expect(() => stringifyJson(() => {}));
     assertion2.toThrow(JsonStringifyError);
     assertion2.toThrow('Value is not serializable');
   });

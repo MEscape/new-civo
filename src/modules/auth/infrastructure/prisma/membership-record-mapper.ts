@@ -8,16 +8,14 @@ import type { Role } from '../../domain/models/role';
  * Generated Prisma contract types never leave the persistence layer.
  */
 export interface MembershipRecord {
-    readonly role: string;
+  readonly role: string;
 }
 
 /**
  * Field list for `.select(...)`; `satisfies` keeps it in sync with the
  * record shape. See `website-record-mapper.ts` for why Prisma 8 spreads it.
  */
-export const MEMBERSHIP_SELECT = ['role'] as const satisfies ReadonlyArray<
-    keyof MembershipRecord
->;
+export const MEMBERSHIP_SELECT = ['role'] as const satisfies ReadonlyArray<keyof MembershipRecord>;
 
 /**
  * One row per (actor, tenant, role) and a unique constraint on that triple,
@@ -33,5 +31,5 @@ export const MAX_MEMBERSHIP_ROWS = ROLES.length;
  * escalate privilege.
  */
 export function toRoles(records: readonly MembershipRecord[]): readonly Role[] {
-    return records.map((record) => record.role).filter(isRole);
+  return records.map((record) => record.role).filter(isRole);
 }

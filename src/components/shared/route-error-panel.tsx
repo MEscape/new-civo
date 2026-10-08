@@ -16,12 +16,7 @@ export interface RouteErrorPanelProps {
  * an unexpected failure is logged where it happened, and its details are not
  * for visitors.
  */
-export function RouteErrorPanel({
-  title,
-  description,
-  retryLabel,
-  onRetry,
-}: RouteErrorPanelProps) {
+export function RouteErrorPanel({ title, description, retryLabel, onRetry }: RouteErrorPanelProps) {
   return (
     <Container className="max-w-md">
       <Section className="space-y-8 text-center">

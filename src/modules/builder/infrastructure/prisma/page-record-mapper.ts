@@ -71,10 +71,9 @@ export const PAGE_CONFIG_SELECT = ['content'] as const satisfies ReadonlyArray<
   keyof PageConfigRecord
 >;
 
-export const SAVED_REVISION_SELECT = [
-  'version',
-  'updatedAt',
-] as const satisfies ReadonlyArray<keyof SavedRevisionRecord>;
+export const SAVED_REVISION_SELECT = ['version', 'updatedAt'] as const satisfies ReadonlyArray<
+  keyof SavedRevisionRecord
+>;
 
 export function toPageSummary(record: PageSummaryRecord): PageSummary {
   return {
@@ -94,9 +93,7 @@ export function toPageSummary(record: PageSummaryRecord): PageSummary {
  * stored revision fails closed like any other corrupted page: reads never
  * hand the renderer a broken tree.
  */
-export function toPage(
-  record: PageRecord
-): AppResult<Page, UnexpectedAppError> {
+export function toPage(record: PageRecord): AppResult<Page, UnexpectedAppError> {
   const [latest] = record.configs;
   return restorePageConfig(latest?.content).map((config) => ({
     ...toPageSummary(record),
@@ -105,7 +102,7 @@ export function toPage(
 }
 
 export function toNullablePage(
-  record: PageRecord | null
+  record: PageRecord | null,
 ): AppResult<Page | null, UnexpectedAppError> {
   return record === null ? ok(null) : toPage(record);
 }
@@ -140,10 +137,7 @@ export function toReleasePage(record: PageRecord): ReleasePage {
 }
 
 /** The config was just written from a validated draft, so it is not re-parsed. */
-export function toCreatedPage(
-  record: PageSummaryRecord,
-  config: PageConfig
-): Page {
+export function toCreatedPage(record: PageSummaryRecord, config: PageConfig): Page {
   return { ...toPageSummary(record), config };
 }
 

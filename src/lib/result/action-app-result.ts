@@ -12,9 +12,7 @@ import type { AppResult } from './app-result';
  * Only serializable error fields are kept: message, a stable code, and
  * optional field-level validation issues. No `cause`, no error instances.
  */
-export type ActionResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: SerializedActionError };
+export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: SerializedActionError };
 
 export interface SerializedActionError {
   code: string;
@@ -29,9 +27,7 @@ export interface SerializedActionError {
  * never inside application/domain code (boundaries.md: application must
  * not import presentation).
  */
-export function toActionResult<T, E extends AppError>(
-  result: AppResult<T, E>
-): ActionResult<T> {
+export function toActionResult<T, E extends AppError>(result: AppResult<T, E>): ActionResult<T> {
   if (result.isOk()) {
     return { ok: true, data: result.value };
   }
@@ -42,16 +38,12 @@ export function toActionResult<T, E extends AppError>(
     error: {
       code: error.code,
       message: error.message,
-      ...(error.kind === 'validation'
-        ? { fieldErrors: error.fieldErrors }
-        : {}),
+      ...(error.kind === 'validation' ? { fieldErrors: error.fieldErrors } : {}),
     },
   };
 }
 
 /** Narrow an ActionResult to its success branch in calling code / tests. */
-export function isActionSuccess<T>(
-  result: ActionResult<T>
-): result is { ok: true; data: T } {
+export function isActionSuccess<T>(result: ActionResult<T>): result is { ok: true; data: T } {
   return result.ok;
 }

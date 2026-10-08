@@ -1,9 +1,6 @@
 import { createAuditLog } from '@lib/logger';
 
-import type {
-  SecurityAuditLog,
-  SecurityEvent,
-} from '../../domain/ports/security-audit-log.port';
+import type { SecurityAuditLog, SecurityEvent } from '../../domain/ports/security-audit-log.port';
 
 /**
  * Failures and denials are `warn` so alerting can key on them; ordinary
@@ -21,4 +18,7 @@ const LEVEL_BY_EVENT = {
 } as const satisfies Record<SecurityEvent['type'], 'info' | 'warn'>;
 
 /** One structured log line per event under `auth.audit`; never throws. */
-export const loggerSecurityAuditLog: SecurityAuditLog = createAuditLog('auth.audit', LEVEL_BY_EVENT);
+export const loggerSecurityAuditLog: SecurityAuditLog = createAuditLog(
+  'auth.audit',
+  LEVEL_BY_EVENT,
+);

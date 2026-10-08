@@ -17,10 +17,7 @@ export type NodeMigrationStatus = (typeof NODE_MIGRATION_STATUSES)[number];
 export const isNodeMigrationStatus = literalGuard(NODE_MIGRATION_STATUSES);
 
 /** Why a node cannot be planned at all. */
-export const UNRESOLVABLE_REASONS = [
-  'type_unregistered',
-  'version_unregistered',
-] as const;
+export const UNRESOLVABLE_REASONS = ['type_unregistered', 'version_unregistered'] as const;
 export type UnresolvableReason = (typeof UNRESOLVABLE_REASONS)[number];
 export const isUnresolvableReason = literalGuard(UNRESOLVABLE_REASONS);
 
@@ -73,7 +70,7 @@ export type NodeStatusCounts = Readonly<Record<NodeMigrationStatus, number>>;
 function planNode(
   node: TreeNode,
   fromVersion: number,
-  components: ComponentCatalog
+  components: ComponentCatalog,
 ): NodeMigrationPlan {
   const base = { nodeId: node.id, type: node.type, fromVersion };
 
@@ -100,7 +97,7 @@ function planNode(
   const { merged, conflicts, addedFields } = threeWayMergeProps(
     oldDefaults,
     node.props,
-    newDefaults
+    newDefaults,
   );
 
   if (conflicts.length === 0) {
@@ -136,23 +133,17 @@ function planNode(
  */
 export function planMigration(
   source: MigrationSource,
-  components: ComponentCatalog
+  components: ComponentCatalog,
 ): MigrationPlan {
-  const versionByType = new Map(
-    source.pins.map((pin) => [pin.type, pin.version] as const)
-  );
+  const versionByType = new Map(source.pins.map((pin) => [pin.type, pin.version] as const));
 
   return {
     pages: source.pages.map((page) => ({
       path: page.path,
-      nodes: flattenForest(page.children, (node) => node.children).flatMap(
-        ({ node }) => {
-          const fromVersion = versionByType.get(node.type);
-          return fromVersion === undefined
-            ? []
-            : [planNode(node, fromVersion, components)];
-        }
-      ),
+      nodes: flattenForest(page.children, (node) => node.children).flatMap(({ node }) => {
+        const fromVersion = versionByType.get(node.type);
+        return fromVersion === undefined ? [] : [planNode(node, fromVersion, components)];
+      }),
     })),
   };
 }
@@ -182,6 +173,6 @@ export function isUpToDate(plan: MigrationPlan): boolean {
 /** A human has to look before anything can be applied in full. */
 export function requiresReview(plan: MigrationPlan): boolean {
   return allNodes(plan).some(
-    (node) => node.status === 'needs_review' || node.status === 'unresolvable'
+    (node) => node.status === 'needs_review' || node.status === 'unresolvable',
   );
 }

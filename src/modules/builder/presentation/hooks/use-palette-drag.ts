@@ -5,10 +5,7 @@ import { hasExceededActivationDistance } from '../dnd/drag-activation';
 
 import type { CanvasDnd } from './use-canvas-dnd';
 
-type PaletteDndApi = Pick<
-  CanvasDnd,
-  'beginPaletteDrag' | 'movePalettePointer' | 'drop' | 'cancel'
->;
+type PaletteDndApi = Pick<CanvasDnd, 'beginPaletteDrag' | 'movePalettePointer' | 'drop' | 'cancel'>;
 
 /**
  * Starts canvas drag sessions from palette items. The palette only STARTS
@@ -19,11 +16,10 @@ type PaletteDndApi = Pick<
 export function usePaletteDrag(dnd: PaletteDndApi) {
   const isDraggingRef = useRef(false);
 
-  function handlePointerDown(
-    event: ReactPointerEvent<HTMLElement>,
-    componentType: string
-  ): void {
-    if (event.button !== 0) {return;}
+  function handlePointerDown(event: ReactPointerEvent<HTMLElement>, componentType: string): void {
+    if (event.button !== 0) {
+      return;
+    }
     const start = { x: event.clientX, y: event.clientY };
     isDraggingRef.current = false;
 
@@ -40,7 +36,9 @@ export function usePaletteDrag(dnd: PaletteDndApi) {
     function handleMove(moveEvent: PointerEvent): void {
       if (!isDraggingRef.current) {
         const current = { x: moveEvent.clientX, y: moveEvent.clientY };
-        if (!hasExceededActivationDistance(start, current)) {return;}
+        if (!hasExceededActivationDistance(start, current)) {
+          return;
+        }
         isDraggingRef.current = true;
         dnd.beginPaletteDrag(componentType);
       }
@@ -48,12 +46,16 @@ export function usePaletteDrag(dnd: PaletteDndApi) {
     }
 
     function handleUp(): void {
-      if (isDraggingRef.current) {dnd.drop();}
+      if (isDraggingRef.current) {
+        dnd.drop();
+      }
       detach();
     }
 
     function handleCancel(): void {
-      if (isDraggingRef.current) {dnd.cancel();}
+      if (isDraggingRef.current) {
+        dnd.cancel();
+      }
       detach();
     }
 

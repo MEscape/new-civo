@@ -18,11 +18,17 @@ const PLACEHOLDER_ORIGIN = 'https://return-path.invalid';
  * and the fragment is dropped.
  */
 export function resolveReturnPath(raw: string | undefined): string {
-    if (!isDefined(raw) || !raw.startsWith('/')) {return DEFAULT_RETURN_PATH;}
-    if (raw.length > RETURN_PATH_MAX_LENGTH) {return DEFAULT_RETURN_PATH;}
+  if (!isDefined(raw) || !raw.startsWith('/')) {
+    return DEFAULT_RETURN_PATH;
+  }
+  if (raw.length > RETURN_PATH_MAX_LENGTH) {
+    return DEFAULT_RETURN_PATH;
+  }
 
-    const resolved = new URL(raw, PLACEHOLDER_ORIGIN);
-    if (resolved.origin !== PLACEHOLDER_ORIGIN) {return DEFAULT_RETURN_PATH;}
+  const resolved = new URL(raw, PLACEHOLDER_ORIGIN);
+  if (resolved.origin !== PLACEHOLDER_ORIGIN) {
+    return DEFAULT_RETURN_PATH;
+  }
 
-    return `${resolved.pathname}${resolved.search}`;
+  return `${resolved.pathname}${resolved.search}`;
 }

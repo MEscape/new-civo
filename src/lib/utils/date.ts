@@ -19,28 +19,20 @@ export function formatDate(
   input: DateInput,
   locale: string,
   timeZone: string,
-  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' }
+  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' },
 ): string {
-  return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(
-    toDate(input)
-  );
+  return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(toDate(input));
 }
 
 /** Formats a date and time for a locale and time zone. */
-export function formatDateTime(
-  input: DateInput,
-  locale: string,
-  timeZone: string
-): string {
+export function formatDateTime(input: DateInput, locale: string, timeZone: string): string {
   return formatDate(input, locale, timeZone, {
     dateStyle: 'medium',
     timeStyle: 'short',
   });
 }
 
-const RELATIVE_UNITS: ReadonlyArray<
-  readonly [Intl.RelativeTimeFormatUnit, number]
-> = [
+const RELATIVE_UNITS: ReadonlyArray<readonly [Intl.RelativeTimeFormatUnit, number]> = [
   ['year', 365 * 24 * 60 * 60 * 1000],
   ['month', 30 * 24 * 60 * 60 * 1000],
   ['week', 7 * 24 * 60 * 60 * 1000],
@@ -56,11 +48,7 @@ const RELATIVE_UNITS: ReadonlyArray<
  * read the clock directly; injecting it here keeps this helper usable from
  * either layer without violating that).
  */
-export function formatRelativeTime(
-  input: DateInput,
-  now: DateInput,
-  locale: string
-): string {
+export function formatRelativeTime(input: DateInput, now: DateInput, locale: string): string {
   const differenceMs = toDate(input).getTime() - toDate(now).getTime();
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
 
@@ -73,11 +61,7 @@ export function formatRelativeTime(
 }
 
 /** True when `date` falls on the same calendar day as `other` in the given time zone. */
-export function isSameDay(
-  date: DateInput,
-  other: DateInput,
-  timeZone: string
-): boolean {
+export function isSameDay(date: DateInput, other: DateInput, timeZone: string): boolean {
   const format = (value: DateInput) =>
     new Intl.DateTimeFormat('en-CA', { timeZone }).format(toDate(value));
   return format(date) === format(other);

@@ -14,9 +14,9 @@ import type { ActorView } from '../contracts/auth-views';
  * @authorization public Answers who the caller is; an anonymous caller learns only that it is anonymous.
  */
 export class GetCurrentActor {
-    constructor(private readonly deps: CurrentActorDependencies) {}
+  constructor(private readonly deps: CurrentActorDependencies) {}
 
-    execute(): AppResultAsync<ActorView, CurrentActorError> {
-        return this.deps.currentActor.getCurrentActor().map(toActorView);
-    }
+  execute(): AppResultAsync<ActorView, CurrentActorError> {
+    return this.deps.currentActor.getCurrentActor().map(toActorView);
+  }
 }

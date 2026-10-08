@@ -74,16 +74,14 @@ describe('retryWithBackoff', () => {
 
   it('stops early when shouldRetry returns false', async () => {
     const fn = vi.fn().mockRejectedValue(new Error('fatal'));
-    await expect(
-      retryWithBackoff(fn, { attempts: 5, shouldRetry: () => false })
-    ).rejects.toThrow('fatal');
+    await expect(retryWithBackoff(fn, { attempts: 5, shouldRetry: () => false })).rejects.toThrow(
+      'fatal',
+    );
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
   it('rejects an invalid attempts value as a programmer error', async () => {
-    await expect(retryWithBackoff(vi.fn(), { attempts: 0 })).rejects.toThrow(
-      RangeError
-    );
+    await expect(retryWithBackoff(vi.fn(), { attempts: 0 })).rejects.toThrow(RangeError);
   });
 });
 
@@ -111,14 +109,10 @@ describe('mapWithConcurrency', () => {
   });
 
   it('handles empty input', async () => {
-    await expect(mapWithConcurrency([], 3, async (x) => x)).resolves.toEqual(
-      []
-    );
+    await expect(mapWithConcurrency([], 3, async (x) => x)).resolves.toEqual([]);
   });
 
   it('rejects an invalid concurrency value', async () => {
-    await expect(mapWithConcurrency([1], 0, async (x) => x)).rejects.toThrow(
-      RangeError
-    );
+    await expect(mapWithConcurrency([1], 0, async (x) => x)).rejects.toThrow(RangeError);
   });
 });

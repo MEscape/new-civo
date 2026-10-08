@@ -13,19 +13,13 @@ import {
 
 describe('isDefined', () => {
   it('removes null and undefined but keeps falsy values', () => {
-    expect([0, '', false, null, undefined].filter(isDefined)).toEqual([
-      0,
-      '',
-      false,
-    ]);
+    expect([0, '', false, null, undefined].filter(isDefined)).toEqual([0, '', false]);
   });
 });
 
 describe('groupBy', () => {
   it('groups items and preserves order', () => {
-    const result = groupBy([1, 2, 3, 4, 5], (n) =>
-      n % 2 === 0 ? 'even' : 'odd'
-    );
+    const result = groupBy([1, 2, 3, 4, 5], (n) => (n % 2 === 0 ? 'even' : 'odd'));
     expect(result.get('odd')).toEqual([1, 3, 5]);
     expect(result.get('even')).toEqual([2, 4]);
   });
@@ -43,7 +37,7 @@ describe('keyBy', () => {
         { id: 1, v: 'a' },
         { id: 1, v: 'b' },
       ],
-      (x) => x.id
+      (x) => x.id,
     );
     expect(result.get(1)?.v).toBe('b');
   });
@@ -74,7 +68,7 @@ describe('unique', () => {
         { id: 1, n: 'a' },
         { id: 1, n: 'b' },
       ],
-      (x) => x.id
+      (x) => x.id,
     );
     expect(result).toEqual([{ id: 1, n: 'a' }]);
   });

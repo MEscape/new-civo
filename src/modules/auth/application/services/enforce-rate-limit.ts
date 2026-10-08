@@ -16,16 +16,18 @@ export type RateLimitError = ForbiddenAppError | InfrastructureAppError;
  * waved through. The refusal is audited; the caller only sees `rateLimited`.
  */
 export function enforceRateLimit(
-    deps: Pick<AuthenticationDependencies, 'rateLimiter' | 'audit'>,
-    action: AuthRateLimitAction,
-    subject: string
+  deps: Pick<AuthenticationDependencies, 'rateLimiter' | 'audit'>,
+  action: AuthRateLimitAction,
+  subject: string,
 ): AppResultAsync<void, RateLimitError> {
-    return deps.rateLimiter
-        .consume({ action, subject, ...AUTH_RATE_LIMITS[action] })
-        .andThen((decision): AppResultAsync<void, ForbiddenAppError> => {
-            if (decision.isAllowed) {return okAsync(undefined);}
+  return deps.rateLimiter
+    .consume({ action, subject, ...AUTH_RATE_LIMITS[action] })
+    .andThen((decision): AppResultAsync<void, ForbiddenAppError> => {
+      if (decision.isAllowed) {
+        return okAsync(undefined);
+      }
 
-            deps.audit.record({ type: 'authentication.rate_limited', action });
-            return errAsync(rateLimited());
-        });
+      deps.audit.record({ type: 'authentication.rate_limited', action });
+      return errAsync(rateLimited());
+    });
 }

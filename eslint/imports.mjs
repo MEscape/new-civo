@@ -18,7 +18,16 @@ export const imports = [
       'import/order': [
         'error',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'object',
+            'type',
+          ],
           pathGroups: [
             { pattern: 'react', group: 'external', position: 'before' },
             { pattern: 'react-dom', group: 'external', position: 'before' },
@@ -45,11 +54,17 @@ export const imports = [
       'import/no-duplicates': 'error',
       'import/no-default-export': 'error',
       'import/no-unresolved': 'off', // TypeScript resolves modules
-      'import/no-extraneous-dependencies': ['error', { devDependencies: [...TEST_FILES, ...CONFIG_FILES], optionalDependencies: false }],
+      'import/no-extraneous-dependencies': [
+        'error',
+        { devDependencies: [...TEST_FILES, ...CONFIG_FILES], optionalDependencies: false },
+      ],
       'import/first': 'error',
       'import/newline-after-import': 'error',
       'unused-imports/no-unused-imports': 'error',
-      'unused-imports/no-unused-vars': ['warn', { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' }],
+      'unused-imports/no-unused-vars': [
+        'warn',
+        { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' },
+      ],
     },
   },
 ];

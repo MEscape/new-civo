@@ -8,10 +8,10 @@
  * precision: the one canonical instant form across modules.
  */
 export interface Clock {
-    now(): Date;
+  now(): Date;
 }
 
 /** The real clock. Created once per process and shared by `composition.ts` files. */
 export const systemClock: Clock = {
-    now: () => new Date(),
+  now: () => new Date(),
 };

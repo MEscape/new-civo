@@ -8,8 +8,7 @@ import { policyFor } from './policy.mjs';
 import { exportedNames, topLevelClasses, violation } from './project.mjs';
 
 const hasFile = (files, local) => files.some((f) => f.local === local);
-const under = (files, prefix) =>
-  files.filter((f) => f.local.startsWith(prefix));
+const under = (files, prefix) => files.filter((f) => f.local.startsWith(prefix));
 
 /** Modules, roles and capability pairs (repository <-> mapper, audit port <-> adapter, messages). */
 export function checkModuleStructure(project) {
@@ -25,8 +24,8 @@ export function checkModuleStructure(project) {
         violation(
           'module-structure',
           `${at}/index.ts`,
-          `Module '${name}' has no public API (index.ts).`
-        )
+          `Module '${name}' has no public API (index.ts).`,
+        ),
       );
 
     const useCases = [
@@ -42,27 +41,23 @@ export function checkModuleStructure(project) {
         violation(
           'module-structure',
           `${at}/${policy.compositionFile}`,
-          `Module '${name}' has use cases but no composition root (${policy.compositionFile}).`
-        )
+          `Module '${name}' has use cases but no composition root (${policy.compositionFile}).`,
+        ),
       );
     }
 
     // persistence capability
     for (const port of under(files, 'domain/ports/').filter((f) =>
-      /\.repository\.ts$/.test(f.local)
+      /\.repository\.ts$/.test(f.local),
     )) {
-      const base = port.local
-        .replace(/^domain\/ports\//, '')
-        .replace(/\.repository\.ts$/, '');
-      if (
-        !hasFile(files, `infrastructure/prisma/prisma-${base}.repository.ts`)
-      ) {
+      const base = port.local.replace(/^domain\/ports\//, '').replace(/\.repository\.ts$/, '');
+      if (!hasFile(files, `infrastructure/prisma/prisma-${base}.repository.ts`)) {
         out.push(
           violation(
             'repository-pairs',
             port.path,
-            `Repository port '${base}.repository.ts' has no adapter 'infrastructure/prisma/prisma-${base}.repository.ts'.`
-          )
+            `Repository port '${base}.repository.ts' has no adapter 'infrastructure/prisma/prisma-${base}.repository.ts'.`,
+          ),
         );
       }
       if (
@@ -73,13 +68,13 @@ export function checkModuleStructure(project) {
           violation(
             'repository-pairs',
             port.path,
-            `Repository '${base}' has no record mapper 'infrastructure/prisma/${base}-record-mapper.ts' (selections and record conversions live there).`
-          )
+            `Repository '${base}' has no record mapper 'infrastructure/prisma/${base}-record-mapper.ts' (selections and record conversions live there).`,
+          ),
         );
       }
     }
     for (const adapter of under(files, 'infrastructure/prisma/').filter((f) =>
-      /prisma-.+\.repository\.ts$/.test(f.local)
+      /prisma-.+\.repository\.ts$/.test(f.local),
     )) {
       const base = adapter.local
         .replace(/^infrastructure\/prisma\/prisma-/, '')
@@ -89,20 +84,18 @@ export function checkModuleStructure(project) {
           violation(
             'repository-pairs',
             adapter.path,
-            `Adapter '${adapter.local}' implements no domain port 'domain/ports/${base}.repository.ts'.`
-          )
+            `Adapter '${adapter.local}' implements no domain port 'domain/ports/${base}.repository.ts'.`,
+          ),
         );
       }
     }
 
     // audit capability
     const auditPorts = under(files, 'domain/ports/').filter((f) =>
-      /-audit-log\.port\.ts$/.test(f.local)
+      /-audit-log\.port\.ts$/.test(f.local),
     );
     for (const port of auditPorts) {
-      const base = port.local
-        .replace(/^domain\/ports\//, '')
-        .replace(/-audit-log\.port\.ts$/, '');
+      const base = port.local.replace(/^domain\/ports\//, '').replace(/-audit-log\.port\.ts$/, '');
       const adapter = ['audit', 'logging']
         .map((d) => `infrastructure/${d}/logger-${base}-audit-log.ts`)
         .find((p) => hasFile(files, p));
@@ -111,21 +104,18 @@ export function checkModuleStructure(project) {
           violation(
             'audit-coverage',
             port.path,
-            `Audit port '${port.local}' has no adapter 'infrastructure/audit/logger-${base}-audit-log.ts'.`
-          )
+            `Audit port '${port.local}' has no adapter 'infrastructure/audit/logger-${base}-audit-log.ts'.`,
+          ),
         );
       const exported = exportedNames(port);
       const pascal = kebabToPascal(base);
-      if (
-        !exported.includes(`${pascal}AuditLog`) ||
-        !exported.includes(`${pascal}Event`)
-      ) {
+      if (!exported.includes(`${pascal}AuditLog`) || !exported.includes(`${pascal}Event`)) {
         out.push(
           violation(
             'audit-coverage',
             port.path,
-            `Audit port must export \`${pascal}AuditLog\` and the event union \`${pascal}Event\`.`
-          )
+            `Audit port must export \`${pascal}AuditLog\` and the event union \`${pascal}Event\`.`,
+          ),
         );
       }
     }
@@ -143,8 +133,8 @@ export function checkModuleStructure(project) {
           violation(
             'audit-coverage',
             adapter.path,
-            `Audit adapter '${adapter.local}' implements no domain audit port '${base}-audit-log.port.ts'.`
-          )
+            `Audit adapter '${adapter.local}' implements no domain audit port '${base}-audit-log.port.ts'.`,
+          ),
         );
       }
     }
@@ -157,14 +147,14 @@ export function checkModuleStructure(project) {
         violation(
           'audit-coverage',
           at,
-          `Module '${name}' has commands but no audit port (domain/ports/<name>-audit-log.port.ts).`
-        )
+          `Module '${name}' has commands but no audit port (domain/ports/<name>-audit-log.port.ts).`,
+        ),
       );
     }
 
     // messages capability: translations travel with their message map and catalog
     const jsonLocales = [...project.json.keys()].filter((p) =>
-      p.startsWith(`${at}/presentation/i18n/`)
+      p.startsWith(`${at}/presentation/i18n/`),
     );
     const hasKeys = hasFile(files, 'presentation/messages/message-keys.ts');
     if (jsonLocales.length > 0 && !hasKeys) {
@@ -172,8 +162,8 @@ export function checkModuleStructure(project) {
         violation(
           'messages',
           `${at}/presentation/messages`,
-          `Module '${name}' ships translations but has no presentation/messages/message-keys.ts mapping its codes to keys.`
-        )
+          `Module '${name}' ships translations but has no presentation/messages/message-keys.ts mapping its codes to keys.`,
+        ),
       );
     }
     if (hasKeys && jsonLocales.length === 0) {
@@ -181,8 +171,8 @@ export function checkModuleStructure(project) {
         violation(
           'messages',
           `${at}/presentation/messages/message-keys.ts`,
-          `Module '${name}' maps codes to translation keys but ships no presentation/i18n/<locale>.json.`
-        )
+          `Module '${name}' maps codes to translation keys but ships no presentation/i18n/<locale>.json.`,
+        ),
       );
     }
 
@@ -193,54 +183,43 @@ export function checkModuleStructure(project) {
           violation(
             'no-placeholders',
             f.path,
-            'Empty file. Do not add placeholder files to satisfy a structure; create files only for capabilities the module has.'
-          )
+            'Empty file. Do not add placeholder files to satisfy a structure; create files only for capabilities the module has.',
+          ),
         );
     }
 
     // Error-code conventions: stable identifiers, not prose.
     for (const f of under(files, 'domain/errors/')) {
       for (const statement of f.ast.body) {
-        const d =
-          statement.type === 'ExportNamedDeclaration'
-            ? statement.declaration
-            : null;
+        const d = statement.type === 'ExportNamedDeclaration' ? statement.declaration : null;
         if (d?.type !== 'VariableDeclaration') continue;
         for (const v of d.declarations) {
-          if (v.id.type !== 'Identifier' || !/_CODES$/.test(v.id.name))
-            continue;
-          if (
-            !/^[A-Z0-9]+(?:_[A-Z0-9]+)*_(?:ERROR|VALIDATION)_CODES$/.test(
-              v.id.name
-            )
-          ) {
+          if (v.id.type !== 'Identifier' || !/_CODES$/.test(v.id.name)) continue;
+          if (!/^[A-Z0-9]+(?:_[A-Z0-9]+)*_(?:ERROR|VALIDATION)_CODES$/.test(v.id.name)) {
             out.push(
               violation(
                 'error-codes',
                 f.path,
-                `'${v.id.name}' must be named <MODULE>_ERROR_CODES or <MODULE>_VALIDATION_CODES.`
-              )
+                `'${v.id.name}' must be named <MODULE>_ERROR_CODES or <MODULE>_VALIDATION_CODES.`,
+              ),
             );
           }
-          const object =
-            v.init?.type === 'TSAsExpression' ? v.init.expression : v.init;
+          const object = v.init?.type === 'TSAsExpression' ? v.init.expression : v.init;
           for (const p of object?.properties ?? []) {
             const value = p.value;
-            if (
-              !(
-                value?.type === 'Literal' &&
-                typeof value.value === 'string' &&
-                /^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$/.test(value.value)
-              )
-            ) {
+            if (!(
+              value?.type === 'Literal' &&
+              typeof value.value === 'string' &&
+              /^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)+$/.test(value.value)
+            )) {
               out.push(
                 violation(
                   'error-codes',
                   f.path,
                   `Code '${p.key.name ?? p.key.value}' in ${
                     v.id.name
-                  } must be a stable dotted identifier such as 'module.some_code', not text shown to users.`
-                )
+                  } must be a stable dotted identifier such as 'module.some_code', not text shown to users.`,
+                ),
               );
             }
           }
@@ -255,10 +234,18 @@ export function checkModuleStructure(project) {
 function portTypedConstants(file) {
   const constants = [];
   for (const statement of file.ast.body) {
-    if (statement.type !== 'ExportNamedDeclaration' || statement.declaration?.type !== 'VariableDeclaration') continue;
+    if (
+      statement.type !== 'ExportNamedDeclaration' ||
+      statement.declaration?.type !== 'VariableDeclaration'
+    )
+      continue;
     for (const declarator of statement.declaration.declarations) {
       const annotation = declarator.id.typeAnnotation?.typeAnnotation;
-      if (declarator.id.type === 'Identifier' && annotation?.type === 'TSTypeReference' && annotation.typeName.type === 'Identifier') {
+      if (
+        declarator.id.type === 'Identifier' &&
+        annotation?.type === 'TSTypeReference' &&
+        annotation.typeName.type === 'Identifier'
+      ) {
         constants.push({ name: declarator.id.name, type: annotation.typeName.name });
       }
     }
@@ -272,13 +259,15 @@ function portTypedConstants(file) {
  */
 export function portImplementations(project, name) {
   const found = [];
-  for (const f of project
-    .moduleFiles(name)
-    .filter((x) => x.local.startsWith('infrastructure/'))) {
+  for (const f of project.moduleFiles(name).filter((x) => x.local.startsWith('infrastructure/'))) {
     const isPortName = (n) =>
-      f.imports.some((imp) => imp.names?.includes(n) && /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/')));
+      f.imports.some(
+        (imp) =>
+          imp.names?.includes(n) && /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/')),
+      );
     for (const constant of portTypedConstants(f)) {
-      if (isPortName(constant.type)) found.push({ file: f, name: constant.name, implemented: [constant.type], kind: 'value' });
+      if (isPortName(constant.type))
+        found.push({ file: f, name: constant.name, implemented: [constant.type], kind: 'value' });
     }
     for (const cls of topLevelClasses(f)) {
       const implemented = (cls.node.implements ?? [])
@@ -288,7 +277,7 @@ export function portImplementations(project, name) {
       const fromPorts = f.imports.some(
         (imp) =>
           imp.names?.some((n) => implemented.includes(n)) &&
-          /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/'))
+          /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/')),
       );
       if (fromPorts) found.push({ file: f, name: cls.name, implemented, kind: 'class' });
     }

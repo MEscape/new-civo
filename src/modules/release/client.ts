@@ -14,10 +14,7 @@ export { toReleaseHistoryDto } from './presentation/dto/release-history-dto';
 
 export type { ReleaseHistoryDto } from './presentation/dto/release-history-dto';
 export type { ReleaseSummaryDto } from './presentation/dto/release-dto';
-export type {
-  MigrationDetailDto,
-  MigrationSummaryDto,
-} from './presentation/dto/migration-dto';
+export type { MigrationDetailDto, MigrationSummaryDto } from './presentation/dto/migration-dto';
 export type { MigrationHistoryDto } from './presentation/dto/migration-history-dto';
 
 export { releaseRoutes } from './presentation/routes';

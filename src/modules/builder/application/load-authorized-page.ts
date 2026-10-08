@@ -21,10 +21,7 @@ import type { Page, PageSummary } from '../domain/models/page';
 
 /** Everything an operation that needs only the page's identity can fail with. */
 export type LoadPageSummaryError =
-  | AuthorizationError
-  | ValidationAppError
-  | NotFoundAppError
-  | InfrastructureAppError;
+  AuthorizationError | ValidationAppError | NotFoundAppError | InfrastructureAppError;
 
 /** Reading the config can additionally fail closed on corrupted stored JSON. */
 export type LoadPageError = LoadPageSummaryError | UnexpectedAppError;
@@ -36,7 +33,7 @@ export interface AuthorizedPageContext<TPage extends PageSummary> {
 
 type PageLookup<TPage extends PageSummary, TError extends AppError> = (
   id: PageId,
-  tenantId: TenantId
+  tenantId: TenantId,
 ) => AppResultAsync<TPage | null, TError>;
 
 /**
@@ -52,7 +49,7 @@ type PageLookup<TPage extends PageSummary, TError extends AppError> = (
 function loadAuthorized<TPage extends PageSummary, TError extends AppError>(
   deps: PageAccessDependencies,
   request: { readonly rawId: string; readonly permission: Permission },
-  find: PageLookup<TPage, TError>
+  find: PageLookup<TPage, TError>,
 ): AppResultAsync<
   AuthorizedPageContext<TPage>,
   AuthorizationError | ValidationAppError | NotFoundAppError | TError
@@ -63,15 +60,14 @@ function loadAuthorized<TPage extends PageSummary, TError extends AppError>(
   return authorization.requireInTenant(permission).andThen((actor) =>
     parsePageId(rawId)
       .asyncAndThen((id) => find(id, actor.tenantId))
-      .andThen(
-        (page): AppResultAsync<TPage, NotFoundAppError> =>
-          page === null ? errAsync(pageNotFound()) : okAsync(page)
+      .andThen((page): AppResultAsync<TPage, NotFoundAppError> =>
+        page === null ? errAsync(pageNotFound()) : okAsync(page),
       )
       .andThen((page) =>
         authorization
           .requireOnResource(permission, scopeOf(page))
-          .map((verifiedActor) => ({ actor: verifiedActor, page }))
-      )
+          .map((verifiedActor) => ({ actor: verifiedActor, page })),
+      ),
   );
 }
 
@@ -79,10 +75,10 @@ function loadAuthorized<TPage extends PageSummary, TError extends AppError>(
 export function loadAuthorizedPage(
   deps: PageAccessDependencies,
   rawId: string,
-  permission: Permission
+  permission: Permission,
 ): AppResultAsync<AuthorizedPageContext<Page>, LoadPageError> {
   return loadAuthorized(deps, { rawId, permission }, (id, tenantId) =>
-    deps.pages.findById(id, tenantId)
+    deps.pages.findById(id, tenantId),
   );
 }
 
@@ -94,9 +90,9 @@ export function loadAuthorizedPage(
 export function loadAuthorizedPageSummary(
   deps: PageAccessDependencies,
   rawId: string,
-  permission: Permission
+  permission: Permission,
 ): AppResultAsync<AuthorizedPageContext<PageSummary>, LoadPageSummaryError> {
   return loadAuthorized(deps, { rawId, permission }, (id, tenantId) =>
-    deps.pages.findSummaryById(id, tenantId)
+    deps.pages.findSummaryById(id, tenantId),
   );
 }

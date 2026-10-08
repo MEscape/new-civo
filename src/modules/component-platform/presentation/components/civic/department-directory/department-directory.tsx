@@ -1,15 +1,5 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 import { ContentLink } from '@components/ui/content-link';
 import { Mail } from '@components/ui/icons';
 
@@ -47,8 +37,7 @@ export async function DepartmentDirectory({
       datasetId: props.datasetId,
     }),
   ]);
-  const heading =
-    trimToNull(props.heading) ?? t('departmentDirectory.defaultHeading');
+  const heading = trimToNull(props.heading) ?? t('departmentDirectory.defaultHeading');
 
   if (result.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -82,10 +71,7 @@ export async function DepartmentDirectory({
                   )}
                   <ul className="mt-3 flex flex-col gap-1.5 text-sm">
                     {department.contacts.map((contact) => (
-                      <li
-                        key={contact.id}
-                        className="flex items-center justify-between gap-2"
-                      >
+                      <li key={contact.id} className="flex items-center justify-between gap-2">
                         <span className="text-copy">{contact.name}</span>
                         {contact.email !== undefined && (
                           <ContentLink

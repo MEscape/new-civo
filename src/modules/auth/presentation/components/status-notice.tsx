@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 export interface StatusNoticeProps {
-    readonly title: string;
-    readonly children: ReactNode;
+  readonly title: string;
+  readonly children: ReactNode;
 }
 
 /**
@@ -10,13 +10,10 @@ export interface StatusNoticeProps {
  * announces it politely without stealing focus.
  */
 export function StatusNotice({ title, children }: StatusNoticeProps) {
-    return (
-        <div
-            role="status"
-            className="space-y-3 rounded-token border border-border bg-surface p-6"
-        >
-            <p className="font-heading text-lg font-semibold text-copy">{title}</p>
-            <div className="space-y-3 text-sm text-copy-muted">{children}</div>
-        </div>
-    );
+  return (
+    <div role="status" className="space-y-3 rounded-token border border-border bg-surface p-6">
+      <p className="font-heading text-lg font-semibold text-copy">{title}</p>
+      <div className="space-y-3 text-sm text-copy-muted">{children}</div>
+    </div>
+  );
 }

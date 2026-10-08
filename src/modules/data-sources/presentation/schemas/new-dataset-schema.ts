@@ -1,10 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import {
-  canonicalKindSchema,
-  datasetNameSchema,
-  idSchema,
-} from "./data-source-fields-schema";
+import { canonicalKindSchema, datasetNameSchema, idSchema } from './data-source-fields-schema';
 
 /** The slug is derived from the name by the domain unless given. */
 export const newDatasetSchema = z.object({

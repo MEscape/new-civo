@@ -10,51 +10,48 @@ import type { PageNode } from '../models/page-node';
  */
 
 export interface EditorSnapshot {
-    readonly children: readonly PageNode[];
-    readonly selectedNodeId: PageNodeId | null;
+  readonly children: readonly PageNode[];
+  readonly selectedNodeId: PageNodeId | null;
 }
 
 export interface DocumentHistory {
-    readonly past: readonly EditorSnapshot[];
-    readonly present: EditorSnapshot;
-    readonly future: readonly EditorSnapshot[];
-    /** True while consecutive prop edits (typing) are folded into one history entry. */
-    readonly isCoalescingProps: boolean;
-    /** The tree as last saved (or loaded): the baseline for `isDirty`. */
-    readonly savedChildren: readonly PageNode[];
+  readonly past: readonly EditorSnapshot[];
+  readonly present: EditorSnapshot;
+  readonly future: readonly EditorSnapshot[];
+  /** True while consecutive prop edits (typing) are folded into one history entry. */
+  readonly isCoalescingProps: boolean;
+  /** The tree as last saved (or loaded): the baseline for `isDirty`. */
+  readonly savedChildren: readonly PageNode[];
 }
 
 export const MAX_HISTORY_ENTRIES = 100;
 
 function pushPast(
-    past: readonly EditorSnapshot[],
-    entry: EditorSnapshot
+  past: readonly EditorSnapshot[],
+  entry: EditorSnapshot,
 ): readonly EditorSnapshot[] {
-    return [...past, entry].slice(-MAX_HISTORY_ENTRIES);
+  return [...past, entry].slice(-MAX_HISTORY_ENTRIES);
 }
 
 export function createHistory(children: readonly PageNode[]): DocumentHistory {
-    return {
-        past: [],
-        present: { children, selectedNodeId: null },
-        future: [],
-        isCoalescingProps: false,
-        savedChildren: children,
-    };
+  return {
+    past: [],
+    present: { children, selectedNodeId: null },
+    future: [],
+    isCoalescingProps: false,
+    savedChildren: children,
+  };
 }
 
 /** A discrete edit: one undo step, and any redo branch is dropped. */
-export function commitSnapshot(
-    history: DocumentHistory,
-    next: EditorSnapshot
-): DocumentHistory {
-    return {
-        ...history,
-        past: pushPast(history.past, history.present),
-        present: next,
-        future: [],
-        isCoalescingProps: false,
-    };
+export function commitSnapshot(history: DocumentHistory, next: EditorSnapshot): DocumentHistory {
+  return {
+    ...history,
+    past: pushPast(history.past, history.present),
+    present: next,
+    future: [],
+    isCoalescingProps: false,
+  };
 }
 
 /**
@@ -63,59 +60,63 @@ export function commitSnapshot(
  * whole typing burst is a single undo step.
  */
 export function updatePropsInPlace(
-    history: DocumentHistory,
-    children: readonly PageNode[]
+  history: DocumentHistory,
+  children: readonly PageNode[],
 ): DocumentHistory {
-    const present = { ...history.present, children };
-    if (history.isCoalescingProps) {return { ...history, present };}
-    return {
-        ...history,
-        past: pushPast(history.past, history.present),
-        present,
-        future: [],
-        isCoalescingProps: true,
-    };
+  const present = { ...history.present, children };
+  if (history.isCoalescingProps) {
+    return { ...history, present };
+  }
+  return {
+    ...history,
+    past: pushPast(history.past, history.present),
+    present,
+    future: [],
+    isCoalescingProps: true,
+  };
 }
 
 export function finishPropsEdit(history: DocumentHistory): DocumentHistory {
-    return history.isCoalescingProps
-        ? { ...history, isCoalescingProps: false }
-        : history;
+  return history.isCoalescingProps ? { ...history, isCoalescingProps: false } : history;
 }
 
 /** Selection is not an edit: it never creates an undo step. */
 export function selectNodeInHistory(
-    history: DocumentHistory,
-    nodeId: PageNodeId | null
+  history: DocumentHistory,
+  nodeId: PageNodeId | null,
 ): DocumentHistory {
-    return {
-        ...history,
-        present: { ...history.present, selectedNodeId: nodeId },
-    };
+  return {
+    ...history,
+    present: { ...history.present, selectedNodeId: nodeId },
+  };
 }
 
 export function undoEdit(history: DocumentHistory): DocumentHistory {
-    const previous = history.past.at(-1);
-    if (previous === undefined) {return history;}
-    return {
-        ...history,
-        past: history.past.slice(0, -1),
-        present: previous,
-        future: [history.present, ...history.future],
-        isCoalescingProps: false,
-    };
+  const previous = history.past.at(-1);
+  if (previous === undefined) {
+    return history;
+  }
+  return {
+    ...history,
+    past: history.past.slice(0, -1),
+    present: previous,
+    future: [history.present, ...history.future],
+    isCoalescingProps: false,
+  };
 }
 
 export function redoEdit(history: DocumentHistory): DocumentHistory {
-    const [next, ...rest] = history.future;
-    if (next === undefined) {return history;}
-    return {
-        ...history,
-        past: pushPast(history.past, history.present),
-        present: next,
-        future: rest,
-        isCoalescingProps: false,
-    };
+  const [next, ...rest] = history.future;
+  if (next === undefined) {
+    return history;
+  }
+  return {
+    ...history,
+    past: pushPast(history.past, history.present),
+    present: next,
+    future: rest,
+    isCoalescingProps: false,
+  };
 }
 
 /**
@@ -123,10 +124,10 @@ export function redoEdit(history: DocumentHistory): DocumentHistory {
  * current one: edits made while the save was in flight must stay dirty.
  */
 export function markSaved(
-    history: DocumentHistory,
-    savedChildren: readonly PageNode[]
+  history: DocumentHistory,
+  savedChildren: readonly PageNode[],
 ): DocumentHistory {
-    return { ...history, savedChildren };
+  return { ...history, savedChildren };
 }
 
 /**
@@ -136,13 +137,13 @@ export function markSaved(
  * identity, so only the edited path is actually compared.
  */
 export function isDirty(history: DocumentHistory): boolean {
-    return !deepEqual(history.present.children, history.savedChildren);
+  return !deepEqual(history.present.children, history.savedChildren);
 }
 
 export function canUndo(history: DocumentHistory): boolean {
-    return history.past.length > 0;
+  return history.past.length > 0;
 }
 
 export function canRedo(history: DocumentHistory): boolean {
-    return history.future.length > 0;
+  return history.future.length > 0;
 }

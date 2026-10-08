@@ -2,12 +2,7 @@ import { email, list, object, optional } from '../models/field-schema';
 
 import { CONTENT_LIMITS as LIMITS } from './content-limits';
 import { defineContent } from './define-content';
-import {
-  optionalLinkTarget,
-  recordId,
-  shortText,
-  title,
-} from './shared-fields';
+import { optionalLinkTarget, recordId, shortText, title } from './shared-fields';
 
 /** A department with its contact persons. */
 export const departmentContent = defineContent({
@@ -22,7 +17,7 @@ export const departmentContent = defineContent({
         name: title(),
         email: optional(email(LIMITS.label)),
       }),
-      LIMITS.contacts
+      LIMITS.contacts,
     ),
   },
   rule: {},
@@ -45,8 +40,6 @@ export const departmentContent = defineContent({
     id: 'sample-department-2',
     name: 'Bauamt',
     description: 'Baugenehmigungen und Stadtplanung.',
-    contacts: [
-      { id: 'sample-dc-3', name: 'Karl Beispiel', email: 'bauamt@example.org' },
-    ],
+    contacts: [{ id: 'sample-dc-3', name: 'Karl Beispiel', email: 'bauamt@example.org' }],
   },
 ]);

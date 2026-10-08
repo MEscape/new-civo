@@ -6,25 +6,22 @@ import type { AppResult } from '@lib/result';
 import type { ZodType } from 'zod';
 
 interface IssueLike {
-    readonly path: readonly PropertyKey[];
-    readonly message: string;
+  readonly path: readonly PropertyKey[];
+  readonly message: string;
 }
 
-function collectFieldErrors(
-    issues: readonly IssueLike[]
-): Record<string, string[]> {
-    const fieldErrors: Record<string, string[]> = {};
-    for (const issue of issues) {
-        const path =
-            issue.path.length > 0 ? fieldPath(...issue.path.map(String)) : ROOT_FIELD;
-        (fieldErrors[path] ??= []).push(issue.message);
-    }
-    return fieldErrors;
+function collectFieldErrors(issues: readonly IssueLike[]): Record<string, string[]> {
+  const fieldErrors: Record<string, string[]> = {};
+  for (const issue of issues) {
+    const path = issue.path.length > 0 ? fieldPath(...issue.path.map(String)) : ROOT_FIELD;
+    (fieldErrors[path] ??= []).push(issue.message);
+  }
+  return fieldErrors;
 }
 
 export type ActionInputParser = <TOutput>(
-    schema: ZodType<TOutput>,
-    input: unknown
+  schema: ZodType<TOutput>,
+  input: unknown,
 ) => AppResult<TOutput, ValidationAppError>;
 
 /**
@@ -32,15 +29,17 @@ export type ActionInputParser = <TOutput>(
  * error model. `code` is the owning module's "invalid input" code.
  */
 export function createActionInputParser(code: string): ActionInputParser {
-    return (schema, input) => {
-        const parsed = schema.safeParse(input);
-        if (parsed.success) {return ok(parsed.data);}
-        return err(
-            validationError(
-                code,
-                'The request input is invalid.',
-                collectFieldErrors(parsed.error.issues)
-            )
-        );
-    };
+  return (schema, input) => {
+    const parsed = schema.safeParse(input);
+    if (parsed.success) {
+      return ok(parsed.data);
+    }
+    return err(
+      validationError(
+        code,
+        'The request input is invalid.',
+        collectFieldErrors(parsed.error.issues),
+      ),
+    );
+  };
 }

@@ -19,10 +19,7 @@ import {
   pageVersionConflict,
   websiteNotFound,
 } from '../../domain/errors/builder-errors';
-import {
-  INITIAL_PAGE_VERSION,
-  PAGE_REVISION_LIMIT,
-} from '../../domain/models/page';
+import { INITIAL_PAGE_VERSION, PAGE_REVISION_LIMIT } from '../../domain/models/page';
 import { serializePageConfig } from '../../domain/models/page-config';
 
 import {
@@ -61,22 +58,18 @@ const persistenceLogger = logger.withContext({ module: MODULE });
 
 /** Pages of every website with only the newest revision's JSON: never the whole history. */
 const pagesWithLatestConfig = () =>
-  db.orm.public.Page.select(...PAGE_SUMMARY_SELECT).include(
-    'configs',
-    (configs) =>
-      configs
-        .select(...PAGE_CONFIG_SELECT)
-        .orderBy([(config) => config.version.desc()])
-        .limit(1)
+  db.orm.public.Page.select(...PAGE_SUMMARY_SELECT).include('configs', (configs) =>
+    configs
+      .select(...PAGE_CONFIG_SELECT)
+      .orderBy([(config) => config.version.desc()])
+      .limit(1),
   );
 
 /**
  * A read that fails closed on a damaged page is an anomaly operations
  * must see, so it is logged here, where it is detected, with ids only.
  */
-function restore(
-  record: PageRecord | null
-): AppResultAsync<Page | null, UnexpectedAppError> {
+function restore(record: PageRecord | null): AppResultAsync<Page | null, UnexpectedAppError> {
   const restored = toNullablePage(record);
   if (restored.isErr() && record !== null) {
     persistenceLogger.error('page.config_corrupted', {
@@ -100,10 +93,7 @@ function toReleasePages(records: readonly PageRecord[]): readonly ReleasePage[] 
   });
 }
 
-type SaveConfigError =
-  | ConflictAppError
-  | NotFoundAppError
-  | InfrastructureAppError;
+type SaveConfigError = ConflictAppError | NotFoundAppError | InfrastructureAppError;
 
 /**
  * Prisma 8 repository for pages and their revisions: the only place that
@@ -125,33 +115,30 @@ type SaveConfigError =
 export class PrismaPageRepository implements PageRepository {
   constructor(private readonly clock: Clock) {}
 
-  findById(
-    id: PageId,
-    tenantId: TenantId
-  ): AppResultAsync<Page | null, PageReadError> {
+  findById(id: PageId, tenantId: TenantId): AppResultAsync<Page | null, PageReadError> {
     return fromThrowableAsync(
       async () => pagesWithLatestConfig().where({ id, tenantId }).first(),
-      failures.infraOnly('findById')
+      failures.infraOnly('findById'),
     ).andThen(restore);
   }
 
   findSummaryById(
     id: PageId,
-    tenantId: TenantId
+    tenantId: TenantId,
   ): AppResultAsync<PageSummary | null, InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.Page.where({ id, tenantId })
           .select(...PAGE_SUMMARY_SELECT)
           .first(),
-      failures.infraOnly('findSummaryById')
+      failures.infraOnly('findSummaryById'),
     ).map((record) => record && toPageSummary(record));
   }
 
   listByWebsite(
     websiteId: WebsiteId,
     tenantId: TenantId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly PageSummary[], InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
@@ -161,13 +148,13 @@ export class PrismaPageRepository implements PageRepository {
           .orderBy([(page) => page.createdAt.asc(), (page) => page.id.asc()])
           .limit(limit)
           .all(),
-      failures.infraOnly('listByWebsite')
+      failures.infraOnly('listByWebsite'),
     ).map((records) => records.map(toPageSummary));
   }
 
   listReleasePages(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly ReleasePage[], InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
@@ -176,16 +163,13 @@ export class PrismaPageRepository implements PageRepository {
           .orderBy([(page) => page.path.asc(), (page) => page.id.asc()])
           .limit(limit)
           .all(),
-      failures.infraOnly('listReleasePages')
+      failures.infraOnly('listReleasePages'),
     ).map(toReleasePages);
   }
 
   create(
-    input: NewPage
-  ): AppResultAsync<
-    Page,
-    NotFoundAppError | ConflictAppError | InfrastructureAppError
-  > {
+    input: NewPage,
+  ): AppResultAsync<Page, NotFoundAppError | ConflictAppError | InfrastructureAppError> {
     const { tenantId, draft } = input;
 
     return fromThrowableAsync(
@@ -198,11 +182,11 @@ export class PrismaPageRepository implements PageRepository {
           })
             .select('id')
             .first();
-          if (website === null) {return null;}
+          if (website === null) {
+            return null;
+          }
 
-          const page = await tx.orm.public.Page.select(
-            ...PAGE_SUMMARY_SELECT
-          ).create({
+          const page = await tx.orm.public.Page.select(...PAGE_SUMMARY_SELECT).create({
             tenantId,
             websiteId: draft.websiteId,
             path: draft.path,
@@ -217,15 +201,13 @@ export class PrismaPageRepository implements PageRepository {
           });
           return page;
         }),
-      failures.orConflict('create', pagePathTaken)
+      failures.orConflict('create', pagePathTaken),
     )
       .andThen(failures.requireRow(websiteNotFound))
       .map((record) => toCreatedPage(record, draft.config));
   }
 
-  saveConfig(
-    input: SavePageConfigInput
-  ): AppResultAsync<SavedRevision, SaveConfigError> {
+  saveConfig(input: SavePageConfigInput): AppResultAsync<SavedRevision, SaveConfigError> {
     const { id, tenantId, config, expectedVersion } = input;
     const nextVersion = expectedVersion + 1;
 
@@ -243,7 +225,9 @@ export class PrismaPageRepository implements PageRepository {
               version: nextVersion,
               updatedAt: dateToInstant(this.clock.now()),
             });
-          if (revision === null) {return null;}
+          if (revision === null) {
+            return null;
+          }
 
           await tx.orm.public.PageConfig.create({
             pageId: id,
@@ -253,16 +237,14 @@ export class PrismaPageRepository implements PageRepository {
           });
           // Revisions are contiguous, so this keeps exactly the newest PAGE_REVISION_LIMIT.
           await tx.orm.public.PageConfig.where({ pageId: id })
-            .where((revisionRow) =>
-              revisionRow.version.lte(nextVersion - PAGE_REVISION_LIMIT)
-            )
+            .where((revisionRow) => revisionRow.version.lte(nextVersion - PAGE_REVISION_LIMIT))
             .deleteAndCount();
           return revision;
         }),
-      failures.infraOnly('saveConfig')
+      failures.infraOnly('saveConfig'),
     )
       .andThen((revision) =>
-        revision === null ? this.explainMissingPage(id, tenantId) : okAsync(revision)
+        revision === null ? this.explainMissingPage(id, tenantId) : okAsync(revision),
       )
       .map(toSavedRevision);
   }
@@ -274,14 +256,11 @@ export class PrismaPageRepository implements PageRepository {
    */
   private explainMissingPage(
     id: PageId,
-    tenantId: TenantId
+    tenantId: TenantId,
   ): AppResultAsync<never, SaveConfigError> {
     return fromThrowableAsync(
-      async () =>
-        db.orm.public.Page.where({ id, tenantId }).select('id').first(),
-      failures.infraOnly('saveConfig.lookup')
-    ).andThen((record) =>
-      errAsync(record === null ? pageNotFound() : pageVersionConflict())
-    );
+      async () => db.orm.public.Page.where({ id, tenantId }).select('id').first(),
+      failures.infraOnly('saveConfig.lookup'),
+    ).andThen((record) => errAsync(record === null ? pageNotFound() : pageVersionConflict()));
   }
 }

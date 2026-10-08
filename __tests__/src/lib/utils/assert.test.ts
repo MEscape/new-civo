@@ -14,12 +14,14 @@ describe('assertNever', () => {
 
 describe('invariant', () => {
   it('passes for truthy conditions', () => {
-    expect(() => { invariant(true, 'ok'); }).not.toThrow();
+    expect(() => {
+      invariant(true, 'ok');
+    }).not.toThrow();
   });
 
   it('throws for falsy conditions with a prefixed message', () => {
-    expect(() => { invariant(false, 'must hold'); }).toThrow(
-      'Invariant violation: must hold'
-    );
+    expect(() => {
+      invariant(false, 'must hold');
+    }).toThrow('Invariant violation: must hold');
   });
 });

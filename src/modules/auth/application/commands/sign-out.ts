@@ -10,9 +10,9 @@ import type { AuthenticationDependencies } from '../auth-dependencies';
  * @audit-exempt Outcomes are audited by the identity provider hooks (create-security-audit-options) where sessions and accounts change; this command audits only its rate-limit refusal, through enforceRateLimit.
  */
 export class SignOut {
-    constructor(private readonly deps: AuthenticationDependencies) {}
+  constructor(private readonly deps: AuthenticationDependencies) {}
 
-    execute(): AppResultAsync<void, AuthenticatorError> {
-        return this.deps.authenticator.signOut();
-    }
+  execute(): AppResultAsync<void, AuthenticatorError> {
+    return this.deps.authenticator.signOut();
+  }
 }

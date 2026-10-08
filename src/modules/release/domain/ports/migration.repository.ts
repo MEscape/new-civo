@@ -1,10 +1,6 @@
 import type { ActorId } from '@modules/auth';
 
-import type {
-  ConflictAppError,
-  InfrastructureAppError,
-  UnexpectedAppError,
-} from '@lib/errors';
+import type { ConflictAppError, InfrastructureAppError, UnexpectedAppError } from '@lib/errors';
 import type { AppResultAsync } from '@lib/result';
 
 import type { ConflictResolutions } from '../models/conflict-resolution';
@@ -42,19 +38,17 @@ export interface MarkApplied {
  * driver failure into our own error kinds before returning (errors.md).
  */
 export interface MigrationRepository {
-  create(
-    input: NewMigration
-  ): AppResultAsync<MigrationSummary, InfrastructureAppError>;
+  create(input: NewMigration): AppResultAsync<MigrationSummary, InfrastructureAppError>;
 
   findById(
     websiteId: WebsiteId,
-    id: MigrationId
+    id: MigrationId,
   ): AppResultAsync<Migration | null, MigrationReadError>;
 
   /** Bounded: never returns more than `limit` items, newest first (performance.md). */
   listByWebsite(
     websiteId: WebsiteId,
-    limit: number
+    limit: number,
   ): AppResultAsync<readonly MigrationSummary[], InfrastructureAppError>;
 
   /**
@@ -63,9 +57,6 @@ export interface MigrationRepository {
    * proposed, which surfaces as a conflict.
    */
   markApplied(
-    input: MarkApplied
-  ): AppResultAsync<
-    MigrationSummary,
-    ConflictAppError | InfrastructureAppError
-  >;
+    input: MarkApplied,
+  ): AppResultAsync<MigrationSummary, ConflictAppError | InfrastructureAppError>;
 }

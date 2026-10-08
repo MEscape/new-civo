@@ -11,8 +11,5 @@ import type { PageNode } from '../models/page-node';
  * throwing, because stored pages may outlive a removed component.
  */
 export interface DraftPageRenderer<TOutput> {
-  render(input: {
-    readonly websiteId: WebsiteId;
-    readonly children: readonly PageNode[];
-  }): TOutput;
+  render(input: { readonly websiteId: WebsiteId; readonly children: readonly PageNode[] }): TOutput;
 }

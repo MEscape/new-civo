@@ -21,13 +21,13 @@ export type SignInError = AuthenticatorError | RateLimitError;
  * @audit-exempt Outcomes are audited by the identity provider hooks (create-security-audit-options) where sessions and accounts change; this command audits only its rate-limit refusal, through enforceRateLimit.
  */
 export class SignIn {
-    constructor(private readonly deps: AuthenticationDependencies) {}
+  constructor(private readonly deps: AuthenticationDependencies) {}
 
-    execute(input: SignInInput): AppResultAsync<void, SignInError> {
-        return createSignInCredentials(input).asyncAndThen((credentials) =>
-            enforceRateLimit(this.deps, 'sign_in', credentials.email).andThen(() =>
-                this.deps.authenticator.signIn(credentials)
-            )
-        );
-    }
+  execute(input: SignInInput): AppResultAsync<void, SignInError> {
+    return createSignInCredentials(input).asyncAndThen((credentials) =>
+      enforceRateLimit(this.deps, 'sign_in', credentials.email).andThen(() =>
+        this.deps.authenticator.signIn(credentials),
+      ),
+    );
+  }
 }

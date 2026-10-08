@@ -47,7 +47,7 @@ export const websiteQueries = {
  * what a valid theme is, so nobody keeps a second theme reader.
  */
 export function restoreStoredWebsiteTheme(
-  stored: StoredWebsiteTheme | null | undefined
+  stored: StoredWebsiteTheme | null | undefined,
 ): WebsiteThemeView {
   return restoreWebsiteTheme(stored);
 }

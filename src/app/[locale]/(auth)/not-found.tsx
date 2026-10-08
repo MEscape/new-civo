@@ -4,7 +4,6 @@ import { NotFoundPanel } from '@components/shared/not-found-panel';
 
 import { useTranslations } from '@i18n/client';
 
-
 /*
  * A 404 is never indexed. Its metadata is static on purpose: a not-found page
  * receives no route params, so a translated title would have to read the

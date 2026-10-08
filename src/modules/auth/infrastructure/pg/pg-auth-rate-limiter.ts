@@ -8,11 +8,10 @@ import type { AppResultAsync } from '@lib/result';
 
 import { rateLimiterFailed } from '../../domain/errors/auth-errors';
 
-
 import type {
-    AuthRateLimiter,
-    RateLimitDecision,
-    RateLimitRequest,
+  AuthRateLimiter,
+  RateLimitDecision,
+  RateLimitRequest,
 } from '../../domain/ports/auth-rate-limiter.port';
 import type { Pool } from 'pg';
 
@@ -42,8 +41,8 @@ RETURNING
 
 /** Driver output is external data, so its shape is parsed, not assumed (validation.md). */
 const consumeRowSchema = z.object({
-    hits: z.number().int(),
-    retry_after_seconds: z.number().int(),
+  hits: z.number().int(),
+  retry_after_seconds: z.number().int(),
 });
 
 /**
@@ -52,30 +51,25 @@ const consumeRowSchema = z.object({
  * harvesting addresses.
  */
 export class PgAuthRateLimiter implements AuthRateLimiter {
-    constructor(
-        private readonly pool: Pick<Pool, 'query'>,
-        private readonly keySecret: string
-    ) {}
+  constructor(
+    private readonly pool: Pick<Pool, 'query'>,
+    private readonly keySecret: string,
+  ) {}
 
-    consume(
-        request: RateLimitRequest
-    ): AppResultAsync<RateLimitDecision, InfrastructureAppError> {
-        const bucketKey = `${request.action}:${this.hashSubject(request.subject)}`;
+  consume(request: RateLimitRequest): AppResultAsync<RateLimitDecision, InfrastructureAppError> {
+    const bucketKey = `${request.action}:${this.hashSubject(request.subject)}`;
 
-        return fromThrowableAsync(async () => {
-            const result = await this.pool.query(CONSUME_SQL, [
-                bucketKey,
-                request.windowSeconds,
-            ]);
-            return consumeRowSchema.parse(result.rows[0]);
-        }, rateLimiterFailed).map((row): RateLimitDecision =>
-            row.hits <= request.limit
-                ? { isAllowed: true }
-                : { isAllowed: false, retryAfterSeconds: row.retry_after_seconds }
-        );
-    }
+    return fromThrowableAsync(async () => {
+      const result = await this.pool.query(CONSUME_SQL, [bucketKey, request.windowSeconds]);
+      return consumeRowSchema.parse(result.rows[0]);
+    }, rateLimiterFailed).map((row): RateLimitDecision =>
+      row.hits <= request.limit
+        ? { isAllowed: true }
+        : { isAllowed: false, retryAfterSeconds: row.retry_after_seconds },
+    );
+  }
 
-    private hashSubject(subject: string): string {
-        return createHmac('sha256', this.keySecret).update(subject).digest('hex');
-    }
+  private hashSubject(subject: string): string {
+    return createHmac('sha256', this.keySecret).update(subject).digest('hex');
+  }
 }

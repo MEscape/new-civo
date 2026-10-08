@@ -13,7 +13,7 @@ import type { ComponentCatalog } from '../../application/contracts/editor-model'
 export function visibleFields(
   descriptor: ComponentDescriptor,
   mode: EditorMode,
-  catalog: ComponentCatalog
+  catalog: ComponentCatalog,
 ): readonly PropFieldDescriptor[] {
   const allowed = catalog.editablePropKeys(descriptor.type, mode);
   return allowed === null

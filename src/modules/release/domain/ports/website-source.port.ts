@@ -16,7 +16,5 @@ export type WebsiteSourceError = AuthorizationError | InfrastructureAppError;
  * exist or belongs to another tenant, so the two are indistinguishable.
  */
 export interface WebsiteSource {
-  findById(
-    id: WebsiteId
-  ): AppResultAsync<PublishableWebsite | null, WebsiteSourceError>;
+  findById(id: WebsiteId): AppResultAsync<PublishableWebsite | null, WebsiteSourceError>;
 }

@@ -21,11 +21,7 @@ export {
   validationError,
 } from './factory';
 
-export {
-  httpStatusForError,
-  toErrorResponseBody,
-  type ErrorResponseBody,
-} from './http-mapping';
+export { httpStatusForError, toErrorResponseBody, type ErrorResponseBody } from './http-mapping';
 
 export { FieldErrorBag } from './field-error-bag';
 

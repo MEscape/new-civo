@@ -2,8 +2,6 @@
 
 import { useId, useState, useTransition } from 'react';
 
-
-
 import { EmptyState } from '@components/layout/layout-primitives';
 import { FieldMessage } from '@components/shared/field-message';
 import { AlertTriangle } from '@components/ui/icons';
@@ -33,10 +31,7 @@ export interface ReleaseHistoryPanelProps {
  * a rollback the route is refreshed instead of mirroring "which release is
  * active" in local state.
  */
-export function ReleaseHistoryPanel({
-  websiteId,
-  history,
-}: ReleaseHistoryPanelProps) {
+export function ReleaseHistoryPanel({ websiteId, history }: ReleaseHistoryPanelProps) {
   const t = useTranslations('release');
 
   const router = useRouter();
@@ -95,9 +90,7 @@ export function ReleaseHistoryPanel({
         ))}
       </ul>
 
-      <p className="text-xs text-copy-muted">
-        {t('history.rollbackNote')}
-      </p>
+      <p className="text-xs text-copy-muted">{t('history.rollbackNote')}</p>
     </div>
   );
 }

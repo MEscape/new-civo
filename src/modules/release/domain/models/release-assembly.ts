@@ -18,11 +18,7 @@ import type {
   ReadyPublishablePage,
   ResolvedComponent,
 } from './publishable';
-import type {
-  ReleaseComponentDependency,
-  ReleaseSnapshot,
-  SnapshotPage,
-} from './release-snapshot';
+import type { ReleaseComponentDependency, ReleaseSnapshot, SnapshotPage } from './release-snapshot';
 
 const HOME_PAGE_FIELD = 'home';
 
@@ -33,10 +29,10 @@ interface Problem {
 
 type PageOutcome =
   | {
-    readonly kind: 'accepted';
-    readonly page: SnapshotPage;
-    readonly dependencies: readonly ReleaseComponentDependency[];
-  }
+      readonly kind: 'accepted';
+      readonly page: SnapshotPage;
+      readonly dependencies: readonly ReleaseComponentDependency[];
+    }
   | { readonly kind: 'blocked'; readonly problems: readonly Problem[] };
 
 type AcceptedOutcome = Extract<PageOutcome, { kind: 'accepted' }>;
@@ -60,14 +56,10 @@ function isAccepted(outcome: PageOutcome): outcome is AcceptedOutcome {
 }
 
 function hasIncompatibleContract(component: ResolvedComponent): boolean {
-  return component.contracts.some(
-    (contract) => contract.currentVersion < contract.minVersion
-  );
+  return component.contracts.some((contract) => contract.currentVersion < contract.minVersion);
 }
 
-function toDependency(
-  component: ResolvedComponent
-): ReleaseComponentDependency {
+function toDependency(component: ResolvedComponent): ReleaseComponentDependency {
   return {
     type: component.type,
     version: component.version,
@@ -82,11 +74,9 @@ function toDependency(
  */
 function evaluateReadyPage(
   page: ReadyPublishablePage,
-  resolveComponent: ComponentResolver
+  resolveComponent: ComponentResolver,
 ): PageOutcome {
-  const components = page.componentTypes
-    .map(resolveComponent)
-    .filter(isDefined);
+  const components = page.componentTypes.map(resolveComponent).filter(isDefined);
 
   const incompatible = components.filter(hasIncompatibleContract);
   if (incompatible.length > 0) {
@@ -107,10 +97,7 @@ function evaluateReadyPage(
   };
 }
 
-function evaluatePage(
-  page: PublishablePage,
-  resolveComponent: ComponentResolver
-): PageOutcome {
+function evaluatePage(page: PublishablePage, resolveComponent: ComponentResolver): PageOutcome {
   switch (page.status) {
     case 'config_missing':
       return blocked(pageField(page.path), CODES.pageConfigMissing);
@@ -132,7 +119,7 @@ function evaluatePage(
  * stored hash deterministic.
  */
 export function assembleReleaseSnapshot(
-  input: AssembleReleaseSnapshotInput
+  input: AssembleReleaseSnapshotInput,
 ): AppResult<ReleaseSnapshot, ValidationAppError> {
   const { website, pages, resolveComponent } = input;
 
@@ -144,7 +131,7 @@ export function assembleReleaseSnapshot(
 
   const outcomes = pages.map((page) => evaluatePage(page, resolveComponent));
   const problems = outcomes.flatMap((outcome) =>
-    outcome.kind === 'blocked' ? outcome.problems : []
+    outcome.kind === 'blocked' ? outcome.problems : [],
   );
   if (problems.length > 0) {
     const bag = createReleasePublishBlockedBag();
@@ -164,7 +151,7 @@ export function assembleReleaseSnapshot(
     // moment, so duplicates are identical and keeping the first is safe.
     dependencies: unique(
       accepted.flatMap((outcome) => outcome.dependencies),
-      (dependency) => dependency.type
+      (dependency) => dependency.type,
     ),
   });
 }

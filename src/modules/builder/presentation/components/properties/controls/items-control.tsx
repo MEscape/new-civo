@@ -1,6 +1,5 @@
 import { useId } from 'react';
 
-
 import { Button } from '@components/ui/button';
 import { Close } from '@components/ui/icons';
 import { Input, Label, Textarea } from '@components/ui/input';
@@ -43,9 +42,20 @@ function ItemFieldInput({ itemField, value, onChange, onCommit }: ItemFieldInput
         {text.itemFieldLabel(itemField)}
       </Label>
       {itemField.multiline ? (
-        <Textarea {...shared} onChange={(event) => { onChange(event.target.value); }} />
+        <Textarea
+          {...shared}
+          onChange={(event) => {
+            onChange(event.target.value);
+          }}
+        />
       ) : (
-        <Input type="text" {...shared} onChange={(event) => { onChange(event.target.value); }} />
+        <Input
+          type="text"
+          {...shared}
+          onChange={(event) => {
+            onChange(event.target.value);
+          }}
+        />
       )}
     </div>
   );
@@ -102,8 +112,8 @@ export function ItemsControl({ labelId, field, value, onChange, onCommit }: Cont
                     onChange={(next) => {
                       replace(
                         entries.map((current, position) =>
-                          position === index ? { ...current, [itemField.key]: next } : current
-                        )
+                          position === index ? { ...current, [itemField.key]: next } : current,
+                        ),
                       );
                     }}
                     onCommit={onCommit}

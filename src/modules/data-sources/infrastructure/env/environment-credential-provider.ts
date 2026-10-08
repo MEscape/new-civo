@@ -8,9 +8,9 @@ import { credentialsMissing } from '../../domain/errors/data-source-errors';
 
 import type { AuthMode } from '../../domain/models/data-source-kinds';
 import type {
-    CredentialProvider,
-    CredentialResolutionError,
-    ResolvedCredential,
+  CredentialProvider,
+  CredentialResolutionError,
+  ResolvedCredential,
 } from '../../domain/ports/credential-provider.port';
 
 /** A read-only view of environment variables. `serverEnv` satisfies it. */
@@ -34,12 +34,14 @@ const SAFE_ID = /^[A-Za-z0-9_-]+$/;
  * cannot be mapped to a valid name.
  */
 export function credentialVariableName(
-    dataSourceId: string,
-    authMode: Exclude<AuthMode, 'NONE'>
+  dataSourceId: string,
+  authMode: Exclude<AuthMode, 'NONE'>,
 ): string | null {
-    if (!SAFE_ID.test(dataSourceId)) {return null;}
-    const suffix = authMode === 'API_KEY' ? 'API_KEY' : 'BEARER_TOKEN';
-    return `DATASOURCE_${dataSourceId.replace(/-/g, '_')}_${suffix}`;
+  if (!SAFE_ID.test(dataSourceId)) {
+    return null;
+  }
+  const suffix = authMode === 'API_KEY' ? 'API_KEY' : 'BEARER_TOKEN';
+  return `DATASOURCE_${dataSourceId.replace(/-/g, '_')}_${suffix}`;
 }
 
 /**
@@ -56,19 +58,25 @@ export function credentialVariableName(
  * logged, put into an error `cause` or into a cache key.
  */
 export class EnvironmentCredentialProvider implements CredentialProvider {
-    constructor(private readonly environment: EnvironmentSource = serverEnv as unknown as EnvironmentSource) {}
+  constructor(
+    private readonly environment: EnvironmentSource = serverEnv as unknown as EnvironmentSource,
+  ) {}
 
-    resolve(
-        input: Parameters<CredentialProvider['resolve']>[0]
-    ): AppResultAsync<ResolvedCredential, CredentialResolutionError> {
-        const { dataSourceId, authMode } = input;
+  resolve(
+    input: Parameters<CredentialProvider['resolve']>[0],
+  ): AppResultAsync<ResolvedCredential, CredentialResolutionError> {
+    const { dataSourceId, authMode } = input;
 
-        if (authMode === 'NONE') {return okAsync(NO_CREDENTIAL);}
-
-        const variable = credentialVariableName(dataSourceId, authMode);
-        const secret = variable === null ? undefined : this.environment[variable];
-        if (!secret) {return errAsync(credentialsMissing());}
-
-        return okAsync({ mode: authMode, secret });
+    if (authMode === 'NONE') {
+      return okAsync(NO_CREDENTIAL);
     }
+
+    const variable = credentialVariableName(dataSourceId, authMode);
+    const secret = variable === null ? undefined : this.environment[variable];
+    if (!secret) {
+      return errAsync(credentialsMissing());
+    }
+
+    return okAsync({ mode: authMode, secret });
+  }
 }

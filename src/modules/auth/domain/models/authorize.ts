@@ -12,7 +12,7 @@ import type { Permission } from './permission';
  * That is what makes cross-tenant access a comparison rather than trust.
  */
 export interface ResourceScope {
-    readonly tenantId: TenantId;
+  readonly tenantId: TenantId;
 }
 
 /**
@@ -23,21 +23,15 @@ export interface ResourceScope {
 export type DenialReason = 'tenant_mismatch' | 'permission_missing';
 
 export type AuthorizationDecision =
-    | { readonly isAllowed: true }
-    | { readonly isAllowed: false; readonly reason: DenialReason };
+  { readonly isAllowed: true } | { readonly isAllowed: false; readonly reason: DenialReason };
 
 /**
  * Whether the actor holds `permission` through any of their roles. This is
  * a union over roles, computed here rather than delegated, so the result
  * cannot change because a provider changes how it combines roles.
  */
-export function actorHasPermission(
-    actor: Actor,
-    permission: Permission
-): boolean {
-    return actor.roles.some((role) =>
-        permissionsForRole(role).includes(permission)
-    );
+export function actorHasPermission(actor: Actor, permission: Permission): boolean {
+  return actor.roles.some((role) => permissionsForRole(role).includes(permission));
 }
 
 /**
@@ -53,15 +47,15 @@ export function actorHasPermission(
  * cannot drop the scope by accident.
  */
 export function decide(
-    actor: Actor,
-    permission: Permission,
-    scope?: ResourceScope
+  actor: Actor,
+  permission: Permission,
+  scope?: ResourceScope,
 ): AuthorizationDecision {
-    if (isDefined(scope) && scope.tenantId !== actor.tenantId) {
-        return { isAllowed: false, reason: 'tenant_mismatch' };
-    }
-    if (!actorHasPermission(actor, permission)) {
-        return { isAllowed: false, reason: 'permission_missing' };
-    }
-    return { isAllowed: true };
+  if (isDefined(scope) && scope.tenantId !== actor.tenantId) {
+    return { isAllowed: false, reason: 'tenant_mismatch' };
+  }
+  if (!actorHasPermission(actor, permission)) {
+    return { isAllowed: false, reason: 'permission_missing' };
+  }
+  return { isAllowed: true };
 }

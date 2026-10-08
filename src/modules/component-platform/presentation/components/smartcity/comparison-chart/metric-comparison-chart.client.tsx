@@ -11,7 +11,13 @@ import {
   YAxis,
 } from 'recharts';
 
-import { AXIS_FONT_SIZE, BAR_RADIUS, CHART_COLORS, CHART_SERIES_COLORS, TOOLTIP_STYLE } from '../support/chart-theme';
+import {
+  AXIS_FONT_SIZE,
+  BAR_RADIUS,
+  CHART_COLORS,
+  CHART_SERIES_COLORS,
+  TOOLTIP_STYLE,
+} from '../support/chart-theme';
 
 export interface ComparisonDatum {
   readonly label: string;

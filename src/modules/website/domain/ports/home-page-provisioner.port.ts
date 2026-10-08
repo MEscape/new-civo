@@ -10,9 +10,7 @@ import type { HomePageBlueprint } from '../models/website-template';
  * Failures the port may report. `unexpected` means the blueprint itself
  * was rejected, which is a template bug rather than a runtime condition.
  */
-export type HomePageProvisioningError =
-  | InfrastructureAppError
-  | UnexpectedAppError;
+export type HomePageProvisioningError = InfrastructureAppError | UnexpectedAppError;
 
 /**
  * Creates the initial home page of a new website. The website module does

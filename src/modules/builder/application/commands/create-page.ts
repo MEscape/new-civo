@@ -31,9 +31,7 @@ export type CreatePageError =
 export class CreatePage {
   constructor(private readonly deps: PageDependencies) {}
 
-  execute(
-    input: CreatePageInput
-  ): AppResultAsync<PageSummaryView, CreatePageError> {
+  execute(input: CreatePageInput): AppResultAsync<PageSummaryView, CreatePageError> {
     const { authorization, pages, audit } = this.deps;
 
     return authorization.requireInTenant('page.create').andThen((actor) =>
@@ -47,8 +45,8 @@ export class CreatePage {
             websiteId: page.websiteId,
           });
           return toPageSummaryView(page);
-        })
-      )
+        }),
+      ),
     );
   }
 }

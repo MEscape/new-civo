@@ -9,40 +9,40 @@
  * the infrastructure/API boundary instead.
  */
 export type AppErrorKind =
-    | 'validation'
-    | 'not_found'
-    | 'conflict'
-    | 'unauthorized'
-    | 'forbidden'
-    | 'infrastructure'
-    | 'unexpected';
+  | 'validation'
+  | 'not_found'
+  | 'conflict'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'infrastructure'
+  | 'unexpected';
 
 interface BaseAppError {
-    readonly kind: AppErrorKind;
-    readonly code: string;
-    readonly message: string;
-    readonly cause?: unknown;
+  readonly kind: AppErrorKind;
+  readonly code: string;
+  readonly message: string;
+  readonly cause?: unknown;
 }
 
 export interface ValidationAppError extends BaseAppError {
-    readonly kind: 'validation';
-    readonly fieldErrors: Record<string, string[]>;
+  readonly kind: 'validation';
+  readonly fieldErrors: Record<string, string[]>;
 }
 
 export interface NotFoundAppError extends BaseAppError {
-    readonly kind: 'not_found';
+  readonly kind: 'not_found';
 }
 
 export interface ConflictAppError extends BaseAppError {
-    readonly kind: 'conflict';
+  readonly kind: 'conflict';
 }
 
 export interface UnauthorizedAppError extends BaseAppError {
-    readonly kind: 'unauthorized';
+  readonly kind: 'unauthorized';
 }
 
 export interface ForbiddenAppError extends BaseAppError {
-    readonly kind: 'forbidden';
+  readonly kind: 'forbidden';
 }
 
 /**
@@ -53,19 +53,19 @@ export interface ForbiddenAppError extends BaseAppError {
  * `message` must never leak infrastructure detail to a user (api.md).
  */
 export interface InfrastructureAppError extends BaseAppError {
-    readonly kind: 'infrastructure';
+  readonly kind: 'infrastructure';
 }
 
 /** A genuinely unexpected failure. Represents a caught `throw`, not a business outcome. */
 export interface UnexpectedAppError extends BaseAppError {
-    readonly kind: 'unexpected';
+  readonly kind: 'unexpected';
 }
 
 export type AppError =
-    | ValidationAppError
-    | NotFoundAppError
-    | ConflictAppError
-    | UnauthorizedAppError
-    | ForbiddenAppError
-    | InfrastructureAppError
-    | UnexpectedAppError;
+  | ValidationAppError
+  | NotFoundAppError
+  | ConflictAppError
+  | UnauthorizedAppError
+  | ForbiddenAppError
+  | InfrastructureAppError
+  | UnexpectedAppError;

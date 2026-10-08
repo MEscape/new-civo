@@ -27,7 +27,9 @@ interface IndicatorInput {
  */
 export function indicatorRectFor(input: IndicatorInput): IndicatorRect | null {
   const { target, rects, containerSize } = input;
-  if (target === null) {return null;}
+  if (target === null) {
+    return null;
+  }
 
   if (target.kind === 'root') {
     return containerSize === null
@@ -36,8 +38,12 @@ export function indicatorRectFor(input: IndicatorInput): IndicatorRect | null {
   }
 
   const rect = rects.get(target.targetNodeId);
-  if (rect === undefined) {return null;}
-  if (target.kind === 'inside') {return { ...rect, position: 'inside' };}
+  if (rect === undefined) {
+    return null;
+  }
+  if (target.kind === 'inside') {
+    return { ...rect, position: 'inside' };
+  }
 
   const edge = target.position === 'before' ? rect.top : rect.top + rect.height;
   return {

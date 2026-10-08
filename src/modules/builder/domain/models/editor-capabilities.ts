@@ -28,23 +28,14 @@ export const VISIBILITY_PROP_KEY = 'visible';
  */
 const CAPABILITIES_BY_MODE = {
   internal: new Set<EditorCapability>(EDITOR_CAPABILITIES),
-  municipality: new Set<EditorCapability>([
-    'editContent',
-    'changeVariant',
-    'toggleVisibility',
-  ]),
+  municipality: new Set<EditorCapability>(['editContent', 'changeVariant', 'toggleVisibility']),
 } as const satisfies Record<EditorMode, ReadonlySet<EditorCapability>>;
 
-export function hasCapability(
-  mode: EditorMode,
-  capability: EditorCapability
-): boolean {
+export function hasCapability(mode: EditorMode, capability: EditorCapability): boolean {
   return CAPABILITIES_BY_MODE[mode].has(capability);
 }
 
 /** True when the mode may do everything, so prop edits are unrestricted. */
 export function isFullAccess(mode: EditorMode): boolean {
-  return EDITOR_CAPABILITIES.every((capability) =>
-    hasCapability(mode, capability)
-  );
+  return EDITOR_CAPABILITIES.every((capability) => hasCapability(mode, capability));
 }

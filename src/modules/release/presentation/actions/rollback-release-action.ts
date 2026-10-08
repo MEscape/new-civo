@@ -20,12 +20,11 @@ import type { ReleaseSummaryDto } from '../dto/release-dto';
  * live immediately.
  */
 export async function rollbackReleaseAction(
-  input: unknown
+  input: unknown,
 ): Promise<ActionResult<ReleaseSummaryDto>> {
-  const result = await parseReleaseInput(
-    rollbackReleaseSchema,
-    input
-  ).asyncAndThen((command) => releaseCommands.rollbackRelease.execute(command));
+  const result = await parseReleaseInput(rollbackReleaseSchema, input).asyncAndThen((command) =>
+    releaseCommands.rollbackRelease.execute(command),
+  );
 
   if (result.isOk()) {
     revalidatePath(websiteRoutes.detail(result.value.websiteId));

@@ -44,5 +44,5 @@ export default defineConfig(
   ...tokens,
   ...overrides,
   prettierConfig,
-  ...afterPrettier
+  ...afterPrettier,
 );

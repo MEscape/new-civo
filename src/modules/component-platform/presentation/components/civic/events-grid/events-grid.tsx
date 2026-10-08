@@ -1,15 +1,5 @@
-import {
-  Container,
-  Grid,
-  Section,
-  SectionHeading,
-} from '@components/layout/layout-primitives';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@components/ui/card';
+import { Container, Grid, Section, SectionHeading } from '@components/layout/layout-primitives';
+import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { getAppFormatters, getTranslations } from '@i18n/server';
 
@@ -34,11 +24,7 @@ export interface EventsGridComponentProps {
 }
 
 /** Upcoming events of a bound dataset, nearest first. */
-export async function EventsGrid({
-  props,
-  context,
-  loadContent,
-}: EventsGridComponentProps) {
+export async function EventsGrid({ props, context, loadContent }: EventsGridComponentProps) {
   const [t, fmt, result] = await Promise.all([
     getTranslations('componentPlatform'),
     getAppFormatters(),
@@ -86,15 +72,11 @@ export async function EventsGrid({
                       </time>
                       <div>
                         <CardTitle>{event.title}</CardTitle>
-                        <p className="mt-1 text-xs text-copy-muted">
-                          {details}
-                        </p>
+                        <p className="mt-1 text-xs text-copy-muted">{details}</p>
                       </div>
                     </div>
                     {event.description !== undefined && (
-                      <CardDescription className="mt-2">
-                        {event.description}
-                      </CardDescription>
+                      <CardDescription className="mt-2">{event.description}</CardDescription>
                     )}
                   </CardHeader>
                 </Card>

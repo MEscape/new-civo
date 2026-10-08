@@ -118,9 +118,7 @@ describe('publicEnvSchema', () => {
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.NEXT_PUBLIC_APP_URL).toBe(
-        'https://production.example.com'
-      );
+      expect(result.data.NEXT_PUBLIC_APP_URL).toBe('https://production.example.com');
     }
   });
 
@@ -143,12 +141,22 @@ describe('publicEnvSchema: map configuration', () => {
   });
 
   it('accepts a public token and refuses a secret one', () => {
-    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: 'pk.abc' }).success).toBe(true);
-    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: 'sk.abc' }).success).toBe(false);
+    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: 'pk.abc' }).success).toBe(
+      true,
+    );
+    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: 'sk.abc' }).success).toBe(
+      false,
+    );
   });
 
   it('only accepts Mapbox-hosted style URLs', () => {
-    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_STYLE_URL: 'mapbox://styles/acme/city-dark' }).success).toBe(true);
-    expect(publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_STYLE_URL: 'https://evil.example/style.json' }).success).toBe(false);
+    expect(
+      publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_STYLE_URL: 'mapbox://styles/acme/city-dark' })
+        .success,
+    ).toBe(true);
+    expect(
+      publicEnvSchema.safeParse({ NEXT_PUBLIC_MAPBOX_STYLE_URL: 'https://evil.example/style.json' })
+        .success,
+    ).toBe(false);
   });
 });

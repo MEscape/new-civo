@@ -10,10 +10,7 @@ import { createSystemPageDraft } from '../../domain/models/page';
 import { checkComposition } from '../../domain/rules/page-save-checks';
 import { toPageSummaryView } from '../page-view-mappers';
 
-import type {
-  CreateSystemPageInput,
-  PageSummaryView,
-} from '../contracts/page-views';
+import type { CreateSystemPageInput, PageSummaryView } from '../contracts/page-views';
 import type { SystemPageDependencies } from '../page-dependencies';
 
 /**
@@ -22,10 +19,7 @@ import type { SystemPageDependencies } from '../page-dependencies';
  * template, and the caller decides how to report it.
  */
 export type CreateSystemPageError =
-  | ValidationAppError
-  | NotFoundAppError
-  | ConflictAppError
-  | InfrastructureAppError;
+  ValidationAppError | NotFoundAppError | ConflictAppError | InfrastructureAppError;
 
 /**
  * Seeds a page with a prepared tree, for trusted modules (website
@@ -40,18 +34,12 @@ export type CreateSystemPageError =
 export class CreateSystemPage {
   constructor(private readonly deps: SystemPageDependencies) {}
 
-  execute(
-    input: CreateSystemPageInput
-  ): AppResultAsync<PageSummaryView, CreateSystemPageError> {
+  execute(input: CreateSystemPageInput): AppResultAsync<PageSummaryView, CreateSystemPageError> {
     const { pages, components, audit } = this.deps;
 
     return createSystemPageDraft(input)
-      .andThen((draft) =>
-        checkComposition(draft.config, components).map(() => draft)
-      )
-      .asyncAndThen((draft) =>
-        pages.create({ tenantId: input.tenantId, draft })
-      )
+      .andThen((draft) => checkComposition(draft.config, components).map(() => draft))
+      .asyncAndThen((draft) => pages.create({ tenantId: input.tenantId, draft }))
       .map((page) => {
         audit.record({
           type: 'page.system_created',

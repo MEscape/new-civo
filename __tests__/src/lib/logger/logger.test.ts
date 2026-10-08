@@ -12,8 +12,8 @@ vi.mock('@lib/config', () => ({
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date('2026-09-28T12:00:00.000Z'));
-  vi.spyOn(console, 'log').mockImplementation(() => { });
-  vi.spyOn(console, 'error').mockImplementation(() => { });
+  vi.spyOn(console, 'log').mockImplementation(() => {});
+  vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {

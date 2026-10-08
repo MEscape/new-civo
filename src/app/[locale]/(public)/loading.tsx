@@ -5,5 +5,5 @@
  * that `cacheComponents` needs.
  */
 export default function Loading(): null {
-    return null;
+  return null;
 }

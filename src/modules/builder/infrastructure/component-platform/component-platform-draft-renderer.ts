@@ -1,9 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type {
-  RenderableNode,
-  RenderContext,
-} from '@modules/component-platform';
+import type { RenderableNode, RenderContext } from '@modules/component-platform';
 
 import type { WebsiteId } from '../../domain/models/ids';
 import type { PageNode } from '../../domain/models/page-node';
@@ -12,7 +9,7 @@ import type { DraftPageRenderer } from '../../domain/ports/draft-page-renderer.p
 /** The platform's page renderer, as `composition.ts` hands it in. */
 export type RenderPageNodesFn = (
   nodes: readonly RenderableNode[],
-  context: RenderContext
+  context: RenderContext,
 ) => ReactNode;
 
 /**
@@ -26,9 +23,7 @@ export type RenderPageNodesFn = (
  * The domain's `PageNode` satisfies the platform's `RenderableNode`
  * structurally, so the tree is passed as is: no copy, no cast.
  */
-export class ComponentPlatformDraftRenderer
-  implements DraftPageRenderer<ReactNode>
-{
+export class ComponentPlatformDraftRenderer implements DraftPageRenderer<ReactNode> {
   constructor(private readonly renderNodes: RenderPageNodesFn) {}
 
   render(input: {

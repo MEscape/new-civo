@@ -11,7 +11,5 @@ import type { EditorMode } from '../../domain/models/editor-capabilities';
  * every save.
  */
 export function resolveEditorMode(actor: Actor): EditorMode {
-  return actorHasPermission(actor, 'page.restructure')
-    ? 'internal'
-    : 'municipality';
+  return actorHasPermission(actor, 'page.restructure') ? 'internal' : 'municipality';
 }

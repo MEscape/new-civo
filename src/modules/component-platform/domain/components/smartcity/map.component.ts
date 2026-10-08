@@ -22,14 +22,10 @@ export const mapDefinition = defineComponent({
       group: 'content',
       municipal: true,
     }),
-    pointStyle: prop.select(
-      ['circles', 'markers', 'clusters', 'heatmap'],
-      'circles',
-      {
-        group: 'appearance',
-        municipal: true,
-      }
-    ),
+    pointStyle: prop.select(['circles', 'markers', 'clusters', 'heatmap'], 'circles', {
+      group: 'appearance',
+      municipal: true,
+    }),
     colorBy: prop.text(PROP_LIMITS.label, {
       group: 'appearance',
       municipal: true,

@@ -9,18 +9,14 @@ import type { Actor } from '../../domain/models/actor';
 import type { TenantId } from '../../domain/models/ids';
 import type { Role } from '../../domain/models/role';
 import type {
-    CurrentActorError,
-    CurrentActorProvider,
+  CurrentActorError,
+  CurrentActorProvider,
 } from '../../domain/ports/current-actor-provider.port';
 
 /** Clearly not a real id, so a leaked dev actor is obvious in logs and data. */
 const DEV_ACTOR_ID = 'dev-actor-not-a-real-user';
 
-const LOOPBACK_HOSTNAMES: ReadonlySet<string> = new Set([
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-]);
+const LOOPBACK_HOSTNAMES: ReadonlySet<string> = new Set(['localhost', '127.0.0.1', '[::1]']);
 
 const devLogger = logger.withContext({ module: 'auth.dev-actor' });
 
@@ -31,9 +27,11 @@ const devLogger = logger.withContext({ module: 'auth.dev-actor' });
  * not provably local, so it is refused.
  */
 function isLoopbackUrl(appUrl: string): boolean {
-    if (!isValidUrl(appUrl)) {return false;}
-    const { hostname } = new URL(appUrl);
-    return LOOPBACK_HOSTNAMES.has(hostname) || hostname.endsWith('.localhost');
+  if (!isValidUrl(appUrl)) {
+    return false;
+  }
+  const { hostname } = new URL(appUrl);
+  return LOOPBACK_HOSTNAMES.has(hostname) || hostname.endsWith('.localhost');
 }
 
 /**
@@ -50,34 +48,34 @@ function isLoopbackUrl(appUrl: string): boolean {
  * tenant are fixed at construction by the composition root.
  */
 export class DevCurrentActorProvider implements CurrentActorProvider {
-    private readonly actor: Actor;
+  private readonly actor: Actor;
 
-    constructor(options: {
-        readonly role: Role;
-        readonly tenantId: TenantId;
-        readonly nodeEnv: string;
-        readonly appUrl: string;
-    }) {
-        // Independent of the env schema on purpose: if that check is removed or
-        // bypassed by a wiring mistake, constructing this class still fails.
-        invariant(
-            options.nodeEnv !== 'production',
-            'DevCurrentActorProvider must never be constructed in production.'
-        );
-        invariant(
-            isLoopbackUrl(options.appUrl),
-            'DevCurrentActorProvider may only run when the app URL is a loopback address.'
-        );
-        this.actor = {
-            id: toActorId(DEV_ACTOR_ID),
-            tenantId: options.tenantId,
-            roles: [options.role],
-        };
-        // Loud on purpose: every request is now this actor.
-        devLogger.warn('auth.disabled_dev_actor_active', { role: options.role });
-    }
+  constructor(options: {
+    readonly role: Role;
+    readonly tenantId: TenantId;
+    readonly nodeEnv: string;
+    readonly appUrl: string;
+  }) {
+    // Independent of the env schema on purpose: if that check is removed or
+    // bypassed by a wiring mistake, constructing this class still fails.
+    invariant(
+      options.nodeEnv !== 'production',
+      'DevCurrentActorProvider must never be constructed in production.',
+    );
+    invariant(
+      isLoopbackUrl(options.appUrl),
+      'DevCurrentActorProvider may only run when the app URL is a loopback address.',
+    );
+    this.actor = {
+      id: toActorId(DEV_ACTOR_ID),
+      tenantId: options.tenantId,
+      roles: [options.role],
+    };
+    // Loud on purpose: every request is now this actor.
+    devLogger.warn('auth.disabled_dev_actor_active', { role: options.role });
+  }
 
-    getCurrentActor(): AppResultAsync<Actor, CurrentActorError> {
-        return okAsync(this.actor);
-    }
+  getCurrentActor(): AppResultAsync<Actor, CurrentActorError> {
+    return okAsync(this.actor);
+  }
 }

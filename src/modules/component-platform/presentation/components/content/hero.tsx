@@ -32,9 +32,7 @@ export async function Hero({ props }: HeroComponentProps) {
         <h1 className="max-w-3xl font-heading text-4xl leading-tight text-primary-copy sm:text-5xl">
           {title}
         </h1>
-        {subtitle !== null && (
-          <p className="mt-4 max-w-xl text-lg text-copy-muted">{subtitle}</p>
-        )}
+        {subtitle !== null && <p className="mt-4 max-w-xl text-lg text-copy-muted">{subtitle}</p>}
       </Container>
     </Section>
   );

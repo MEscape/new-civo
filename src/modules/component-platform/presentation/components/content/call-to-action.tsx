@@ -19,8 +19,7 @@ export async function CallToAction({ props }: CallToActionComponentProps) {
   const t = await getTranslations('componentPlatform');
   const heading = trimToNull(props.heading) ?? t('callToAction.defaultHeading');
   const body = trimToNull(props.body);
-  const buttonLabel =
-    trimToNull(props.buttonLabel) ?? t('callToAction.defaultButtonLabel');
+  const buttonLabel = trimToNull(props.buttonLabel) ?? t('callToAction.defaultButtonLabel');
   const href = trimToNull(props.href) ?? FALLBACK_HREF;
 
   return (
@@ -30,9 +29,7 @@ export async function CallToAction({ props }: CallToActionComponentProps) {
           <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-heading text-2xl">{heading}</h2>
-              {body !== null && (
-                <p className="mt-2 max-w-lg text-primary-foreground/80">{body}</p>
-              )}
+              {body !== null && <p className="mt-2 max-w-lg text-primary-foreground/80">{body}</p>}
             </div>
             <ContentLink
               href={href}

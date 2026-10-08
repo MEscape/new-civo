@@ -74,8 +74,8 @@ export function insertComponent(componentType: string): BuilderThunk {
           componentType,
           placement,
           idSeed: createIdSeed(),
-        }).map(toSnapshot)
-      )
+        }).map(toSnapshot),
+      ),
     );
   };
 }
@@ -87,13 +87,9 @@ export function removeNodeById(nodeId: PageNodeId): BuilderThunk {
       commit(
         removeNode(children, nodeId).map((tree) => ({
           children: tree,
-          selectedNodeId: nextSelectionAfterRemoval(
-            children,
-            nodeId,
-            selectedNodeId
-          ),
-        }))
-      )
+          selectedNodeId: nextSelectionAfterRemoval(children, nodeId, selectedNodeId),
+        })),
+      ),
     );
   };
 }
@@ -101,7 +97,9 @@ export function removeNodeById(nodeId: PageNodeId): BuilderThunk {
 export function removeSelectedNode(): BuilderThunk {
   return (dispatch, getState) => {
     const { selectedNodeId } = getState().document.history.present;
-    if (selectedNodeId !== null) {dispatch(removeNodeById(selectedNodeId));}
+    if (selectedNodeId !== null) {
+      dispatch(removeNodeById(selectedNodeId));
+    }
   };
 }
 
@@ -110,46 +108,42 @@ export function duplicateNodeById(nodeId: PageNodeId): BuilderThunk {
     const { children } = getState().document.history.present;
     dispatch(
       commit(
-        duplicateNode(children, nodeId, createIdSeed()).map(
-          ({ tree, newNodeId }) => ({
-            children: tree,
-            selectedNodeId: newNodeId,
-          })
-        )
-      )
+        duplicateNode(children, nodeId, createIdSeed()).map(({ tree, newNodeId }) => ({
+          children: tree,
+          selectedNodeId: newNodeId,
+        })),
+      ),
     );
   };
 }
 
 /** Moves a node one step among its siblings; a no-op at the ends. */
-export function moveNodeBy(
-  nodeId: PageNodeId,
-  direction: -1 | 1
-): BuilderThunk {
+export function moveNodeBy(nodeId: PageNodeId, direction: -1 | 1): BuilderThunk {
   return (dispatch, getState, { catalog }) => {
     const { children, selectedNodeId } = getState().document.history.present;
     const location = locateNode(children, nodeId);
-    if (location === null) {return;}
+    if (location === null) {
+      return;
+    }
 
     const index = location.index + direction;
-    if (index < 0 || index >= location.siblings.length) {return;}
+    if (index < 0 || index >= location.siblings.length) {
+      return;
+    }
     dispatch(
       commit(
         moveNode(
           children,
           { nodeId, placement: { parentId: location.parentId, index } },
-          catalog
-        ).map((tree) => ({ children: tree, selectedNodeId }))
-      )
+          catalog,
+        ).map((tree) => ({ children: tree, selectedNodeId })),
+      ),
     );
   };
 }
 
 /** Applies a finished drag: inserts a palette component or moves an existing node. */
-export function applyDrop(
-  source: ActiveDrag,
-  target: DropTarget
-): BuilderThunk {
+export function applyDrop(source: ActiveDrag, target: DropTarget): BuilderThunk {
   return (dispatch, getState, { catalog, createIdSeed }) => {
     const { children } = getState().document.history.present;
 
@@ -162,9 +156,9 @@ export function applyDrop(
             moveNode(children, { nodeId: movedId, placement: resolved }, catalog).map((tree) => ({
               children: tree,
               selectedNodeId: movedId,
-            }))
-          )
-        )
+            })),
+          ),
+        ),
       );
       return;
     }
@@ -178,9 +172,9 @@ export function applyDrop(
             componentType: source.type,
             placement: resolved,
             idSeed: createIdSeed(),
-          }).map(toSnapshot)
-        )
-      )
+          }).map(toSnapshot),
+        ),
+      ),
     );
   };
 }

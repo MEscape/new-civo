@@ -710,9 +710,9 @@ The index should not depend directly on a specific search provider.
 Conceptually:
 
 ```ts
-SearchService
-SearchDocument
-SearchResult
+SearchService;
+SearchDocument;
+SearchResult;
 ```
 
 Start simple.

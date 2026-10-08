@@ -13,17 +13,21 @@ import type { RefObject } from 'react';
 export function useScaledHeight(
   elementRef: RefObject<HTMLElement | null>,
   scale: number,
-  isActive: boolean
+  isActive: boolean,
 ): number | null {
   const [height, setHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const element = elementRef.current;
-    if (!isActive || element === null) {return undefined;}
+    if (!isActive || element === null) {
+      return undefined;
+    }
 
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
-      if (entry !== undefined) {setHeight(entry.contentRect.height * scale);}
+      if (entry !== undefined) {
+        setHeight(entry.contentRect.height * scale);
+      }
     });
     observer.observe(element);
     return () => {

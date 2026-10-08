@@ -381,8 +381,16 @@ export function messageKeyForCode(code: string): string {
   return Object.hasOwn(MESSAGE_KEY_BY_CODE, code) ? MESSAGE_KEY_BY_CODE[code as keyof typeof MESSAGE_KEY_BY_CODE] : GENERIC_ERROR_MESSAGE_KEY;
 }
 `,
-    [`${M}/presentation/i18n/en.json`]: JSON.stringify(catalog('Not found', 'Something went wrong', 'Name is required'), null, 2),
-    [`${M}/presentation/i18n/de.json`]: JSON.stringify(catalog('Nicht gefunden', 'Etwas ist schiefgelaufen', 'Name ist erforderlich'), null, 2),
+    [`${M}/presentation/i18n/en.json`]: JSON.stringify(
+      catalog('Not found', 'Something went wrong', 'Name is required'),
+      null,
+      2,
+    ),
+    [`${M}/presentation/i18n/de.json`]: JSON.stringify(
+      catalog('Nicht gefunden', 'Etwas ist schiefgelaufen', 'Name ist erforderlich'),
+      null,
+      2,
+    ),
     [`${M}/presentation/i18n/catalog.ts`]: `import de from './de.json';
 import en from './en.json';
 

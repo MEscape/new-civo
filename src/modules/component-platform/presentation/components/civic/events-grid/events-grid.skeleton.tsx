@@ -1,7 +1,4 @@
-import {
-  CardGridSkeleton,
-  SectionSkeleton,
-} from '../../shared/skeleton-blocks';
+import { CardGridSkeleton, SectionSkeleton } from '../../shared/skeleton-blocks';
 
 export function EventsGridSkeleton() {
   return (

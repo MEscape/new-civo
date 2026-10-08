@@ -108,7 +108,7 @@ export const prop = {
   /** Trimmed free text; absent or blank means "use the translated default". */
   text(
     max: number,
-    meta?: PropMeta & { readonly placeholder?: boolean }
+    meta?: PropMeta & { readonly placeholder?: boolean },
   ): PropField<string | undefined> {
     return propField({
       control: 'text',
@@ -122,7 +122,7 @@ export const prop = {
   /** Like `text`, edited in a multi-line field. */
   longText(
     max: number,
-    meta?: PropMeta & { readonly placeholder?: boolean }
+    meta?: PropMeta & { readonly placeholder?: boolean },
   ): PropField<string | undefined> {
     return propField({
       control: 'textarea',
@@ -143,7 +143,7 @@ export const prop = {
     options: PropMeta & {
       readonly allowRelative: boolean;
       readonly placeholder?: boolean;
-    }
+    },
   ): PropField<string | undefined> {
     return propField({
       control: 'text',
@@ -154,10 +154,7 @@ export const prop = {
     });
   },
 
-  number(
-    bounds: PropBounds & { readonly initial: number },
-    meta?: PropMeta
-  ): PropField<number> {
+  number(bounds: PropBounds & { readonly initial: number }, meta?: PropMeta): PropField<number> {
     return propField({
       control: 'number',
       schema: numberField({ min: bounds.min, max: bounds.max, integer: true }),
@@ -167,11 +164,7 @@ export const prop = {
     });
   },
 
-  select<const V extends string>(
-    options: readonly V[],
-    initial: V,
-    meta?: PropMeta
-  ): PropField<V> {
+  select<const V extends string>(options: readonly V[], initial: V, meta?: PropMeta): PropField<V> {
     return propField({
       control: 'select',
       schema: oneOf(options),
@@ -181,10 +174,7 @@ export const prop = {
     });
   },
 
-  columns(
-    initial: GridColumnCount,
-    meta?: PropMeta
-  ): PropField<GridColumnCount> {
+  columns(initial: GridColumnCount, meta?: PropMeta): PropField<GridColumnCount> {
     return propField({
       control: 'columns',
       schema: oneOf(GRID_COLUMN_COUNTS),
@@ -210,7 +200,7 @@ export const prop = {
   items<S extends Shape>(
     shape: S,
     max: number,
-    meta?: PropMeta & { readonly multiline?: ReadonlyArray<keyof S & string> }
+    meta?: PropMeta & { readonly multiline?: ReadonlyArray<keyof S & string> },
   ): PropField<ReadonlyArray<Infer<S>>> {
     const multiline: readonly string[] = meta?.multiline ?? [];
     return propField({

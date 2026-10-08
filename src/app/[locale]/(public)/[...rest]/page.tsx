@@ -10,9 +10,9 @@ import { notFound } from 'next/navigation';
  * the route be prerendered.
  */
 export function generateStaticParams() {
-    return [{ rest: ['not-found'] }];
+  return [{ rest: ['not-found'] }];
 }
 
 export default function UnmatchedRoutePage(): never {
-    notFound();
+  notFound();
 }

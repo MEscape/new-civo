@@ -38,9 +38,7 @@ export interface ConfigInvalidPublishablePage extends PublishablePageBase {
 }
 
 export type PublishablePage =
-  | ReadyPublishablePage
-  | ConfigMissingPublishablePage
-  | ConfigInvalidPublishablePage;
+  ReadyPublishablePage | ConfigMissingPublishablePage | ConfigInvalidPublishablePage;
 
 export interface ComponentContract {
   readonly contract: string;

@@ -25,8 +25,7 @@ export const smartCityObservationContent = defineContent({
     category: smartCityCategory(),
   },
   rule: {
-    compare: (first, second) =>
-      compareText(second.observedAt, first.observedAt),
+    compare: (first, second) => compareText(second.observedAt, first.observedAt),
     categoryOf: (observation) => observation.category,
   },
 }).withSample((now) => {

@@ -14,7 +14,8 @@ import { classifyContext, defineRule, memberPath, report } from '../util.mjs';
  *     dependency never implies that every code path emits.
  */
 export const commandAuditDependency = defineRule({
-  description: 'Commands are not built from public dependency sets and record typed audit events; exemptions are explicit.',
+  description:
+    'Commands are not built from public dependency sets and record typed audit events; exemptions are explicit.',
   create(context) {
     const { file } = classifyContext(context);
     if (file.area !== 'module' || file.layer !== 'application') return {};
@@ -30,11 +31,19 @@ export const commandAuditDependency = defineRule({
       return {
         ClassDeclaration(node) {
           classNode = node;
-          const ctor = node.body.body.find((m) => m.type === 'MethodDefinition' && m.kind === 'constructor');
+          const ctor = node.body.body.find(
+            (m) => m.type === 'MethodDefinition' && m.kind === 'constructor',
+          );
           const param = ctor?.value.params[0];
-          const annotation = param?.type === 'TSParameterProperty' ? param.parameter.typeAnnotation?.typeAnnotation : undefined;
-          if (annotation?.type === 'TSTypeReference' && annotation.typeName.type === 'Identifier') depsName = annotation.typeName.name;
-          const comments = sourceCode.getCommentsBefore(node.parent?.type === 'ExportNamedDeclaration' ? node.parent : node);
+          const annotation =
+            param?.type === 'TSParameterProperty'
+              ? param.parameter.typeAnnotation?.typeAnnotation
+              : undefined;
+          if (annotation?.type === 'TSTypeReference' && annotation.typeName.type === 'Identifier')
+            depsName = annotation.typeName.name;
+          const comments = sourceCode.getCommentsBefore(
+            node.parent?.type === 'ExportNamedDeclaration' ? node.parent : node,
+          );
           exempt = comments.some((c) => /@audit-exempt\s+\S/.test(c.value));
         },
         CallExpression(node) {
@@ -44,21 +53,35 @@ export const commandAuditDependency = defineRule({
           const [event] = node.arguments;
           const hasLiteralType =
             event?.type === 'ObjectExpression' &&
-            event.properties.some((p) => p.type === 'Property' && p.key.name === 'type' && p.value.type === 'Literal' && typeof p.value.value === 'string');
+            event.properties.some(
+              (p) =>
+                p.type === 'Property' &&
+                p.key.name === 'type' &&
+                p.value.type === 'Literal' &&
+                typeof p.value.value === 'string',
+            );
           if (!hasLiteralType) {
-            report(context, node, "Record a typed audit event: pass an object literal with a literal `type` (e.g. `audit.record({ type: 'website.created', ... })`) so the event union stays exhaustive.");
+            report(
+              context,
+              node,
+              "Record a typed audit event: pass an object literal with a literal `type` (e.g. `audit.record({ type: 'website.created', ... })`) so the event union stays exhaustive.",
+            );
           }
         },
         'Program:exit'() {
           if (classNode === null) return;
           if (depsName !== null && depsName.startsWith('Public')) {
-            report(context, classNode.id, `Commands are audited and must not be built from the public dependency set \`${depsName}\`. Use a dependency interface that includes \`audit\`.`);
+            report(
+              context,
+              classNode.id,
+              `Commands are audited and must not be built from the public dependency set \`${depsName}\`. Use a dependency interface that includes \`audit\`.`,
+            );
           }
           if (recordCalls === 0 && !exempt) {
             report(
               context,
               classNode.id,
-              'This command never records an audit event. Call `audit.record({ type: ... })` for its successful outcome, or document an intentional exception with `@audit-exempt <reason>` in the class comment.'
+              'This command never records an audit event. Call `audit.record({ type: ... })` for its successful outcome, or document an intentional exception with `@audit-exempt <reason>` in the class comment.',
             );
           }
         },

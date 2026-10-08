@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { datasetNameSchema, idSchema } from "./data-source-fields-schema";
+import { datasetNameSchema, idSchema } from './data-source-fields-schema';
 
 export const datasetEditSchema = z.object({
   datasetId: idSchema,

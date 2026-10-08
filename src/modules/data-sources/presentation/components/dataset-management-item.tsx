@@ -1,18 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import { Button } from "@components/ui/button";
+import { Button } from '@components/ui/button';
 
-import { useTranslations } from "@i18n/client";
+import { useTranslations } from '@i18n/client';
 
+import { CANONICAL_KIND_MESSAGE_KEYS } from '../messages/message-keys';
 
-import { CANONICAL_KIND_MESSAGE_KEYS } from "../messages/message-keys";
+import { DataSourceMappingPanel } from './data-source-mapping-panel';
+import { DatasetForm } from './dataset-form';
 
-import { DataSourceMappingPanel } from "./data-source-mapping-panel";
-import { DatasetForm } from "./dataset-form";
-
-import type { DatasetDto } from "../dto/dataset-dto";
+import type { DatasetDto } from '../dto/dataset-dto';
 
 export interface DatasetManagementItemProps {
   readonly dataSourceId: string;
@@ -31,7 +30,7 @@ export function DatasetManagementItem({
   onDelete,
   isPending,
 }: DatasetManagementItemProps) {
-  const t = useTranslations("dataSources");
+  const t = useTranslations('dataSources');
   const [isEditing, setIsEditing] = useState(false);
   const panelId = `mapping-${dataset.id}`;
 
@@ -41,8 +40,12 @@ export function DatasetManagementItem({
         <DatasetForm
           dataSourceId={dataSourceId}
           dataset={dataset}
-          onSaved={() => { setIsEditing(false); }}
-          onCancel={() => { setIsEditing(false); }}
+          onSaved={() => {
+            setIsEditing(false);
+          }}
+          onCancel={() => {
+            setIsEditing(false);
+          }}
         />
       </li>
     );
@@ -52,11 +55,9 @@ export function DatasetManagementItem({
     <li className="space-y-4 rounded-token border border-border p-4">
       <div className="flex items-center justify-between">
         <div>
-          <h4 className="font-medium text-copy">
-            {dataset.name}
-          </h4>
+          <h4 className="font-medium text-copy">{dataset.name}</h4>
           <p className="text-sm text-copy-muted">
-            {t("datasets.kind", {
+            {t('datasets.kind', {
               kind: t(CANONICAL_KIND_MESSAGE_KEYS[dataset.canonicalKind]),
             })}
           </p>
@@ -65,10 +66,12 @@ export function DatasetManagementItem({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setIsEditing(true); }}
+            onClick={() => {
+              setIsEditing(true);
+            }}
             disabled={isPending}
           >
-            {t("datasets.edit")}
+            {t('datasets.edit')}
           </Button>
           <Button
             variant="outline"
@@ -77,17 +80,17 @@ export function DatasetManagementItem({
             aria-controls={panelId}
             onClick={onToggleExpand}
           >
-            {isExpanded
-              ? t("datasets.hideMapping")
-              : t("datasets.editMapping")}
+            {isExpanded ? t('datasets.hideMapping') : t('datasets.editMapping')}
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => { onDelete(dataset.id); }}
+            onClick={() => {
+              onDelete(dataset.id);
+            }}
             disabled={isPending}
           >
-            {t("datasets.delete")}
+            {t('datasets.delete')}
           </Button>
         </div>
       </div>

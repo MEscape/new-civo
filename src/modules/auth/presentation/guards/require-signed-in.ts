@@ -20,11 +20,13 @@ import type { ActorView } from '../../application/contracts/auth-views';
  * and must reach `error.tsx` instead of bouncing the user to sign-in.
  */
 export async function requireSignedIn(returnTo?: string): Promise<ActorView> {
-    const result = await getAuthQueries().getCurrentActor.execute();
+  const result = await getAuthQueries().getCurrentActor.execute();
 
-    if (result.isOk()) {return result.value;}
-    if (result.error.kind === 'unauthorized') {
-        redirect({ href: authRoutes.signIn(returnTo), locale: await getLocale() });
-    }
-    throw new Error(result.error.code, { cause: result.error });
+  if (result.isOk()) {
+    return result.value;
+  }
+  if (result.error.kind === 'unauthorized') {
+    redirect({ href: authRoutes.signIn(returnTo), locale: await getLocale() });
+  }
+  throw new Error(result.error.code, { cause: result.error });
 }

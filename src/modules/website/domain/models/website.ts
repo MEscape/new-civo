@@ -1,15 +1,11 @@
 import type { TenantId } from '@modules/auth';
 
-import type { ValidationAppError , FieldErrorBag } from '@lib/errors';
+import type { ValidationAppError, FieldErrorBag } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
-import {isDefined, trimToNull} from '@lib/utils';
+import { isDefined, trimToNull } from '@lib/utils';
 
-
-import {
-  WEBSITE_VALIDATION_CODES,
-  createWebsiteErrorBag,
-} from '../errors/website-errors';
+import { WEBSITE_VALIDATION_CODES, createWebsiteErrorBag } from '../errors/website-errors';
 
 import { isTemplateKey } from './website-template';
 
@@ -76,9 +72,15 @@ export interface WebsiteChanges {
 }
 
 function slugViolation(slug: string): string | null {
-  if (slug.length === 0) {return CODES.slugRequired;}
-  if (slug.length > WEBSITE_LIMITS.slugMax) {return CODES.slugTooLong;}
-  if (!SLUG_PATTERN.test(slug)) {return CODES.slugInvalid;}
+  if (slug.length === 0) {
+    return CODES.slugRequired;
+  }
+  if (slug.length > WEBSITE_LIMITS.slugMax) {
+    return CODES.slugTooLong;
+  }
+  if (!SLUG_PATTERN.test(slug)) {
+    return CODES.slugInvalid;
+  }
   return null;
 }
 
@@ -87,52 +89,52 @@ export function isValidSlug(slug: string): boolean {
 }
 
 function checkName(name: string, bag: FieldErrorBag): void {
-  if (name.length < WEBSITE_LIMITS.nameMin) {bag.add('name', CODES.nameTooShort);}
-  else if (name.length > WEBSITE_LIMITS.nameMax)
-    {bag.add('name', CODES.nameTooLong);}
+  if (name.length < WEBSITE_LIMITS.nameMin) {
+    bag.add('name', CODES.nameTooShort);
+  } else if (name.length > WEBSITE_LIMITS.nameMax) {
+    bag.add('name', CODES.nameTooLong);
+  }
 }
 
 function checkSlug(slug: string, bag: FieldErrorBag): void {
   const violation = slugViolation(slug);
-  if (violation !== null) {bag.add('slug', violation);}
+  if (violation !== null) {
+    bag.add('slug', violation);
+  }
 }
 
-function checkDescription(
-  description: string | null,
-  bag: FieldErrorBag
-): void {
-  if (
-    description !== null &&
-    description.length > WEBSITE_LIMITS.descriptionMax
-  ) {
+function checkDescription(description: string | null, bag: FieldErrorBag): void {
+  if (description !== null && description.length > WEBSITE_LIMITS.descriptionMax) {
     bag.add('description', CODES.descriptionTooLong);
   }
 }
 
 /** The only way a new website enters the system. Reports every invalid field. */
 export function createWebsiteDraft(
-  input: WebsiteDraftInput
+  input: WebsiteDraftInput,
 ): AppResult<WebsiteDraft, ValidationAppError> {
   const bag = createWebsiteErrorBag();
   const name = input.name.trim();
   const slug = input.slug.trim();
   const description = trimToNull(input.description);
-  const templateKey = isTemplateKey(input.templateKey)
-    ? input.templateKey
-    : null;
+  const templateKey = isTemplateKey(input.templateKey) ? input.templateKey : null;
 
   checkName(name, bag);
   checkSlug(slug, bag);
   checkDescription(description, bag);
-  if (templateKey === null) {bag.add('templateKey', CODES.templateUnknown);}
+  if (templateKey === null) {
+    bag.add('templateKey', CODES.templateUnknown);
+  }
 
-  if (bag.hasErrors || templateKey === null) {return err(bag.toError());}
+  if (bag.hasErrors || templateKey === null) {
+    return err(bag.toError());
+  }
   return ok({ name, slug, description, templateKey });
 }
 
 /** Validates a partial update; only the fields that were provided are checked. */
 export function parseWebsiteChanges(
-  input: WebsiteChangesInput
+  input: WebsiteChangesInput,
 ): AppResult<WebsiteChanges, ValidationAppError> {
   const bag = createWebsiteErrorBag();
   const changes: { name?: string; description?: string | null } = {};

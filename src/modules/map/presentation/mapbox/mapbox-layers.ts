@@ -127,9 +127,7 @@ interface LayerInput {
   readonly palette: ResolvedPalette;
 }
 
-function areaLayers(
-  { id, source, style, palette }: LayerInput,
-): LayerSpecification[] {
+function areaLayers({ id, source, style, palette }: LayerInput): LayerSpecification[] {
   const color = colorExpression(style, palette);
   return [
     {
@@ -149,9 +147,7 @@ function areaLayers(
   ];
 }
 
-function lineLayers(
-  { id, source, style, palette }: LayerInput,
-): LayerSpecification[] {
+function lineLayers({ id, source, style, palette }: LayerInput): LayerSpecification[] {
   return [
     {
       id: `${id}-line`,
@@ -184,9 +180,7 @@ function dotLayer(
   };
 }
 
-function pointLayers(
-  { id, source, style, palette }: LayerInput,
-): LayerSpecification[] {
+function pointLayers({ id, source, style, palette }: LayerInput): LayerSpecification[] {
   const points = isGeometry(POINT_TYPES);
   const byStyle: Record<PointStyle, () => LayerSpecification[]> = {
     markers: () => [dotLayer({ id: `${id}-point`, source, style, palette }, points)],
@@ -225,7 +219,11 @@ function pointLayers(
         },
         paint: { 'text-color': palette.onCluster },
       },
-      dotLayer({ id: `${id}-point`, source, style, palette }, ['all', points, ['!', ['has', 'point_count']]]),
+      dotLayer({ id: `${id}-point`, source, style, palette }, [
+        'all',
+        points,
+        ['!', ['has', 'point_count']],
+      ]),
     ],
     heatmap: () => [
       {
@@ -286,9 +284,7 @@ export interface LayerGroups {
   readonly clusterIds: readonly string[];
 }
 
-function highlightLayers(
-  { id, source, palette }: LayerInput,
-): LayerSpecification[] {
+function highlightLayers({ id, source, palette }: LayerInput): LayerSpecification[] {
   const none: ExpressionSpecification = ['==', ['get', KEY_PROPERTY], ''];
   return [
     {

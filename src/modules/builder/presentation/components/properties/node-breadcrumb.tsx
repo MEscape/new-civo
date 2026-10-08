@@ -2,7 +2,6 @@ import { ChevronRight } from '@components/ui/icons';
 
 import { useTranslations } from '@i18n/client';
 
-
 import { useComponentText } from '../../hooks/use-component-text';
 import { nodeSelected } from '../../state/builder-actions';
 import { useBuilderDispatch } from '../../state/builder-hooks';
@@ -18,10 +17,7 @@ export interface NodeBreadcrumbProps {
 }
 
 /** The selected node's place in the tree; each ancestor selects itself. */
-export function NodeBreadcrumb({
-  ancestors,
-  currentLabel,
-}: NodeBreadcrumbProps) {
+export function NodeBreadcrumb({ ancestors, currentLabel }: NodeBreadcrumbProps) {
   const t = useTranslations('builder');
   const dispatch = useBuilderDispatch();
   const text = useComponentText();
@@ -30,11 +26,7 @@ export function NodeBreadcrumb({
     <nav aria-label={t('properties.breadcrumb')}>
       <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-copy-muted">
         <li>
-          <button
-            type="button"
-            onClick={() => dispatch(nodeSelected(null))}
-            className={CRUMB}
-          >
+          <button type="button" onClick={() => dispatch(nodeSelected(null))} className={CRUMB}>
             {t('properties.page')}
           </button>
         </li>

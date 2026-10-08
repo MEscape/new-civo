@@ -8,16 +8,8 @@ import { cn } from '@lib/utils';
  * Tokens used: `bg-canvas` (page background), `h-full` (full height chain
  * starting from the `<html>` element set in the root layout).
  */
-export function PageShell({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn('flex h-full flex-col bg-canvas', className)}
-      {...props}
-    />
-  );
+export function PageShell({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn('flex h-full flex-col bg-canvas', className)} {...props} />;
 }
 
 /**
@@ -26,16 +18,13 @@ export function PageShell({
  *
  * Semantics: use `<header>` so screen-readers announce it as a landmark.
  */
-export function AppHeader({
-  className,
-  ...props
-}: HTMLAttributes<HTMLElement>) {
+export function AppHeader({ className, ...props }: HTMLAttributes<HTMLElement>) {
   return (
     <header
       className={cn(
         'sticky top-0 z-40 flex h-[var(--civo-app-header-height)] shrink-0 items-center',
         'border-b border-border bg-surface px-4',
-        className
+        className,
       )}
       {...props}
     />
@@ -46,15 +35,9 @@ export function AppHeader({
  * Scrollable body below the app header.
  * Uses the `h-app-body` utility defined in globals.css (dvh-aware).
  */
-export function AppBody({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
+export function AppBody({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn('flex min-h-0 flex-1 flex-col overflow-y-auto', className)}
-      {...props}
-    />
+    <div className={cn('flex min-h-0 flex-1 flex-col overflow-y-auto', className)} {...props} />
   );
 }
 
@@ -65,15 +48,9 @@ export function AppBody({
  * for sidebar layouts. Override via `className` when a narrower prose column
  * is needed (e.g. `max-w-2xl`).
  */
-export function Container({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
+export function Container({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn('mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8', className)}
-      {...props}
-    />
+    <div className={cn('mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8', className)} {...props} />
   );
 }
 
@@ -99,12 +76,7 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
  * Use for major content sections on marketing/content pages.
  */
 export function Section({ tone = 'default', className, ...props }: SectionProps) {
-  return (
-    <section
-      className={cn('py-section', sectionToneClass(tone), className)}
-      {...props}
-    />
-  );
+  return <section className={cn('py-section', sectionToneClass(tone), className)} {...props} />;
 }
 
 /**
@@ -128,21 +100,16 @@ export function SidebarLayout({
   ...props
 }: SidebarLayoutProps) {
   return (
-    <div
-      className={cn('flex h-app-body overflow-hidden', className)}
-      {...props}
-    >
+    <div className={cn('flex h-app-body overflow-hidden', className)} {...props}>
       <aside
         className={cn(
           'flex w-64 shrink-0 flex-col overflow-y-auto border-r border-border bg-surface',
-          sidebarClassName
+          sidebarClassName,
         )}
       >
         {sidebar}
       </aside>
-      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
-        {children}
-      </main>
+      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">{children}</main>
     </div>
   );
 }
@@ -157,18 +124,11 @@ interface PageHeadingProps extends HTMLAttributes<HTMLDivElement> {
   description?: string | undefined;
 }
 
-export function PageHeading({
-  title,
-  description,
-  className,
-  ...props
-}: PageHeadingProps) {
+export function PageHeading({ title, description, className, ...props }: PageHeadingProps) {
   return (
     <div className={cn('space-y-1', className)} {...props}>
       <h1 className="font-heading text-2xl font-semibold text-copy">{title}</h1>
-      {description ? (
-        <p className="text-sm text-copy-muted">{description}</p>
-      ) : null}
+      {description ? <p className="text-sm text-copy-muted">{description}</p> : null}
     </div>
   );
 }
@@ -177,10 +137,7 @@ export function PageHeading({
  * Horizontal rule using the design-system border token.
  * Thin wrapper so `<hr>` always uses `border-border`, never a raw color.
  */
-export function Divider({
-  className,
-  ...props
-}: HTMLAttributes<HTMLHRElement>) {
+export function Divider({ className, ...props }: HTMLAttributes<HTMLHRElement>) {
   return <hr className={cn('border-t border-border', className)} {...props} />;
 }
 
@@ -215,18 +172,14 @@ export function EmptyState({
       className={cn(
         'flex flex-col items-center justify-center gap-4 py-16 text-center',
         EMPTY_STATE_VARIANTS[variant],
-        className
+        className,
       )}
       {...props}
     >
       {icon ? <span className="text-copy-muted">{icon}</span> : null}
       <div className="space-y-1">
-        <p className="font-heading text-base font-semibold text-copy">
-          {title}
-        </p>
-        {description ? (
-          <p className="max-w-sm text-sm text-copy-muted">{description}</p>
-        ) : null}
+        <p className="font-heading text-base font-semibold text-copy">{title}</p>
+        {description ? <p className="max-w-sm text-sm text-copy-muted">{description}</p> : null}
       </div>
       {action}
     </div>
@@ -243,13 +196,7 @@ export function SectionHeading({
   ...props
 }: HTMLAttributes<HTMLHeadingElement>) {
   return (
-    <h2
-      className={cn(
-        'mb-6 font-heading text-2xl font-semibold text-copy',
-        className
-      )}
-      {...props}
-    >
+    <h2 className={cn('mb-6 font-heading text-2xl font-semibold text-copy', className)} {...props}>
       {children}
     </h2>
   );
@@ -275,18 +222,10 @@ interface GridProps extends HTMLAttributes<HTMLElement> {
  * the window, so it lays out correctly inside the builder canvas where side
  * panels take away from the viewport.
  */
-export function Grid({
-  columns,
-  as: Element = 'div',
-  className,
-  ...props
-}: GridProps) {
+export function Grid({ columns, as: Element = 'div', className, ...props }: GridProps) {
   return (
     <div className="@container">
-      <Element
-        className={cn('grid gap-4', GRID_COLUMN_CLASSES[columns], className)}
-        {...props}
-      />
+      <Element className={cn('grid gap-4', GRID_COLUMN_CLASSES[columns], className)} {...props} />
     </div>
   );
 }

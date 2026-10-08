@@ -13,7 +13,9 @@ import type { BuilderThunk } from './builder-thunk';
 export function saveDraft(): BuilderThunk<Promise<void>> {
   return async (dispatch, getState, { savePageConfig }) => {
     const state = getState();
-    if (state.save.status === 'saving' || !selectIsDirty(state)) {return;}
+    if (state.save.status === 'saving' || !selectIsDirty(state)) {
+      return;
+    }
 
     const sentChildren = state.document.history.present.children;
     dispatch(saveStarted());
@@ -29,7 +31,7 @@ export function saveDraft(): BuilderThunk<Promise<void>> {
           saveSucceeded({
             version: result.data.version,
             savedChildren: sentChildren,
-          })
+          }),
         );
       } else {
         dispatch(saveFailed(result.error.code));

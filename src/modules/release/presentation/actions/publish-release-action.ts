@@ -23,12 +23,11 @@ import type { ReleaseSummaryDto } from '../dto/release-dto';
  * writes a draft, this is the one action that makes pages public.
  */
 export async function publishReleaseAction(
-  input: unknown
+  input: unknown,
 ): Promise<ActionResult<ReleaseSummaryDto>> {
-  const result = await parseReleaseInput(
-    publishReleaseSchema,
-    input
-  ).asyncAndThen((command) => releaseCommands.publishRelease.execute(command));
+  const result = await parseReleaseInput(publishReleaseSchema, input).asyncAndThen((command) =>
+    releaseCommands.publishRelease.execute(command),
+  );
 
   if (result.isOk()) {
     revalidatePath(websiteRoutes.detail(result.value.websiteId));

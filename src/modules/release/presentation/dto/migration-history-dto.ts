@@ -8,9 +8,7 @@ export interface MigrationHistoryDto {
   readonly migrations: readonly MigrationSummaryDto[];
 }
 
-export function toMigrationHistoryDto(
-  views: readonly MigrationSummaryView[]
-): MigrationHistoryDto {
+export function toMigrationHistoryDto(views: readonly MigrationSummaryView[]): MigrationHistoryDto {
   return {
     migrations: views.map(toMigrationSummaryDto),
   };

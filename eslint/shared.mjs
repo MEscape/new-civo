@@ -1,7 +1,11 @@
 /** Globs and constants shared by the config modules. */
 
 /** Tests live in __tests__/** (mirroring src/) and may be co-located. */
-export const TEST_FILES = ['__tests__/**/*.{ts,tsx}', 'src/**/*.test.{ts,tsx}', 'src/**/*.spec.{ts,tsx}'];
+export const TEST_FILES = [
+  '__tests__/**/*.{ts,tsx}',
+  'src/**/*.test.{ts,tsx}',
+  'src/**/*.spec.{ts,tsx}',
+];
 
 /** Config, tooling and script files: Node globals, relaxed rules. */
 export const CONFIG_FILES = [

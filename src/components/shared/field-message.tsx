@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { cn } from "@lib/utils";
+import { cn } from '@lib/utils';
 
 export interface FieldMessageProps {
   readonly id: string;
@@ -9,10 +9,12 @@ export interface FieldMessageProps {
 }
 
 export function FieldMessage({ id, message, className }: FieldMessageProps) {
-  if (!message) {return null;}
+  if (!message) {
+    return null;
+  }
 
   return (
-    <p id={id} role="alert" className={cn("text-xs text-danger", className)}>
+    <p id={id} role="alert" className={cn('text-xs text-danger', className)}>
       {message}
     </p>
   );

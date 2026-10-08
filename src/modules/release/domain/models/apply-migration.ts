@@ -3,10 +3,7 @@ import type { JsonValue } from '@lib/utils';
 
 import { childrenOf } from './page-tree';
 
-import type {
-  ConflictResolution,
-  ConflictResolutions,
-} from './conflict-resolution';
+import type { ConflictResolution, ConflictResolutions } from './conflict-resolution';
 import type { MigrationPlan, NodeMigrationPlan } from './migration-plan';
 import type { NodeProps, PageTree, TreeNode } from './page-tree';
 import type { FieldConflict } from './three-way-merge';
@@ -29,13 +26,9 @@ export interface ApplyMigrationResult {
 }
 
 type FieldSettlement =
-  | { readonly kind: 'set'; readonly value: JsonValue }
-  | { readonly kind: 'remove' };
+  { readonly kind: 'set'; readonly value: JsonValue } | { readonly kind: 'remove' };
 
-function settle(
-  conflict: FieldConflict,
-  resolution: ConflictResolution
-): FieldSettlement {
+function settle(conflict: FieldConflict, resolution: ConflictResolution): FieldSettlement {
   switch (resolution.action) {
     case 'keep_local':
       return conflict.local === undefined
@@ -61,7 +54,7 @@ function settle(
 function resolveConflicts(
   mergedProps: NodeProps,
   conflicts: readonly FieldConflict[],
-  resolutions: Readonly<Record<string, ConflictResolution>> | undefined
+  resolutions: Readonly<Record<string, ConflictResolution>> | undefined,
 ): NodeProps | null {
   let finalProps: NodeProps = mergedProps;
 
@@ -83,7 +76,7 @@ function resolveConflicts(
 /** The node's final props, or `null` when the node must stay untouched. */
 function resolveNodeProps(
   plan: NodeMigrationPlan,
-  resolutions: Readonly<Record<string, ConflictResolution>> | undefined
+  resolutions: Readonly<Record<string, ConflictResolution>> | undefined,
 ): NodeProps | null {
   switch (plan.status) {
     case 'unchanged':
@@ -110,49 +103,37 @@ type PageResolutions = ConflictResolutions[string];
 function applyToNode(
   root: TreeNode,
   plans: ReadonlyMap<string, NodeMigrationPlan>,
-  resolutions: PageResolutions
+  resolutions: PageResolutions,
 ): AppliedNode {
-  return mapTree<TreeNode, AppliedNode>(
-    root,
-    childrenOf,
-    (node, appliedChildren) => {
-      // Children are visited even when the node itself has no plan: a plain
-      // container can hold migratable descendants.
-      const children = appliedChildren.map((applied) => applied.node);
-      const updatedNodeIds = appliedChildren.flatMap(
-        (applied) => applied.updatedNodeIds
-      );
-      const skippedNodeIds = appliedChildren.flatMap(
-        (applied) => applied.skippedNodeIds
-      );
+  return mapTree<TreeNode, AppliedNode>(root, childrenOf, (node, appliedChildren) => {
+    // Children are visited even when the node itself has no plan: a plain
+    // container can hold migratable descendants.
+    const children = appliedChildren.map((applied) => applied.node);
+    const updatedNodeIds = appliedChildren.flatMap((applied) => applied.updatedNodeIds);
+    const skippedNodeIds = appliedChildren.flatMap((applied) => applied.skippedNodeIds);
 
-      const plan = plans.get(node.id);
-      if (plan === undefined) {
-        return { node: { ...node, children }, updatedNodeIds, skippedNodeIds };
-      }
+    const plan = plans.get(node.id);
+    if (plan === undefined) {
+      return { node: { ...node, children }, updatedNodeIds, skippedNodeIds };
+    }
 
-      const props = resolveNodeProps(plan, resolutions[node.id]);
-      if (props === null) {
-        return {
-          node: { ...node, children },
-          updatedNodeIds,
-          skippedNodeIds:
-            plan.status === 'needs_review'
-              ? [...skippedNodeIds, node.id]
-              : skippedNodeIds,
-        };
-      }
-
-      const isChanged = !deepEqual(props, node.props);
+    const props = resolveNodeProps(plan, resolutions[node.id]);
+    if (props === null) {
       return {
-        node: { ...node, props, children },
-        updatedNodeIds: isChanged
-          ? [...updatedNodeIds, node.id]
-          : updatedNodeIds,
-        skippedNodeIds,
+        node: { ...node, children },
+        updatedNodeIds,
+        skippedNodeIds:
+          plan.status === 'needs_review' ? [...skippedNodeIds, node.id] : skippedNodeIds,
       };
     }
-  );
+
+    const isChanged = !deepEqual(props, node.props);
+    return {
+      node: { ...node, props, children },
+      updatedNodeIds: isChanged ? [...updatedNodeIds, node.id] : updatedNodeIds,
+      skippedNodeIds,
+    };
+  });
 }
 
 /**
@@ -169,20 +150,14 @@ function applyToNode(
 export function applyMigrationPlan(
   plan: MigrationPlan,
   pages: readonly PageTree[],
-  resolutions: ConflictResolutions
+  resolutions: ConflictResolutions,
 ): ApplyMigrationResult {
   const applied = pages.map((page) => {
-    const pagePlan = plan.pages.find(
-      (candidate) => candidate.path === page.path
-    );
-    const plans = new Map(
-      (pagePlan?.nodes ?? []).map((node) => [node.nodeId, node] as const)
-    );
+    const pagePlan = plan.pages.find((candidate) => candidate.path === page.path);
+    const plans = new Map((pagePlan?.nodes ?? []).map((node) => [node.nodeId, node] as const));
     const pageResolutions = resolutions[page.path] ?? {};
 
-    const results = page.children.map((node) =>
-      applyToNode(node, plans, pageResolutions)
-    );
+    const results = page.children.map((node) => applyToNode(node, plans, pageResolutions));
     return {
       path: page.path,
       children: results.map((result) => result.node),
@@ -193,9 +168,6 @@ export function applyMigrationPlan(
 
   return {
     changedPages: applied.filter((page) => page.updatedNodeIds.length > 0),
-    skippedNodeCount: applied.reduce(
-      (total, page) => total + page.skippedNodeIds.length,
-      0
-    ),
+    skippedNodeCount: applied.reduce((total, page) => total + page.skippedNodeIds.length, 0),
   };
 }

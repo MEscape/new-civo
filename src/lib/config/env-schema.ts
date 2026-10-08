@@ -13,17 +13,11 @@ const DEFAULT_MAPBOX_STYLE_URL = 'mapbox://styles/mapbox/light-v11';
 const MAPBOX_STYLE_URL_PATTERN = /^mapbox:\/\/styles\/[\w-]+\/[\w-]+$/;
 
 const serverEnvBaseSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default(DEFAULT_NODE_ENV),
+  NODE_ENV: z.enum(['development', 'test', 'production']).default(DEFAULT_NODE_ENV),
 
   DATABASE_URL: z.url(),
 
-  DATABASE_POOL_SIZE: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(DEFAULT_DATABASE_POOL_SIZE),
+  DATABASE_POOL_SIZE: z.coerce.number().int().positive().default(DEFAULT_DATABASE_POOL_SIZE),
 
   DATABASE_POOL_TIMEOUT_SECONDS: z.coerce
     .number()
@@ -31,9 +25,7 @@ const serverEnvBaseSchema = z.object({
     .positive()
     .default(DEFAULT_DATABASE_POOL_TIMEOUT_SECONDS),
 
-  LOG_LEVEL: z
-    .enum(['debug', 'info', 'warn', 'error'])
-    .default(DEFAULT_LOG_LEVEL),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default(DEFAULT_LOG_LEVEL),
 });
 
 /**
@@ -42,30 +34,23 @@ const serverEnvBaseSchema = z.object({
  * Authentication configuration is composed into the server schema so the
  * application has one validated server configuration object.
  */
-export const serverEnvSchema = serverEnvBaseSchema
-  .and(authEnvSchema)
-  .superRefine((env, ctx) => {
-    if (!env.AUTH_ENABLED && env.NODE_ENV === 'production') {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_ENABLED'],
-        message: 'AUTH_ENABLED=false is not allowed when NODE_ENV=production.',
-      });
-    }
+export const serverEnvSchema = serverEnvBaseSchema.and(authEnvSchema).superRefine((env, ctx) => {
+  if (!env.AUTH_ENABLED && env.NODE_ENV === 'production') {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['AUTH_ENABLED'],
+      message: 'AUTH_ENABLED=false is not allowed when NODE_ENV=production.',
+    });
+  }
 
-    if (
-      env.AUTH_ENABLED &&
-      env.NODE_ENV === 'production' &&
-      env.AUTH_MAIL_PROVIDER === 'none'
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_MAIL_PROVIDER'],
-        message:
-          'AUTH_MAIL_PROVIDER cannot be "none" in production when auth is enabled.',
-      });
-    }
-  });
+  if (env.AUTH_ENABLED && env.NODE_ENV === 'production' && env.AUTH_MAIL_PROVIDER === 'none') {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['AUTH_MAIL_PROVIDER'],
+      message: 'AUTH_MAIL_PROVIDER cannot be "none" in production when auth is enabled.',
+    });
+  }
+});
 
 /**
  * Public configuration.
@@ -88,10 +73,7 @@ export const publicEnvSchema = z.object({
 
   NEXT_PUBLIC_MAPBOX_STYLE_URL: z
     .string()
-    .regex(
-      MAPBOX_STYLE_URL_PATTERN,
-      'Must look like mapbox://styles/<owner>/<style>.'
-    )
+    .regex(MAPBOX_STYLE_URL_PATTERN, 'Must look like mapbox://styles/<owner>/<style>.')
     .default(DEFAULT_MAPBOX_STYLE_URL),
 });
 

@@ -33,9 +33,7 @@ function relativeLuminance(hex: string): number {
 }
 
 function contrastRatio(first: number, second: number): number {
-  return (
-    (Math.max(first, second) + CONTRAST_OFFSET) / (Math.min(first, second) + CONTRAST_OFFSET)
-  );
+  return (Math.max(first, second) + CONTRAST_OFFSET) / (Math.min(first, second) + CONTRAST_OFFSET);
 }
 
 /** Picks white or near-black, whichever contrasts more with `background` (`#rrggbb`). */

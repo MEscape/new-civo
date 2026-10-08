@@ -7,5 +7,5 @@ import type { Metadata } from 'next';
  * carries just a title and `noindex`.
  */
 export function buildPrivateMetadata(title: string): Metadata {
-    return { title, robots: { index: false, follow: false } };
+  return { title, robots: { index: false, follow: false } };
 }

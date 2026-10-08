@@ -1,9 +1,4 @@
-import {
-  publicEnvSchema,
-  serverEnvSchema,
-  type PublicEnv,
-  type ServerEnv,
-} from './env-schema';
+import { publicEnvSchema, serverEnvSchema, type PublicEnv, type ServerEnv } from './env-schema';
 
 /**
  * Parses and validates `process.env` exactly once, at import time.
@@ -17,21 +12,15 @@ import {
  * `@lib/config`.
  */
 
-function formatIssues(
-  issues: ReadonlyArray<{ path: PropertyKey[]; message: string }>
-): string {
-  return issues
-    .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
-    .join('\n');
+function formatIssues(issues: ReadonlyArray<{ path: PropertyKey[]; message: string }>): string {
+  return issues.map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`).join('\n');
 }
 
 function parseServerEnv(): ServerEnv {
   const result = serverEnvSchema.safeParse(process.env);
   if (!result.success) {
     throw new Error(
-      `Invalid server environment configuration:\n${formatIssues(
-        result.error.issues
-      )}`
+      `Invalid server environment configuration:\n${formatIssues(result.error.issues)}`,
     );
   }
   return result.data;
@@ -40,15 +29,12 @@ function parseServerEnv(): ServerEnv {
 function parsePublicEnv(): PublicEnv {
   const result = publicEnvSchema.safeParse({
     NEXT_PUBLIC_APP_URL: process.env['NEXT_PUBLIC_APP_URL'],
-    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN:
-      process.env['NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN'],
+    NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN: process.env['NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN'],
     NEXT_PUBLIC_MAPBOX_STYLE_URL: process.env['NEXT_PUBLIC_MAPBOX_STYLE_URL'],
   });
   if (!result.success) {
     throw new Error(
-      `Invalid public environment configuration:\n${formatIssues(
-        result.error.issues
-      )}`
+      `Invalid public environment configuration:\n${formatIssues(result.error.issues)}`,
     );
   }
   return result.data;

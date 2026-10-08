@@ -13,10 +13,8 @@ export class FieldErrorBag {
   private readonly errors: Record<string, string[]> = {};
 
   constructor(
-    private readonly fail: (
-      fieldErrors: Record<string, string[]>
-    ) => ValidationAppError
-  ) { }
+    private readonly fail: (fieldErrors: Record<string, string[]>) => ValidationAppError,
+  ) {}
 
   add(path: string, code: string): void {
     const existing = this.errors[path];
@@ -34,9 +32,7 @@ export class FieldErrorBag {
   toError(): ValidationAppError {
     // Copy the arrays too, so the returned error cannot alias the bag.
     return this.fail(
-      Object.fromEntries(
-        Object.entries(this.errors).map(([path, codes]) => [path, [...codes]])
-      )
+      Object.fromEntries(Object.entries(this.errors).map(([path, codes]) => [path, [...codes]])),
     );
   }
 }

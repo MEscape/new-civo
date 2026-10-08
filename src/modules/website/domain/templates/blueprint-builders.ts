@@ -11,7 +11,7 @@ export const HOME_PAGE_TITLE = 'Startseite';
 export function component(
   type: string,
   key: string,
-  props?: Readonly<Record<string, unknown>>
+  props?: Readonly<Record<string, unknown>>,
 ): BlueprintNode {
   return props ? { key, type, props } : { key, type };
 }
@@ -19,7 +19,7 @@ export function component(
 export function section(
   key: string,
   tone: SectionTone,
-  children: readonly BlueprintNode[]
+  children: readonly BlueprintNode[],
 ): BlueprintNode {
   return { key, type: 'section', props: { tone }, children };
 }

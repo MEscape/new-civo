@@ -29,35 +29,39 @@ const dbLogger = logger.withContext({ module: 'infrastructure.prisma' });
  * "never log secrets or sensitive data").
  */
 export function queryLogger(): SqlMiddleware {
-    return {
-        name: 'query-logger',
-        familyId: 'sql',
+  return {
+    name: 'query-logger',
+    familyId: 'sql',
 
-        afterQuery(plan, result) {
-            const fields = {
-                sql: plan.sql,
-                rowCount: result.rowCount,
-                latencyMs: Math.round(result.latencyMs),
-                completed: result.completed,
-                source: result.source,
-            };
-            dbLogger.debug('db.query', fields);
-            if (!result.completed) {dbLogger.warn('db.query.failed', fields);}
-            return Promise.resolve();
-        },
+    afterQuery(plan, result) {
+      const fields = {
+        sql: plan.sql,
+        rowCount: result.rowCount,
+        latencyMs: Math.round(result.latencyMs),
+        completed: result.completed,
+        source: result.source,
+      };
+      dbLogger.debug('db.query', fields);
+      if (!result.completed) {
+        dbLogger.warn('db.query.failed', fields);
+      }
+      return Promise.resolve();
+    },
 
-        afterExecute(plan, result) {
-            const affectedRows = result.completed ? result.stats.affectedRows : 0;
-            const fields = {
-                sql: plan.sql,
-                affectedRows,
-                latencyMs: Math.round(result.latencyMs),
-                completed: result.completed,
-                source: result.source,
-            };
-            dbLogger.debug('db.execute', fields);
-            if (!result.completed) {dbLogger.warn('db.execute.failed', fields);}
-            return Promise.resolve();
-        },
-    };
+    afterExecute(plan, result) {
+      const affectedRows = result.completed ? result.stats.affectedRows : 0;
+      const fields = {
+        sql: plan.sql,
+        affectedRows,
+        latencyMs: Math.round(result.latencyMs),
+        completed: result.completed,
+        source: result.source,
+      };
+      dbLogger.debug('db.execute', fields);
+      if (!result.completed) {
+        dbLogger.warn('db.execute.failed', fields);
+      }
+      return Promise.resolve();
+    },
+  };
 }

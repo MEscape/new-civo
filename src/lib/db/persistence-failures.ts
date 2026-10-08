@@ -6,7 +6,7 @@ import type {
   NotFoundAppError,
 } from '@lib/errors';
 import { logger } from '@lib/logger';
-import { type AppResult, err, ok } from '@lib/result'
+import { type AppResult, err, ok } from '@lib/result';
 
 import { mapPrismaError } from './prisma-error-mapping';
 
@@ -40,7 +40,7 @@ export function createPersistenceFailures(config: PersistenceFailureConfig) {
   function toInfrastructure(
     thrown: unknown,
     mapped: AppError,
-    operation: string
+    operation: string,
   ): InfrastructureAppError {
     log.error(`${operation} failed`, thrown, { operation });
     return mapped.kind === 'infrastructure'
@@ -52,26 +52,23 @@ export function createPersistenceFailures(config: PersistenceFailureConfig) {
     /** For operations that can only fail on infrastructure (reads, idempotent deletes). */
     infraOnly:
       (operation: string) =>
-        (thrown: unknown): InfrastructureAppError =>
-          toInfrastructure(thrown, classify(thrown, operation), operation),
+      (thrown: unknown): InfrastructureAppError =>
+        toInfrastructure(thrown, classify(thrown, operation), operation),
 
     /** For writes that can violate a unique constraint. */
     orConflict:
-      <C extends ConflictAppError>(
-        operation: string,
-        onConflict: (thrown: unknown) => C
-      ) =>
-        (thrown: unknown): C | InfrastructureAppError => {
-          const mapped = classify(thrown, operation);
-          return mapped.kind === 'conflict'
-            ? onConflict(thrown)
-            : toInfrastructure(thrown, mapped, operation);
-        },
+      <C extends ConflictAppError>(operation: string, onConflict: (thrown: unknown) => C) =>
+      (thrown: unknown): C | InfrastructureAppError => {
+        const mapped = classify(thrown, operation);
+        return mapped.kind === 'conflict'
+          ? onConflict(thrown)
+          : toInfrastructure(thrown, mapped, operation);
+      },
 
     /** For single-row writes: Prisma 8 resolves to `null` when nothing matched. */
     requireRow:
       <N extends NotFoundAppError>(onNotFound: (thrown: unknown) => N) =>
-        <R extends object>(row: R | null): AppResult<R, N> =>
-          row === null ? err(onNotFound(undefined)) : ok(row),
+      <R extends object>(row: R | null): AppResult<R, N> =>
+        row === null ? err(onNotFound(undefined)) : ok(row),
   };
 }

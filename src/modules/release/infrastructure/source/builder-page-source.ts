@@ -5,18 +5,11 @@ import type {
   SavedRevisionView,
 } from '@modules/builder';
 
-import type {
-  AppError,
-  ConflictAppError,
-  UnexpectedAppError,
-} from '@lib/errors';
+import type { AppError, ConflictAppError, UnexpectedAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult, AppResultAsync } from '@lib/result';
 
-import {
-  releaseSnapshotCorrupted,
-  releaseSourceFailed,
-} from '../../domain/errors/release-errors';
+import { releaseSnapshotCorrupted, releaseSourceFailed } from '../../domain/errors/release-errors';
 import { toPageId } from '../../domain/models/ids';
 
 import type { WebsiteId } from '../../domain/models/ids';
@@ -81,14 +74,14 @@ function toPublishablePage(view: ReleasePageView): PublishablePage {
 export class BuilderPageSource implements PageSource {
   constructor(
     private readonly listPagesForRelease: (
-      websiteId: string
+      websiteId: string,
     ) => AppResultAsync<readonly ReleasePageView[]>,
     private readonly restorePageConfig: (
-      stored: unknown
+      stored: unknown,
     ) => AppResult<PageConfigView, UnexpectedAppError>,
     private readonly savePageDraft: (
-      input: SavePageConfigInput
-    ) => AppResultAsync<SavedRevisionView>
+      input: SavePageConfigInput,
+    ) => AppResultAsync<SavedRevisionView>,
   ) {}
 
   listForRelease(websiteId: WebsiteId) {
@@ -97,9 +90,7 @@ export class BuilderPageSource implements PageSource {
       .mapErr(releaseSourceFailed);
   }
 
-  readTrees(
-    pages: readonly SnapshotPage[]
-  ): AppResult<readonly PageTree[], UnexpectedAppError> {
+  readTrees(pages: readonly SnapshotPage[]): AppResult<readonly PageTree[], UnexpectedAppError> {
     const trees: PageTree[] = [];
 
     for (const page of pages) {
@@ -112,16 +103,14 @@ export class BuilderPageSource implements PageSource {
     return ok(trees);
   }
 
-  listDrafts(
-    websiteId: WebsiteId
-  ): AppResultAsync<readonly PageDraft[], PageDraftError> {
+  listDrafts(websiteId: WebsiteId): AppResultAsync<readonly PageDraft[], PageDraftError> {
     return this.listPagesForRelease(websiteId)
       .map((views) => views.map((view) => this.toPageDraft(view)))
       .mapErr(releaseSourceFailed);
   }
 
   replaceChildren(
-    input: ReplaceChildrenInput
+    input: ReplaceChildrenInput,
   ): AppResultAsync<void, ConflictAppError | PageDraftError> {
     return this.savePageDraft({
       pageId: input.pageId,
@@ -134,8 +123,7 @@ export class BuilderPageSource implements PageSource {
 
   /** A draft without a readable configuration has no children: it is never overwritten. */
   private toPageDraft(view: ReleasePageView): PageDraft {
-    const config =
-      view.status === 'ready' ? this.restorePageConfig(view.config) : null;
+    const config = view.status === 'ready' ? this.restorePageConfig(view.config) : null;
 
     return {
       pageId: toPageId(view.pageId),

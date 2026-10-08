@@ -1,27 +1,15 @@
 import type { UnexpectedAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
-import {
-  assertNever,
-  isJsonRecord,
-  isJsonValue,
-  isPlainObject,
-} from '@lib/utils';
+import { assertNever, isJsonRecord, isJsonValue, isPlainObject } from '@lib/utils';
 import type { JsonValue } from '@lib/utils';
 
 import { releaseMigrationPlanCorrupted } from '../errors/release-errors';
 
-import {
-  isNodeMigrationStatus,
-  isUnresolvableReason,
-} from './migration-plan';
+import { isNodeMigrationStatus, isUnresolvableReason } from './migration-plan';
 import { toStoredJson } from './stored-json';
 
-import type {
-  MigrationPlan,
-  NodeMigrationPlan,
-  PageMigrationPlan,
-} from './migration-plan';
+import type { MigrationPlan, NodeMigrationPlan, PageMigrationPlan } from './migration-plan';
 import type { FieldConflict } from './three-way-merge';
 
 /**
@@ -44,10 +32,7 @@ export function serializeMigrationPlan(plan: MigrationPlan): JsonValue {
 }
 
 /** Reads every item or none: a partly readable list is a corrupted list. */
-function readAll<T>(
-  raw: unknown,
-  read: (item: unknown) => T | null
-): T[] | null {
+function readAll<T>(raw: unknown, read: (item: unknown) => T | null): T[] | null {
   if (!Array.isArray(raw)) {
     return null;
   }
@@ -164,17 +149,18 @@ function readPagePlan(raw: unknown): PageMigrationPlan | null {
  * does not understand) and must never be applied, not even partially.
  */
 export function restoreMigrationPlan(
-  stored: unknown
+  stored: unknown,
 ): AppResult<MigrationPlan, UnexpectedAppError> {
-  const pages = isPlainObject(stored) && stored['schemaVersion'] === STORED_PLAN_SCHEMA_VERSION
-    ? readAll(stored['pages'], readPagePlan)
-    : null;
+  const pages =
+    isPlainObject(stored) && stored['schemaVersion'] === STORED_PLAN_SCHEMA_VERSION
+      ? readAll(stored['pages'], readPagePlan)
+      : null;
 
   return pages === null
     ? err(
         releaseMigrationPlanCorrupted(
-          new TypeError('The stored migration plan has an unknown shape.')
-        )
+          new TypeError('The stored migration plan has an unknown shape.'),
+        ),
       )
     : ok({ pages });
 }

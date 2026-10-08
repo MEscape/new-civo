@@ -17,7 +17,7 @@ export interface AuditRecorder<T extends string> {
  */
 export function createAuditLog<T extends string>(
   module: string,
-  levels: Readonly<Record<T, AuditLevel>>
+  levels: Readonly<Record<T, AuditLevel>>,
 ): AuditRecorder<T> {
   const auditLogger = logger.withContext({ module });
   return {
