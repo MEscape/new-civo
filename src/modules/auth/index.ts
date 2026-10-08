@@ -19,9 +19,7 @@ export { getAccessControl, isAuthEnabled } from './composition';
 /** Framework entry points: the auth Route Handler and the page guard. */
 export { authRouteHandlers } from './composition';
 export { requireSignedIn } from './presentation/guards/require-signed-in';
-export type { ActorView, Role } from './application/contracts/auth-views';
 
-export { AUTH_ERROR_CODES } from './domain/errors/auth-errors';
 export { authRoutes } from './presentation/routes';
 export {
   parseEmailVerifiedPageParams,

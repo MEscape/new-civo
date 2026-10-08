@@ -116,7 +116,6 @@
       "nameRequired": "Bitte geben Sie Ihren Namen ein.",
       "nameTooLong": "Der Name darf höchstens {nameMax} Zeichen lang sein.",
       "tokenInvalid": "Dieser Link ist ungültig. Fordern Sie einen neuen an."
-    },
-    "loading": "Wird geladen…"
+    }
   }
 }

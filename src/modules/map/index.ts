@@ -13,13 +13,8 @@ export { default as deMap } from './presentation/i18n/de.json';
 
 export type { MapSectionProps } from './presentation/components/map-section';
 export type {
-  AttributeValue,
   Attributes,
-  FeatureInteraction,
   MapConfig,
   MapFeatureInput,
-  MapHeight,
   MapLayerInput,
-  MapValidationCode,
-  PointStyle,
 } from './application/contracts/map-constraints';

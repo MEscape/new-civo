@@ -565,8 +565,7 @@
       "time": "{time} Uhr"
     },
     "states": {
-      "empty": "Hier gibt es derzeit nichts anzuzeigen.",
-      "loading": "Inhalt wird geladen…"
+      "empty": "Hier gibt es derzeit nichts anzuzeigen."
     },
     "render": {
       "sectionUnavailable": "Dieser Abschnitt ist vorübergehend nicht verfügbar.",

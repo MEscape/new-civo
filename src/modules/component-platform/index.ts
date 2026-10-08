@@ -6,28 +6,15 @@
  */
 export { componentPlatformQueries, renderPageNodes } from './composition';
 
-export {
-  COMPONENT_PLATFORM_ERROR_CODES,
-  CONTENT_KINDS,
-} from './application/contracts/component-platform-constraints';
-
 export { default as enComponentPlatform } from './presentation/i18n/en.json';
 export { default as deComponentPlatform } from './presentation/i18n/de.json';
 
 export type {
-  CatalogBoundsView,
-  CatalogContractView,
   CatalogFieldView,
-  CatalogItemFieldView,
-  CatalogOptionView,
   ComponentCatalogEntry,
-  ComponentCatalogView,
   ComponentReleaseInfo,
-  ReleaseContractView,
 } from './application/contracts/catalog-views';
 export type {
-  ContentKind,
   RenderContext,
-  RenderMode,
   RenderableNode,
 } from './application/contracts/component-platform-constraints';

@@ -13,9 +13,12 @@ Built on **shadcn/ui** and **Radix UI**, adapted to the design tokens in `src/ap
 
 `layout-primitives.tsx`: `PageShell`, `AppHeader`, `AppBody`, `Container`, `Section` (`tone`: `default` | `muted`), `SidebarLayout`, `PageHeading` (the page's single `h1`), `SectionHeading` (`h2`), `Divider`, `EmptyState` (`variant`: `plain` | `outlined`), `Grid` (container-query columns).
 
+`app-nav.tsx`: `AppNav`, a header's navigation links. A Client Component so the locale-aware `Link` does not read the request while a layout prerenders.
+
 ## `@components/shared` (Composites)
 
 - `text-field.tsx`, `select-field.tsx`, `field-message.tsx`: labelled form fields with hints and errors wired to `aria-describedby`.
+- `loading-status.tsx`: `LoadingStatus`, the one screen-reader announcement inside loading UI (`app.loading`); skeletons stay `aria-hidden`.
 - `not-found-panel.tsx`: the body of every `not-found.tsx`.
 - `route-error-panel.tsx`: the body of every `error.tsx`; it never shows the raw error message.
 

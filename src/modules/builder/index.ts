@@ -27,14 +27,12 @@ export { toDatasetOptionsByType } from './presentation/dto/dataset-options-dto';
 export { builderRoutes } from './presentation/routes';
 
 export { HOME_PAGE_PATH } from './application/contracts/builder-constraints';
-export { BUILDER_ERROR_CODES } from './domain/errors/builder-errors';
 
 export { default as enBuilder } from './presentation/i18n/en.json';
 export { default as deBuilder } from './presentation/i18n/de.json';
 
 export type { CreateSystemPageError } from './application/commands/create-system-page';
-export type { ListPagesForReleaseError } from './application/queries/list-pages-for-release';
-export type { SavePageConfigError } from './application/commands/save-page-config';
+
 export type {
   CreateSystemPageInput,
   PageConfigView,
@@ -44,9 +42,3 @@ export type {
   SavePageConfigInput,
   SavedRevisionView,
 } from './application/contracts/page-views';
-export type { EditorLinks } from './presentation/navigation/editor-links';
-export type {
-  DatasetOptionDto,
-  DatasetOptionInput,
-  DatasetOptionsByKind,
-} from './presentation/dto/dataset-options-dto';

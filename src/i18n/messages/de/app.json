@@ -17,5 +17,9 @@
     "title": "Seite nicht gefunden",
     "description": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
     "returnHome": "Zur Startseite"
-  }
+  },
+  "navigation": {
+    "label": "Hauptnavigation"
+  },
+  "loading": "Wird geladen…"
 }
