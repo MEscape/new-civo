@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { RefObject } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { useCanvasRender } from '../../hooks/use-canvas-render';
 import { useCanvasSelection } from '../../hooks/use-canvas-selection';

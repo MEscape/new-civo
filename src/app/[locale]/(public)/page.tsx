@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 
-import { getTranslations } from 'next-intl/server';
 
 import { Container, PageHeading, Section } from '@components/layout/layout-primitives';
 
 import { requireLocale } from '@i18n';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildLocalizedMetadata } from '@lib/seo';
 

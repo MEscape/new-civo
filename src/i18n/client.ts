@@ -1,6 +1,7 @@
 export {
   NextIntlClientProvider,
   useLocale,
+  useMessages,
   useNow,
   useTimeZone,
   useTranslations,

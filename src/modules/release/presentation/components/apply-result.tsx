@@ -1,8 +1,9 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 import { Alert, AlertDescription, AlertTitle } from '@components/ui/alert';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { PAGE_OUTCOME_MESSAGE_KEYS } from '../messages/message-keys';
 

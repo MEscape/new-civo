@@ -51,12 +51,12 @@ export interface DatasetRepository {
     ): AppResultAsync<readonly Dataset[], InfrastructureAppError>;
 
     /** Datasets of one or more canonical kinds within a website: the builder's selector. Bounded. */
-    listCompatible(
-        websiteId: WebsiteId,
-        tenantId: TenantId,
-        canonicalKinds: readonly CanonicalKind[],
-        limit: number
-    ): AppResultAsync<readonly Dataset[], InfrastructureAppError>;
+    listCompatible(query: {
+        readonly websiteId: WebsiteId;
+        readonly tenantId: TenantId;
+        readonly canonicalKinds: readonly CanonicalKind[];
+        readonly limit: number;
+    }): AppResultAsync<readonly Dataset[], InfrastructureAppError>;
 
     /**
      * `NotFoundAppError` when the draft's data source does not exist in the

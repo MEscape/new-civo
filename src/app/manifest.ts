@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
 
-import { getTranslations } from 'next-intl/server';
-
 import { I18N_CONFIG } from '@i18n';
+
+import { getTranslations } from '@i18n/server';
+
 
 import { APP_IDENTITY } from '@lib/config';
 import { toLocalizedPath } from '@lib/seo';

@@ -3,13 +3,14 @@
 import { useId, useState, useTransition } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { TextField } from '@components/shared/text-field';
 import { Button } from '@components/ui/button';
 import { Card } from '@components/ui/card';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 
@@ -32,6 +33,9 @@ export interface ResetPasswordFormProps {
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     const t = useTranslations('auth');
+    /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+    const errorText = (code: string | undefined) =>
+      code === undefined ? undefined : t(messageKeyForCode(code), MESSAGE_PARAMS);
 
     const id = useId();
     const [isPending, startTransition] = useTransition();
@@ -82,7 +86,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 hint={t('resetPassword.passwordHint', MESSAGE_PARAMS)}
                 type="password"
                 autoComplete="new-password"
-                error={errors.newPassword?.message ? t(messageKeyForCode(errors.newPassword.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.newPassword?.message)}
                 {...form.register('newPassword')}
             />
             <TextField
@@ -90,7 +94,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 label={t('resetPassword.confirmPassword')}
                 type="password"
                 autoComplete="new-password"
-                error={errors.confirmPassword?.message ? t(messageKeyForCode(errors.confirmPassword.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.confirmPassword?.message)}
                 {...form.register('confirmPassword')}
             />
 

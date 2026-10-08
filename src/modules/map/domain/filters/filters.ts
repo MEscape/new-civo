@@ -66,13 +66,23 @@ function definitionOf(profile: FieldProfile): FilterDefinition | null {
   return null;
 }
 
+/** Two layers' value counts for one field, summed; too many distinct values is no longer a select. */
+function mergeSelects(first: SelectFilter, second: SelectFilter): SelectFilter | null {
+  const counts = new Map(first.options.map((option) => [option.value, option.count]));
+  for (const option of second.options) {
+    counts.set(option.value, (counts.get(option.value) ?? 0) + option.count);
+  }
+  const options = [...counts]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value, 'en'));
+  return options.length <= FILTER_LIMITS.maxOptions ? { ...first, options } : null;
+}
+
+/** The same field in two layers: one filter covering both, or `null` when they disagree on its kind. */
 function mergeDefinitions(
   first: FilterDefinition,
   second: FilterDefinition,
 ): FilterDefinition | null {
-  if (first.kind !== second.kind) {
-    return null;
-  }
   if (first.kind === 'range' && second.kind === 'range') {
     return { ...first, min: Math.min(first.min, second.min), max: Math.max(first.max, second.max) };
   }
@@ -84,14 +94,7 @@ function mergeDefinitions(
     };
   }
   if (first.kind === 'select' && second.kind === 'select') {
-    const counts = new Map(first.options.map((option) => [option.value, option.count]));
-    for (const option of second.options) {
-      counts.set(option.value, (counts.get(option.value) ?? 0) + option.count);
-    }
-    const options = [...counts]
-      .map(([value, count]) => ({ value, count }))
-      .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value, 'en'));
-    return options.length <= FILTER_LIMITS.maxOptions ? { ...first, options } : null;
+    return mergeSelects(first, second);
   }
   return null;
 }
@@ -145,6 +148,11 @@ export function countActiveFilters(state: FilterState): number {
   return Object.values(state).filter(isFilterActive).length;
 }
 
+/** Inclusive bounds where `null` means unbounded; works for numbers and ISO dates alike. */
+function isWithin<T extends number | string>(candidate: T, lower: T | null, upper: T | null): boolean {
+  return (lower === null || candidate >= lower) && (upper === null || candidate <= upper);
+}
+
 function matches(feature: MapFeature, field: string, value: FilterValue): boolean {
   if (!Object.hasOwn(feature.attributes, field)) {
     return false;
@@ -154,18 +162,9 @@ function matches(feature: MapFeature, field: string, value: FilterValue): boolea
     case 'select':
       return value.selected.includes(String(raw));
     case 'range':
-      return (
-        typeof raw === 'number' &&
-        (value.min === null || raw >= value.min) &&
-        (value.max === null || raw <= value.max)
-      );
-    case 'dateRange': {
-      if (typeof raw !== 'string') {
-        return false;
-      }
-      const day = raw.slice(0, DATE_LENGTH);
-      return (value.from === null || day >= value.from) && (value.to === null || day <= value.to);
-    }
+      return typeof raw === 'number' && isWithin(raw, value.min, value.max);
+    case 'dateRange':
+      return typeof raw === 'string' && isWithin(raw.slice(0, DATE_LENGTH), value.from, value.to);
   }
 }
 

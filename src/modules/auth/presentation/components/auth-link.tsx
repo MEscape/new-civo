@@ -1,11 +1,11 @@
 import type { ComponentProps } from 'react';
 
-import Link from 'next/link';
+import { Link } from '@i18n';
 
 import { cn } from '@lib/utils';
 
 /** A text link with the module's one link style; visible keyboard focus included. */
-export function AuthLink({ className, ...props }: ComponentProps<typeof Link>) {
+export function AuthLink({ className, children, ...props }: ComponentProps<typeof Link>) {
     return (
         <Link
             className={cn(
@@ -14,6 +14,8 @@ export function AuthLink({ className, ...props }: ComponentProps<typeof Link>) {
                 className
             )}
             {...props}
-        />
+        >
+            {children}
+        </Link>
     );
 }

@@ -42,7 +42,7 @@ const commaSeparatedListSchema = z
 const positiveIntegerSchema = (defaultValue: number) =>
   z.coerce.number().int().positive().default(defaultValue);
 
-export const authEnvSchema = z
+const authEnvObjectSchema = z
   .object({
     AUTH_ENABLED: booleanFlagSchema(DEFAULT_AUTH_ENABLED),
 
@@ -81,91 +81,67 @@ export const authEnvSchema = z
     AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(DEFAULT_SMTP_PORT),
     AUTH_MAIL_SMTP_SECURE: booleanFlagSchema(false),
     AUTH_MAIL_FROM: z.string().min(1).optional(),
-  })
-  .superRefine((env, ctx) => {
-    if (!env.AUTH_ENABLED) {
-      return;
-    }
-
-    if (
-      env.AUTH_SECRET === undefined ||
-      env.AUTH_SECRET.length < MIN_AUTH_SECRET_LENGTH
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_SECRET'],
-        message: `AUTH_SECRET is required and must be at least ${MIN_AUTH_SECRET_LENGTH} characters when auth is enabled.`,
-      });
-    }
-
-    if (!env.AUTH_DATABASE_URL) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_DATABASE_URL'],
-        message: 'AUTH_DATABASE_URL is required when auth is enabled.',
-      });
-    }
-
-    if (
-      env.AUTH_SESSION_UPDATE_AGE_SECONDS > env.AUTH_SESSION_EXPIRES_IN_SECONDS
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_SESSION_UPDATE_AGE_SECONDS'],
-        message: 'Must not exceed AUTH_SESSION_EXPIRES_IN_SECONDS.',
-      });
-    }
-
-    if (
-      env.AUTH_SESSION_FRESH_AGE_SECONDS > env.AUTH_SESSION_EXPIRES_IN_SECONDS
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_SESSION_FRESH_AGE_SECONDS'],
-        message: 'Must not exceed AUTH_SESSION_EXPIRES_IN_SECONDS.',
-      });
-    }
-
-    if (
-      env.AUTH_SESSION_MAX_LIFETIME_SECONDS <
-      env.AUTH_SESSION_EXPIRES_IN_SECONDS
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUTH_SESSION_MAX_LIFETIME_SECONDS'],
-        message: 'Must be at least AUTH_SESSION_EXPIRES_IN_SECONDS.',
-      });
-    }
-
-    if (env.AUTH_MAIL_PROVIDER === 'resend') {
-      if (!env.AUTH_MAIL_API_KEY) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['AUTH_MAIL_API_KEY'],
-          message: 'AUTH_MAIL_API_KEY is required when AUTH_MAIL_PROVIDER is "resend".',
-        });
-      }
-    }
-
-    if (env.AUTH_MAIL_PROVIDER === 'smtp') {
-      if (!env.AUTH_MAIL_SMTP_HOST) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['AUTH_MAIL_SMTP_HOST'],
-          message: 'AUTH_MAIL_SMTP_HOST is required when AUTH_MAIL_PROVIDER is "smtp".',
-        });
-      }
-    }
-
-    if (env.AUTH_MAIL_PROVIDER !== 'none') {
-      if (!env.AUTH_MAIL_FROM) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['AUTH_MAIL_FROM'],
-          message: 'AUTH_MAIL_FROM is required when AUTH_MAIL_PROVIDER is not "none".',
-        });
-      }
-    }
   });
+
+/** A setting that must hold once auth is enabled. */
+interface Requirement {
+  readonly path: keyof AuthEnv;
+  readonly isMet: (env: AuthEnv) => boolean;
+  readonly message: string;
+}
+
+const REQUIREMENTS_WHEN_ENABLED: readonly Requirement[] = [
+  {
+    path: 'AUTH_SECRET',
+    isMet: (env) => (env.AUTH_SECRET?.length ?? 0) >= MIN_AUTH_SECRET_LENGTH,
+    message: `AUTH_SECRET is required and must be at least ${MIN_AUTH_SECRET_LENGTH} characters when auth is enabled.`,
+  },
+  {
+    path: 'AUTH_DATABASE_URL',
+    isMet: (env) => Boolean(env.AUTH_DATABASE_URL),
+    message: 'AUTH_DATABASE_URL is required when auth is enabled.',
+  },
+  {
+    path: 'AUTH_SESSION_UPDATE_AGE_SECONDS',
+    isMet: (env) => env.AUTH_SESSION_UPDATE_AGE_SECONDS <= env.AUTH_SESSION_EXPIRES_IN_SECONDS,
+    message: 'Must not exceed AUTH_SESSION_EXPIRES_IN_SECONDS.',
+  },
+  {
+    path: 'AUTH_SESSION_FRESH_AGE_SECONDS',
+    isMet: (env) => env.AUTH_SESSION_FRESH_AGE_SECONDS <= env.AUTH_SESSION_EXPIRES_IN_SECONDS,
+    message: 'Must not exceed AUTH_SESSION_EXPIRES_IN_SECONDS.',
+  },
+  {
+    path: 'AUTH_SESSION_MAX_LIFETIME_SECONDS',
+    isMet: (env) => env.AUTH_SESSION_MAX_LIFETIME_SECONDS >= env.AUTH_SESSION_EXPIRES_IN_SECONDS,
+    message: 'Must be at least AUTH_SESSION_EXPIRES_IN_SECONDS.',
+  },
+  {
+    path: 'AUTH_MAIL_API_KEY',
+    isMet: (env) => env.AUTH_MAIL_PROVIDER !== 'resend' || Boolean(env.AUTH_MAIL_API_KEY),
+    message: 'AUTH_MAIL_API_KEY is required when AUTH_MAIL_PROVIDER is "resend".',
+  },
+  {
+    path: 'AUTH_MAIL_SMTP_HOST',
+    isMet: (env) => env.AUTH_MAIL_PROVIDER !== 'smtp' || Boolean(env.AUTH_MAIL_SMTP_HOST),
+    message: 'AUTH_MAIL_SMTP_HOST is required when AUTH_MAIL_PROVIDER is "smtp".',
+  },
+  {
+    path: 'AUTH_MAIL_FROM',
+    isMet: (env) => env.AUTH_MAIL_PROVIDER === 'none' || Boolean(env.AUTH_MAIL_FROM),
+    message: 'AUTH_MAIL_FROM is required when AUTH_MAIL_PROVIDER is not "none".',
+  },
+];
+
+export const authEnvSchema = authEnvObjectSchema.superRefine((env, ctx) => {
+  if (!env.AUTH_ENABLED) {
+    return;
+  }
+  for (const requirement of REQUIREMENTS_WHEN_ENABLED) {
+    if (!requirement.isMet(env)) {
+      ctx.addIssue({ code: 'custom', path: [requirement.path], message: requirement.message });
+    }
+  }
+});
 
 export type AuthEnv = z.infer<typeof authEnvSchema>;

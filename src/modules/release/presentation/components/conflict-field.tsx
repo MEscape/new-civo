@@ -2,12 +2,14 @@
 
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { TextField } from '@components/shared/text-field';
 
-import { ConflictValues } from './conflict-values';
+import { useTranslations } from '@i18n/client';
+
+
 import { parseCustomValue } from '../resolutions/resolution-choices';
+
+import { ConflictValues } from './conflict-values';
 
 import type { ResolutionAction } from '../../application/contracts/release-constraints';
 import type { FieldConflict } from '../../application/contracts/release-views';

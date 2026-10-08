@@ -10,15 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { Mail, Phone } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
 
 import { trimToNull } from '@lib/utils';
 
-import { columnsForCount } from '../../shared/grid-columns';
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
+import { columnsForCount } from '../../shared/grid-columns';
 
 import type {
   ComponentProps,
@@ -75,22 +76,22 @@ export async function ContactCard({
                   )}
                   <div className="mt-3 flex flex-col gap-1.5 text-sm">
                     {contact.email !== undefined && (
-                      <a
+                      <ContentLink
                         href={`mailto:${contact.email}`}
                         className="flex items-center gap-2 text-primary-copy hover:underline"
                       >
                         <Mail className="h-4 w-4" aria-hidden="true" />
                         {contact.email}
-                      </a>
+                      </ContentLink>
                     )}
                     {contact.phone !== undefined && (
-                      <a
+                      <ContentLink
                         href={`tel:${contact.phone.replace(/\s+/g, '')}`}
                         className="flex items-center gap-2 text-copy-muted hover:underline"
                       >
                         <Phone className="h-4 w-4" aria-hidden="true" />
                         {contact.phone}
-                      </a>
+                      </ContentLink>
                     )}
                   </div>
                 </CardHeader>

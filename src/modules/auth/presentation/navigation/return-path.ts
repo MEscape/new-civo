@@ -1,6 +1,6 @@
 import { isDefined } from '@lib/utils';
 
-import { DEFAULT_RETURN_PATH } from './routes';
+import { DEFAULT_RETURN_PATH } from '../routes';
 
 /** Longest `returnTo` a request may carry; also enforced by the action schema. */
 export const RETURN_PATH_MAX_LENGTH = 2048;

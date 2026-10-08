@@ -63,6 +63,20 @@ export type DropTarget =
 /** The hovered node and its parent. Both `FlatNode` and `NodeLocation` fit. */
 type DropAnchor = Pick<FlatNode, 'node' | 'parentId'>;
 
+/** What every drop decision is made against: the tree, what is being dragged, and the nesting rules. */
+export interface DropContext {
+  readonly tree: readonly PageNode[];
+  readonly active: ActiveDrag;
+  readonly policy: NestingPolicy;
+}
+
+/** The node under the pointer, and where the pointer is on it. */
+export interface PointerOverNode {
+  readonly targetId: PageNodeId;
+  readonly pointerY: number;
+  readonly targetRect: Rect;
+}
+
 /**
  * The top and bottom bands of a hovered node that resolve to before/after.
  * Generous (30%) so reordering is easy to hit; the middle resolves to
@@ -79,9 +93,9 @@ const MIDPOINT_RATIO = 0.5;
 export function resolveDropPosition(
   pointerY: number,
   targetRect: Rect,
-  targetAcceptsChildren: boolean,
-  targetIsEmpty: boolean
+  target: { readonly acceptsChildren: boolean; readonly isEmpty: boolean }
 ): DropPosition {
+  const { acceptsChildren: targetAcceptsChildren, isEmpty: targetIsEmpty } = target;
   if (targetAcceptsChildren && targetIsEmpty) {return 'inside';}
 
   const relativeY =
@@ -99,11 +113,9 @@ export function resolveDropPosition(
  * (`isOwnSubtree`), so no self-check is repeated here.
  */
 function relativeTarget(
-  tree: readonly PageNode[],
-  active: ActiveDrag,
+  { tree, active, policy }: DropContext,
   anchor: DropAnchor,
-  position: 'before' | 'after',
-  policy: NestingPolicy
+  position: 'before' | 'after'
 ): DropTarget | null {
   const parent =
     anchor.parentId === null ? null : findNode(tree, anchor.parentId);
@@ -135,8 +147,7 @@ function insideTarget(
 
 /** True when `targetId` is the dragged node or lies inside it: never a valid drop. */
 function isOwnSubtree(
-  tree: readonly PageNode[],
-  active: ActiveDrag,
+  { tree, active }: DropContext,
   targetId: PageNodeId
 ): boolean {
   if (active.id === null) {return false;}
@@ -151,25 +162,19 @@ function isOwnSubtree(
  * an operation the tree refuses.
  */
 export function resolveDropTargetForNode(
-  tree: readonly PageNode[],
-  active: ActiveDrag,
-  targetId: PageNodeId,
-  pointerY: number,
-  targetRect: Rect,
-  policy: NestingPolicy
+  context: DropContext,
+  { targetId, pointerY, targetRect }: PointerOverNode
 ): DropTarget | null {
-  const location = locateNode(tree, targetId);
-  if (location === null || isOwnSubtree(tree, active, targetId)) {return null;}
+  const location = locateNode(context.tree, targetId);
+  if (location === null || isOwnSubtree(context, targetId)) {return null;}
 
-  const position = resolveDropPosition(
-    pointerY,
-    targetRect,
-    policy.acceptsChildren(location.node.type),
-    location.node.children.length === 0
-  );
+  const position = resolveDropPosition(pointerY, targetRect, {
+    acceptsChildren: context.policy.acceptsChildren(location.node.type),
+    isEmpty: location.node.children.length === 0,
+  });
   return position === 'inside'
-    ? insideTarget(location.node, active, policy)
-    : relativeTarget(tree, active, location, position, policy);
+    ? insideTarget(location.node, context.active, context.policy)
+    : relativeTarget(context, location, position);
 }
 
 /**
@@ -177,10 +182,9 @@ export function resolveDropTargetForNode(
  * node, or the start of an empty page.
  */
 export function resolveDropTargetAtCanvasEnd(
-  tree: readonly PageNode[],
-  active: ActiveDrag,
-  policy: NestingPolicy
+  context: DropContext
 ): DropTarget | null {
+  const { tree, active, policy } = context;
   const lastRoot = tree.at(-1);
   if (lastRoot === undefined) {
     return policy.canNest(null, active.type)
@@ -188,13 +192,7 @@ export function resolveDropTargetAtCanvasEnd(
       : null;
   }
   if (lastRoot.id === active.id) {return null;}
-  return relativeTarget(
-    tree,
-    active,
-    { node: lastRoot, parentId: null },
-    'after',
-    policy
-  );
+  return relativeTarget(context, { node: lastRoot, parentId: null }, 'after');
 }
 
 /**
@@ -203,13 +201,11 @@ export function resolveDropTargetAtCanvasEnd(
  * the tree refuses, so a keypress never gets stuck on an illegal neighbour.
  */
 export function stepDropTarget(
-  tree: readonly PageNode[],
-  active: ActiveDrag,
+  context: DropContext,
   currentTargetId: PageNodeId,
-  direction: -1 | 1,
-  policy: NestingPolicy
+  direction: -1 | 1
 ): DropTarget | null {
-  const flat = flattenNodes(tree);
+  const flat = flattenNodes(context.tree);
   const currentIndex = flat.findIndex(
     (entry) => entry.node.id === currentTargetId
   );
@@ -223,15 +219,13 @@ export function stepDropTarget(
     const candidate = flat[index];
     if (
       candidate === undefined ||
-      isOwnSubtree(tree, active, candidate.node.id)
+      isOwnSubtree(context, candidate.node.id)
     )
       {continue;}
     const target = relativeTarget(
-      tree,
-      active,
+      context,
       candidate,
-      direction === -1 ? 'before' : 'after',
-      policy
+      direction === -1 ? 'before' : 'after'
     );
     if (target !== null) {return target;}
   }

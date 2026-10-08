@@ -24,28 +24,33 @@ export class TransactionalAuthMailer implements AuthMailer {
     sendVerification(
         message: AuthLinkMessage
     ): AppResultAsync<void, InfrastructureAppError> {
-        return this.send('verification', message.to, message.url, message.locale);
+        return this.send({ kind: 'verification', ...message });
     }
 
     sendPasswordReset(
         message: AuthLinkMessage
     ): AppResultAsync<void, InfrastructureAppError> {
-        return this.send('password_reset', message.to, message.url, message.locale);
+        return this.send({ kind: 'password_reset', ...message });
     }
 
     sendExistingAccountNotice(message: {
         readonly to: string;
         readonly locale: MailLocale;
     }): AppResultAsync<void, InfrastructureAppError> {
-        return this.send('existing_account', message.to, null, message.locale);
+        return this.send({ kind: 'existing_account', url: null, ...message });
     }
 
-    private send(
-        kind: AuthEmailKind,
-        to: string,
-        url: string | null,
-        locale: MailLocale
-    ): AppResultAsync<void, InfrastructureAppError> {
+    private send({
+        kind,
+        to,
+        url,
+        locale,
+    }: {
+        readonly kind: AuthEmailKind;
+        readonly to: string;
+        readonly url: string | null;
+        readonly locale: MailLocale;
+    }): AppResultAsync<void, InfrastructureAppError> {
         return this.transport.send({
             to,
             ...renderAuthEmail({

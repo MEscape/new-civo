@@ -28,7 +28,7 @@ const mailLogger = logger.withContext({ module: 'auth.mail' });
 export async function resolveMailLocale(): Promise<MailLocale> {
     try {
         const raw = await getLocale();
-        if (raw && (I18N_CONFIG.locales as readonly string[]).includes(raw)) {
+        if ((I18N_CONFIG.locales as readonly string[]).includes(raw)) {
             return raw;
         }
     } catch {

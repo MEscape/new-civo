@@ -15,6 +15,7 @@ const A11Y_COMPONENTS = {
   Textarea: 'textarea',
   Label: 'label',
   Link: 'a',
+  ContentLink: 'a',
   Image: 'img',
 };
 
@@ -46,12 +47,17 @@ export const react = [
       'react/no-danger': 'error',
       'react/jsx-no-target-blank': ['error', { enforceDynamicLinks: 'always', links: true, forms: true }],
       'react/jsx-no-script-url': 'error',
+      // docs/rules/i18n.md: text in JSX comes from the catalog. Symbols that read the same in every language are allowed.
+      'react/jsx-no-literals': [
+        'error',
+        { noStrings: false, ignoreProps: true, allowedStrings: ['·', '→', '—', '–', '…', '/', '|', '(', ')', ':', '%', '×', '+', '-', '*', '#'] },
+      ],
       'react-hooks/exhaustive-deps': 'error',
       'react-hooks/rules-of-hooks': 'error',
 
       // Accessibility is part of the definition of done (it is not proven by lint:
       // keyboard flow, screen-reader output and contrast need runtime checks).
-      'jsx-a11y/anchor-is-valid': ['error', { components: ['Link'], specialLink: ['hrefLeft', 'hrefRight'], aspects: ['invalidHref', 'preferButton'] }],
+      'jsx-a11y/anchor-is-valid': ['error', { components: ['Link', 'ContentLink'], specialLink: ['hrefLeft', 'hrefRight'], aspects: ['invalidHref', 'preferButton'] }],
       'jsx-a11y/no-autofocus': 'warn',
       'jsx-a11y/media-has-caption': 'error',
       'jsx-a11y/alt-text': ['error', { elements: ['img', 'object', 'area', 'input[type="image"]'], img: ['Image'] }],
@@ -59,7 +65,7 @@ export const react = [
         'error',
         {
           labelAttributes: ['aria-label', 'aria-labelledby', 'title'],
-          controlComponents: ['Button', 'SelectTrigger', 'Link'],
+          controlComponents: ['Button', 'SelectTrigger', 'Link', 'ContentLink'],
           ignoreElements: ['audio', 'canvas', 'embed', 'input', 'textarea', 'tr', 'video'],
           ignoreRoles: ['grid', 'listbox', 'menu', 'menubar', 'radiogroup', 'row', 'tablist', 'toolbar', 'tree', 'treegrid'],
           depth: 3,

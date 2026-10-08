@@ -2,16 +2,18 @@
 
 import { useId, useState, useTransition } from "react";
 
-import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
 import { FieldMessage } from "@components/shared/field-message";
 import { SelectField } from "@components/shared/select-field";
 import { TextField } from "@components/shared/text-field";
 import { Button } from "@components/ui/button";
+
+import { useRouter } from "@i18n";
+
+import { useTranslations } from "@i18n/client";
 
 import { applyActionError } from "@lib/actions";
 
@@ -34,6 +36,9 @@ export function DataSourceForm({
   onSaved,
 }: DataSourceFormProps) {
   const t = useTranslations("dataSources");
+  /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+  const errorText = (code: string | undefined) =>
+    code === undefined ? undefined : t(messageKeyForCode(code), MESSAGE_PARAMS);
 
   const router = useRouter();
   const id = useId();
@@ -80,13 +85,13 @@ export function DataSourceForm({
           id={nameId}
           label={t("sourceForm.name")}
           placeholder={t("sourceForm.namePlaceholder")}
-          error={errors.name?.message ? t(messageKeyForCode(errors.name.message), MESSAGE_PARAMS) : undefined}
+          error={errorText(errors.name?.message)}
           {...form.register("name")}
         />
         <SelectField
           id={`${id}-auth-mode`}
           label={t("sourceForm.authMode")}
-          errorMessage={errors.authMode?.message ? t(messageKeyForCode(errors.authMode.message), MESSAGE_PARAMS) : undefined}
+          errorMessage={errorText(errors.authMode?.message)}
           {...form.register("authMode")}
         >
           {AUTH_MODES.map((mode) => (
@@ -104,7 +109,7 @@ export function DataSourceForm({
         autoComplete="off"
         label={t("sourceForm.baseUrl")}
         placeholder={t("sourceForm.baseUrlPlaceholder")}
-        error={errors.baseUrl?.message ? t(messageKeyForCode(errors.baseUrl.message), MESSAGE_PARAMS) : undefined}
+        error={errorText(errors.baseUrl?.message)}
         {...form.register("baseUrl")}
       />
 

@@ -1,12 +1,12 @@
 import type { AppResultAsync } from '@lib/result';
 
 import { createSignInCredentials } from '../../domain/models/credentials';
-import { enforceRateLimit } from '../enforce-rate-limit';
+import { enforceRateLimit } from '../services/enforce-rate-limit';
 
 import type { AuthenticatorError } from '../../domain/ports/authenticator.port';
 import type { AuthenticationDependencies } from '../auth-dependencies';
 import type { SignInInput } from '../contracts/auth-inputs';
-import type { RateLimitError } from '../enforce-rate-limit';
+import type { RateLimitError } from '../services/enforce-rate-limit';
 
 export type SignInError = AuthenticatorError | RateLimitError;
 

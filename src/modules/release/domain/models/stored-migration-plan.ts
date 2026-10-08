@@ -92,48 +92,59 @@ function readConflict(raw: unknown): FieldConflict | null {
   }
 }
 
-function readNodePlan(raw: unknown): NodeMigrationPlan | null {
+/** What every node plan has, whatever its status. */
+function readNodeHeader(raw: unknown) {
   if (!isPlainObject(raw)) {
     return null;
   }
   const { nodeId, type, fromVersion, status } = raw;
-  if (
-    typeof nodeId !== 'string' ||
-    typeof type !== 'string' ||
-    typeof fromVersion !== 'number' ||
-    typeof status !== 'string' ||
-    !isNodeMigrationStatus(status)
-  ) {
+  return typeof nodeId === 'string' &&
+    typeof type === 'string' &&
+    typeof fromVersion === 'number' &&
+    typeof status === 'string' &&
+    isNodeMigrationStatus(status)
+    ? { raw, status, base: { nodeId, type, fromVersion } }
+    : null;
+}
+
+/** The part an upgradable and a reviewable node share: the target version and the merged props. */
+function readUpgrade(raw: Readonly<Record<string, unknown>>) {
+  const { toVersion, mergedProps } = raw;
+  const addedFields = readAll(raw['addedFields'], readString);
+  return typeof toVersion === 'number' && isJsonRecord(mergedProps) && addedFields !== null
+    ? { toVersion, mergedProps, addedFields }
+    : null;
+}
+
+function readNodePlan(item: unknown): NodeMigrationPlan | null {
+  const header = readNodeHeader(item);
+  if (header === null) {
     return null;
   }
-  const base = { nodeId, type, fromVersion };
-  const { toVersion, mergedProps, reason } = raw;
-  const addedFields = readAll(raw['addedFields'], readString);
+  const { raw, status, base } = header;
 
   switch (status) {
-    case 'unchanged':
-      return typeof toVersion === 'number'
-        ? { ...base, status, toVersion }
-        : null;
-    case 'upgradable':
-      return typeof toVersion === 'number' &&
-        isJsonRecord(mergedProps) &&
-        addedFields !== null
-        ? { ...base, status, toVersion, mergedProps, addedFields }
-        : null;
-    case 'needs_review': {
-      const conflicts = readAll(raw['conflicts'], readConflict);
-      return typeof toVersion === 'number' &&
-        isJsonRecord(mergedProps) &&
-        addedFields !== null &&
-        conflicts !== null
-        ? { ...base, status, toVersion, mergedProps, conflicts, addedFields }
-        : null;
+    case 'unchanged': {
+      const { toVersion } = raw;
+      return typeof toVersion === 'number' ? { ...base, status, toVersion } : null;
     }
-    case 'unresolvable':
+    case 'upgradable': {
+      const upgrade = readUpgrade(raw);
+      return upgrade === null ? null : { ...base, status, ...upgrade };
+    }
+    case 'needs_review': {
+      const upgrade = readUpgrade(raw);
+      const conflicts = readAll(raw['conflicts'], readConflict);
+      return upgrade === null || conflicts === null
+        ? null
+        : { ...base, status, ...upgrade, conflicts };
+    }
+    case 'unresolvable': {
+      const { reason } = raw;
       return typeof reason === 'string' && isUnresolvableReason(reason)
         ? { ...base, status, reason }
         : null;
+    }
     default:
       return assertNever(status);
   }

@@ -87,6 +87,13 @@ export const UI_PRIMITIVES = [
   {
     selector: "JSXOpeningElement[name.name='a']",
     message:
-      "Use the locale-aware `Link` from '@i18n' instead of a raw <a> (keeps the locale prefix and client navigation).",
+      "Use the locale-aware `Link` from '@i18n' for app navigation, or `ContentLink` from '@components/ui/content-link' for a target that comes from content (external URL, mailto:, tel:, a published site's path).",
   },
 ];
+
+/** docs/rules/nextjs.md: an error boundary never shows the raw failure to visitors. */
+export const ERROR_DETAILS = {
+  selector: "MemberExpression[object.name='error'][property.name=/^(message|stack|cause)$/]",
+  message:
+    'An error boundary shows translated generic text; never render the error message, stack or cause (docs/rules/nextjs.md).',
+};

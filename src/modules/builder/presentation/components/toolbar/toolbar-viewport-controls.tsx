@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { Monitor, Smartphone, Tablet } from '@components/ui/icons';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { VIEWPORT_MESSAGE_KEYS } from '../../messages/message-keys';
 import { viewportChanged } from '../../state/builder-actions';

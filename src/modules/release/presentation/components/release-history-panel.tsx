@@ -2,13 +2,15 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useRouter } from 'next/navigation';
 
-import { useTranslations } from 'next-intl';
 
 import { EmptyState } from '@components/layout/layout-primitives';
 import { FieldMessage } from '@components/shared/field-message';
 import { AlertTriangle } from '@components/ui/icons';
+
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 import { noop } from '@lib/utils';

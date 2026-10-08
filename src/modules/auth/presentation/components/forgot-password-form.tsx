@@ -3,13 +3,14 @@
 import { useId, useState, useTransition } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { TextField } from '@components/shared/text-field';
 import { Button } from '@components/ui/button';
 import { Card } from '@components/ui/card';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 

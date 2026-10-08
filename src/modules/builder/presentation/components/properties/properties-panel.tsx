@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { VISIBILITY_PROP_KEY } from '../../../application/contracts/builder-constraints';
 import { hasCapability } from '../../../application/contracts/editor-model';

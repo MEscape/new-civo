@@ -72,22 +72,27 @@ export class ProposeMigration {
             )
         )
         .andThen((source) =>
-          this.record(
+          this.record({
             actor,
-            website.id,
+            websiteId: website.id,
             source,
-            planMigration(source, components)
-          )
+            plan: planMigration(source, components),
+          })
         )
     );
   }
 
-  private record(
-    actor: Actor,
-    websiteId: WebsiteId,
-    source: MigrationSource,
-    plan: MigrationPlan
-  ): AppResultAsync<MigrationProposalView, InfrastructureAppError> {
+  private record({
+    actor,
+    websiteId,
+    source,
+    plan,
+  }: {
+    readonly actor: Actor;
+    readonly websiteId: WebsiteId;
+    readonly source: MigrationSource;
+    readonly plan: MigrationPlan;
+  }): AppResultAsync<MigrationProposalView, InfrastructureAppError> {
     const { migrations, audit } = this.deps;
     const sourceReleaseId = source.releaseId;
 

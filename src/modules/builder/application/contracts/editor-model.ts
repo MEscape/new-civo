@@ -45,6 +45,7 @@ export {
 } from '../../domain/tree/drop-placement';
 export type {
   ActiveDrag,
+  DropContext,
   DropPosition,
   DropTarget,
   Rect,

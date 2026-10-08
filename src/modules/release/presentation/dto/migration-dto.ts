@@ -1,3 +1,6 @@
+import { toMigrationPlanDto } from './migration-plan-dto';
+
+import type { MigrationPlanDto } from './migration-plan-dto';
 import type {
   MigrationDetailView,
   MigrationStatus,
@@ -30,7 +33,7 @@ export interface MigrationSummaryDto {
  * its history/list representation.
  */
 export interface MigrationDetailDto extends MigrationSummaryDto {
-  readonly plan: import('./migration-plan-dto').MigrationPlanDto;
+  readonly plan: MigrationPlanDto;
 }
 
 /**
@@ -64,8 +67,6 @@ export function toMigrationDetailDto(
     status: view.status,
     createdAt: view.createdAt.toISOString(),
     appliedAt: view.appliedAt?.toISOString() ?? null,
-    plan: {
-      ...view.plan,
-    },
+    plan: toMigrationPlanDto(view.plan),
   };
 }

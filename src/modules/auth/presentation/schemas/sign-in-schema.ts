@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { RETURN_PATH_MAX_LENGTH } from '../return-path';
+import { RETURN_PATH_MAX_LENGTH } from '../navigation/return-path';
 
 import { emailSchema, submittedPasswordSchema } from './auth-fields-schema';
 

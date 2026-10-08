@@ -1,16 +1,17 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 import { Badge } from '@components/ui/badge';
+
+import { useTranslations } from '@i18n/client';
+
 
 import {
   NODE_STATUS_MESSAGE_KEYS,
   UNRESOLVABLE_REASON_MESSAGE_KEYS,
 } from '../messages/message-keys';
+import { conflictKey } from '../resolutions/resolution-choices';
 
 import { ConflictField } from './conflict-field';
-import { conflictKey } from '../resolutions/resolution-choices';
 
 import type { NodeMigrationView } from '../../application/contracts/release-views';
 import type {

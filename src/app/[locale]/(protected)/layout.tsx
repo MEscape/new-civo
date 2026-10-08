@@ -11,7 +11,7 @@ import { requireSignedIn } from '@modules/auth';
  */
 async function SignedInGate({ children }: { readonly children: ReactNode }) {
   await requireSignedIn();
-  return <>{children}</>;
+  return children;
 }
 
 export default function ProtectedLayout({

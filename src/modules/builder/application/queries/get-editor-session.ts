@@ -2,7 +2,7 @@ import type { AppResultAsync } from '@lib/result';
 
 import { loadAuthorizedPage } from '../load-authorized-page';
 import { toEditorSessionView } from '../page-view-mappers';
-import { resolveEditorMode } from '../resolve-editor-mode';
+import { resolveEditorMode } from '../services/resolve-editor-mode';
 
 import type { EditorSessionView } from '../contracts/page-views';
 import type { LoadPageError } from '../load-authorized-page';

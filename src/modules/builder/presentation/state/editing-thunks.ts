@@ -33,12 +33,17 @@ function toSnapshot(inserted: InsertedComponent) {
   return { children: inserted.tree, selectedNodeId: inserted.newNodeId };
 }
 
-function resolveAppendPlacement(
-  children: readonly PageNode[],
-  selectedId: PageNodeId | null,
-  componentType: string,
-  catalog: ComponentCatalog
-): Placement | null {
+function resolveAppendPlacement({
+  children,
+  selectedId,
+  componentType,
+  catalog,
+}: {
+  readonly children: readonly PageNode[];
+  readonly selectedId: PageNodeId | null;
+  readonly componentType: string;
+  readonly catalog: ComponentCatalog;
+}): Placement | null {
   if (catalog.canNest(null, componentType)) {
     return { parentId: null, index: APPEND_INDEX };
   }
@@ -51,12 +56,12 @@ function resolveAppendPlacement(
 export function insertComponent(componentType: string): BuilderThunk {
   return (dispatch, getState, { catalog, createIdSeed }) => {
     const { children, selectedNodeId } = getState().document.history.present;
-    const placement = resolveAppendPlacement(
+    const placement = resolveAppendPlacement({
       children,
-      selectedNodeId,
+      selectedId: selectedNodeId,
       componentType,
-      catalog
-    );
+      catalog,
+    });
     if (placement === null) {
       dispatch(noticeRaised(BUILDER_ERROR_CODES.placementRejected));
       return;
@@ -132,8 +137,7 @@ export function moveNodeBy(
       commit(
         moveNode(
           children,
-          nodeId,
-          { parentId: location.parentId, index },
+          { nodeId, placement: { parentId: location.parentId, index } },
           catalog
         ).map((tree) => ({ children: tree, selectedNodeId }))
       )
@@ -155,7 +159,7 @@ export function applyDrop(
       dispatch(
         commit(
           placement.andThen((resolved) =>
-            moveNode(children, movedId, resolved, catalog).map((tree) => ({
+            moveNode(children, { nodeId: movedId, placement: resolved }, catalog).map((tree) => ({
               children: tree,
               selectedNodeId: movedId,
             }))

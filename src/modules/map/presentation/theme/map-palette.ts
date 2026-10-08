@@ -1,5 +1,8 @@
+import { toHexColor } from '@lib/utils';
+
 import type { PALETTE_SIZE } from '../../application/contracts/map-constraints';
 import type { ResolvedPalette } from '../mapbox/mapbox-layers';
+
 
 /**
  * The design system's chart tokens (see `globals.css`), by palette slot. DOM
@@ -26,14 +29,7 @@ const ON_CLUSTER_COLOR_VAR = 'var(--civo-color-primary-foreground)';
 /** Gradient for the legend's numeric ranges: the same two stops the map interpolates between. */
 export const RANGE_GRADIENT = `linear-gradient(to right, ${RANGE_LOW_COLOR_VAR}, ${RANGE_HIGH_COLOR_VAR})`;
 
-const HEX_BYTE_LENGTH = 2;
 const FALLBACK_COLOR = '#000000';
-
-function toHex(channels: ArrayLike<number>): string {
-  return `#${[channels[0], channels[1], channels[2]]
-    .map((channel) => (channel ?? 0).toString(16).padStart(HEX_BYTE_LENGTH, '0'))
-    .join('')}`;
-}
 
 /**
  * Resolves CSS colours (including `var()` and `color-mix()`) to `#rrggbb`.
@@ -60,7 +56,8 @@ class ColorProbe {
     context.clearRect(0, 0, 1, 1);
     context.fillStyle = computed;
     context.fillRect(0, 0, 1, 1);
-    return toHex(context.getImageData(0, 0, 1, 1).data);
+    const [red = 0, green = 0, blue = 0] = context.getImageData(0, 0, 1, 1).data;
+    return toHexColor({ red, green, blue });
   }
 }
 

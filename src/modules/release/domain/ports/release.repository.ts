@@ -1,3 +1,5 @@
+import type { TenantId } from '@modules/auth';
+
 import type {
   ConflictAppError,
   InfrastructureAppError,
@@ -75,7 +77,7 @@ export interface ReleaseRepository {
    * concern.
    */
   listPublishedDependencies(
-    tenantId: string,
+    tenantId: TenantId,
     limit: number
   ): AppResultAsync<readonly PublishedDependencies[], InfrastructureAppError>;
 

@@ -1,7 +1,7 @@
 import { actorHasPermission } from '@modules/auth';
 import type { Actor } from '@modules/auth';
 
-import type { EditorMode } from '../domain/models/editor-capabilities';
+import type { EditorMode } from '../../domain/models/editor-capabilities';
 
 /**
  * The editor mode is derived from what the actor may do, never from a

@@ -2,7 +2,7 @@
 
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { ThemeProvider } from './theme-provider';
 

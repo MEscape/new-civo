@@ -133,12 +133,17 @@ export class PrismaDatasetRepository implements DatasetRepository {
      * kind. The website filter is part of the query, so datasets of other
      * websites can never use up the limit.
      */
-    listCompatible(
-        websiteId: WebsiteId,
-        tenantId: TenantId,
-        canonicalKinds: readonly CanonicalKind[],
-        limit: number
-    ): AppResultAsync<readonly Dataset[], InfrastructureAppError> {
+    listCompatible({
+        websiteId,
+        tenantId,
+        canonicalKinds,
+        limit,
+    }: {
+        readonly websiteId: WebsiteId;
+        readonly tenantId: TenantId;
+        readonly canonicalKinds: readonly CanonicalKind[];
+        readonly limit: number;
+    }): AppResultAsync<readonly Dataset[], InfrastructureAppError> {
         return fromThrowableAsync(
             async () =>
                 ownDatasets(tenantId)

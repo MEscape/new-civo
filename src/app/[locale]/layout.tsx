@@ -2,14 +2,16 @@ import React from "react";
 
 import type { Metadata, Viewport } from "next";
 
-import { APP_IDENTITY, publicEnv } from '@lib/config';
-import { fontVariables } from "@lib/fonts";
 
-import { setRequestLocale } from 'next-intl/server';
 
 import { I18nProvider } from "@components/providers/i18n-provider";
 
 import { I18N_CONFIG, requireLocale } from "@i18n";
+
+import { setRequestLocale } from '@i18n/server';
+
+import { APP_IDENTITY, publicEnv } from '@lib/config';
+import { fontVariables } from "@lib/fonts";
 
 import "../globals.css";
 
@@ -47,6 +49,7 @@ export default async function RootLayout({
 }) {
     const locale = requireLocale((await params).locale);
     // Tells next-intl the locale without reading request headers, which would make the whole tree dynamic.
+    // eslint-disable-next-line @typescript-eslint/no-deprecated -- migrate to next/root-params together with i18n/request.ts
     setRequestLocale(locale);
 
     return (

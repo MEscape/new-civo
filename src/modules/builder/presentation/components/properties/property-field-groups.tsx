@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { GROUP_MESSAGE_KEYS } from '../../messages/message-keys';
 import { groupFields } from '../../properties/group-fields';

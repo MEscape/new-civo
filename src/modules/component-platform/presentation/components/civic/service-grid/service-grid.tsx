@@ -5,6 +5,7 @@ import {
   SectionHeading,
 } from '@components/layout/layout-primitives';
 import { Card, CardContent } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { DynamicIcon } from '@components/ui/dynamic-icon';
 
 import { getTranslations } from '@i18n/server';
@@ -61,7 +62,7 @@ export async function ServiceGrid({
         <Grid as="ul" columns={props.columns}>
           {items.map((service) => (
             <li key={service.id}>
-              <a href={service.href} className="group block h-full">
+              <ContentLink href={service.href} className="group block h-full">
                 <Card className="h-full transition-colors group-hover:border-primary">
                   <CardContent className="flex items-center gap-3 pt-5">
                     <DynamicIcon
@@ -75,7 +76,7 @@ export async function ServiceGrid({
                     </span>
                   </CardContent>
                 </Card>
-              </a>
+              </ContentLink>
             </li>
           ))}
         </Grid>

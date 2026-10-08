@@ -1,9 +1,10 @@
 import 'server-only';
 import type { ReactElement, ReactNode } from 'react';
 
-import { getLocale, getMessages, getTimeZone } from 'next-intl/server';
-
 import type { Locale, Namespace } from '@i18n';
+
+import { getLocale, getMessages, getTimeZone } from '@i18n/server';
+
 
 import { serverEnv } from '@lib/config';
 import { pick, unique } from '@lib/utils';

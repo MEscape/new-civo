@@ -1,18 +1,17 @@
-export type GridColumns = 1 | 2 | 3 | 4;
+import type { GridColumns } from '@components/layout/layout-primitives';
 
-const COLUMN_STEPS: readonly GridColumns[] = [1, 2, 3, 4];
+import { GRID_COLUMN_COUNTS } from '../../../application/contracts/component-platform-constraints';
+
+const [FEWEST_COLUMNS, , , WIDEST_COLUMNS] = GRID_COLUMN_COUNTS;
 
 /** The widest column count up to `max` that the number of items can fill. */
 export function columnsForCount(
   count: number,
-  max: GridColumns = 4
+  max: GridColumns = WIDEST_COLUMNS
 ): GridColumns {
-  const wanted = Math.min(Math.max(count, 1), max);
-  let columns: GridColumns = 1;
-  for (const step of COLUMN_STEPS) {
-    if (step <= wanted) {
-      columns = step;
-    }
-  }
-  return columns;
+  const wanted = Math.min(count, max);
+  return GRID_COLUMN_COUNTS.reduce<GridColumns>(
+    (columns, step) => (step <= wanted ? step : columns),
+    FEWEST_COLUMNS
+  );
 }

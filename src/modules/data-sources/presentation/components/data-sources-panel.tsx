@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 
-import { useTranslations } from "next-intl";
 
+import { EmptyState } from "@components/layout/layout-primitives";
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
-import { EmptyState } from "@components/layout/layout-primitives";
+
+import { useTranslations } from "@i18n/client";
 
 import { ConfiguredSourceCard } from "./configured-source-card";
 import { DataSourceForm } from "./data-source-form";

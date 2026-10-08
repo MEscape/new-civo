@@ -67,7 +67,7 @@ export async function NewsGrid({
             <li key={item.id}>
               <Card className="h-full overflow-hidden">
                 {item.imageUrl !== undefined && (
-                  // eslint-disable-next-line @next/next/no-img-element
+                  // eslint-disable-next-line @next/next/no-img-element -- the URL comes from municipal content on any host; next/image would need each host allow-listed
                   <img
                     src={item.imageUrl}
                     alt=""

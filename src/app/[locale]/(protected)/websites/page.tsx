@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
 
-import { getTranslations } from 'next-intl/server';
 
 import { CreateWebsiteForm, websiteQueries, websiteRoutes } from '@modules/website';
 
-import { I18nProvider } from '@components/providers/i18n-provider';
 import { Container, EmptyState, Grid, PageHeading, Section } from '@components/layout/layout-primitives';
+import { I18nProvider } from '@components/providers/i18n-provider';
 import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { Link } from '@i18n';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildPrivateMetadata } from '@lib/seo';
 
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function WebsitesPage() {
     const t = await getTranslations('website');
-    const websites = orFail(await websiteQueries.listWebsites.execute());
+    const websites = await orFail(websiteQueries.listWebsites.execute());
 
     return (
         <Container className="max-w-4xl">

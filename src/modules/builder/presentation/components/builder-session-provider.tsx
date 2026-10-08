@@ -11,12 +11,12 @@ import { createBuilderStore } from '../state/builder-store';
 
 import { BuilderSessionContext } from './builder-session-context';
 
-import type { DatasetOptionsByType } from '../dto/dataset-options-dto';
+import type { DatasetOptionsByKind } from '../dto/dataset-options-dto';
 import type { EditorSessionDto } from '../dto/editor-session-dto';
 
 export interface BuilderSessionProviderProps {
   readonly session: EditorSessionDto;
-  readonly datasetOptions: DatasetOptionsByType;
+  readonly datasetOptions: DatasetOptionsByKind;
   readonly children: ReactNode;
 }
 

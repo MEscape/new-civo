@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 
 import { trimToNull } from '@lib/utils';
 
@@ -37,9 +38,9 @@ export function CardGrid({ props }: CardGridComponentProps) {
                 <CardHeader>
                   <CardTitle>
                     {card.href !== undefined ? (
-                      <a href={card.href} className="hover:text-primary-copy">
+                      <ContentLink href={card.href} className="hover:text-primary-copy">
                         {card.title}
-                      </a>
+                      </ContentLink>
                     ) : (
                       card.title
                     )}

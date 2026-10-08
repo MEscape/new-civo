@@ -2,12 +2,11 @@ import type { ForbiddenAppError, InfrastructureAppError } from '@lib/errors';
 import { errAsync, okAsync } from '@lib/result';
 import type { AppResultAsync } from '@lib/result';
 
-import { rateLimited } from '../domain/errors/auth-errors';
+import { rateLimited } from '../../domain/errors/auth-errors';
+import { AUTH_RATE_LIMITS } from '../auth-limits';
 
-import { AUTH_RATE_LIMITS } from './rate-limit-policy';
-
-import type { AuthenticationDependencies } from './auth-dependencies';
-import type { AuthRateLimitAction } from '../domain/models/rate-limit';
+import type { AuthRateLimitAction } from '../../domain/models/rate-limit';
+import type { AuthenticationDependencies } from '../auth-dependencies';
 
 export type RateLimitError = ForbiddenAppError | InfrastructureAppError;
 

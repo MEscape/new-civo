@@ -6,7 +6,7 @@ import { headers } from 'next/headers';
 import { systemClock } from '@lib/clock';
 import { APP_IDENTITY, publicEnv, serverEnv } from '@lib/config';
 import type { ServerEnv } from '@lib/config';
-import { invariant, isDefined, once } from '@lib/utils';
+import { assertNever, invariant, isDefined, once } from '@lib/utils';
 
 import { createAuthorizationService } from './application/authorization-service';
 import { RequestPasswordReset } from './application/commands/request-password-reset';
@@ -159,9 +159,7 @@ function buildMailer(env: ServerEnv): AuthMailer {
       break;
     }
     default:
-      throw new Error(
-        `Unsupported AUTH_MAIL_PROVIDER: ${env.AUTH_MAIL_PROVIDER}`
-      );
+      return assertNever(env.AUTH_MAIL_PROVIDER, 'Unsupported AUTH_MAIL_PROVIDER.');
   }
 
   return new TransactionalAuthMailer(transport, {

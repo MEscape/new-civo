@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 
-import { getTranslations } from 'next-intl/server';
 
 import {
     EmailVerificationResult,
@@ -13,6 +12,8 @@ import {
 import { Container, PageHeading, Section } from '@components/layout/layout-primitives';
 
 import type { Locale } from '@i18n';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildPrivateMetadata } from '@lib/seo';
 

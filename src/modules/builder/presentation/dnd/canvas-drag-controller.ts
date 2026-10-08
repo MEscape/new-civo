@@ -52,16 +52,19 @@ export interface CanvasDragControllerOptions {
   onDrop(session: DragSession, target: DropTarget): void;
 }
 
+/** Keyboard steps through drop targets in render order. */
+const ARROW_DIRECTIONS: Readonly<Partial<Record<string, -1 | 1>>> = { ArrowUp: -1, ArrowDown: 1 };
+
 export interface CanvasDragController {
-  subscribe(listener: () => void): () => void;
-  getSnapshot(): DragState;
+  readonly subscribe: (listener: () => void) => () => void;
+  readonly getSnapshot: () => DragState;
   /** Wires pointer dragging of canvas nodes; returns the detach function. */
-  attach(container: HTMLElement): () => void;
-  beginPaletteDrag(componentType: string): void;
-  movePointer(clientX: number, clientY: number): void;
-  drop(): void;
-  cancel(): void;
-  handleGripKey(nodeId: PageNodeId, event: KeyEventLike): void;
+  readonly attach: (container: HTMLElement) => () => void;
+  readonly beginPaletteDrag: (componentType: string) => void;
+  readonly movePointer: (clientX: number, clientY: number) => void;
+  readonly drop: () => void;
+  readonly cancel: () => void;
+  readonly handleGripKey: (nodeId: PageNodeId, event: KeyEventLike) => void;
 }
 
 const IDLE: DragState = {
@@ -114,7 +117,7 @@ export function createCanvasDragController(
   function begin(session: DragSession, isKeyboard: boolean): void {
     if (!options.isEnabled()) {return;}
     const container = options.getContainer();
-    rects = container === null ? new Map() : measureAllNodeRects(container);
+    rects = container === null ? new Map<PageNodeId, Rect>() : measureAllNodeRects(container);
     setState({ session, target: null, indicator: null, isKeyboard });
   }
 
@@ -137,19 +140,15 @@ export function createCanvasDragController(
     const active = { id: session.id, type: session.type };
     const nodeId = findNodeId(element);
     if (nodeId === null)
-      {return resolveDropTargetAtCanvasEnd(children, active, options.catalog);}
+      {return resolveDropTargetAtCanvasEnd({ tree: children, active, policy: options.catalog });}
 
     const rect = rects.get(nodeId);
     if (rect === undefined) {return null;}
     // Rects are container-relative, so the pointer must be too.
     const pointerY = clientY - container.getBoundingClientRect().top;
     return resolveDropTargetForNode(
-      children,
-      active,
-      nodeId,
-      pointerY,
-      rect,
-      options.catalog
+      { tree: children, active, policy: options.catalog },
+      { targetId: nodeId, pointerY, targetRect: rect }
     );
   }
 
@@ -177,6 +176,21 @@ export function createCanvasDragController(
       );}
   }
 
+  function stepKeyboardTarget(session: DragSession, nodeId: PageNodeId, direction: -1 | 1): void {
+    const current = state.target;
+    const next = stepDropTarget(
+      {
+        tree: options.getChildren(),
+        active: { id: session.id, type: session.type },
+        policy: options.catalog,
+      },
+      current === null || current.kind === 'root' ? nodeId : current.targetNodeId,
+      direction
+    );
+    if (next !== null) {setTarget(next);}
+  }
+
+  /** Space or Enter picks the node up, then drops it; arrows move the target; Escape cancels. */
   function handleGripKey(nodeId: PageNodeId, event: KeyEventLike): void {
     const isPickupKey = event.key === ' ' || event.key === 'Enter';
     if (!state.isKeyboard) {
@@ -192,23 +206,19 @@ export function createCanvasDragController(
     if (isPickupKey) {
       event.preventDefault();
       drop();
-    } else if (event.key === 'Escape') {
+      return;
+    }
+    if (event.key === 'Escape') {
       // Stopped here so the window-level Escape (deselect) does not also fire.
       event.preventDefault();
       event.stopPropagation();
       cancel();
-    } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      return;
+    }
+    const direction = ARROW_DIRECTIONS[event.key];
+    if (direction !== undefined) {
       event.preventDefault();
-      const next = stepDropTarget(
-        options.getChildren(),
-        { id: session.id, type: session.type },
-        state.target?.kind === 'root'
-          ? nodeId
-          : state.target?.targetNodeId ?? nodeId,
-        event.key === 'ArrowUp' ? -1 : 1,
-        options.catalog
-      );
-      if (next !== null) {setTarget(next);}
+      stepKeyboardTarget(session, nodeId, direction);
     }
   }
 

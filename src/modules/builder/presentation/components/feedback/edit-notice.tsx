@@ -1,6 +1,7 @@
-import { useTranslations } from 'next-intl';
-
 import { Button } from '@components/ui/button';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { noticeDismissed } from '../../state/builder-actions';
 import {

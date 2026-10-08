@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { findNode } from '../../../application/contracts/editor-model';
 import { useComponentText } from '../../hooks/use-component-text';

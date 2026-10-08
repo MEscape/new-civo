@@ -5,16 +5,16 @@ import {
     ensureRequiredTargets,
 } from '../../domain/mapping/dataset-mapping';
 import { toDatasetView } from '../data-source-view-mappers';
-import { dryRunMapping } from '../dry-run-mapping';
 import { loadAuthorizedDataset } from '../load-authorized-dataset';
+import { dryRunMapping } from '../services/dry-run-mapping';
 
 import type {
     DatasetView,
     SaveDatasetMappingInput,
 } from '../contracts/data-source-views';
 import type { ConnectedDataSourceDependencies } from '../data-source-dependencies';
-import type { DryRunError } from '../dry-run-mapping';
 import type { LoadDatasetError } from '../load-authorized-dataset';
+import type { DryRunError } from '../services/dry-run-mapping';
 
 export type SaveDatasetMappingError = LoadDatasetError | DryRunError;
 

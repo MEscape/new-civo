@@ -15,6 +15,8 @@ export const overrides = [
     files: TEST_FILES,
     rules: {
       'no-magic-numbers': 'off',
+      // Fixtures render literal text on purpose.
+      'react/jsx-no-literals': 'off',
       'max-params': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',

@@ -58,8 +58,8 @@ export class CreateWebsite {
             .map((website) => ({ website, templateKey: draft.templateKey }))
         )
         .andThen(({ website, templateKey }) =>
-          this.provisionHomePage(website, templateKey).map((website) => ({
-            website,
+          this.provisionHomePage(website, templateKey).map((provisioned) => ({
+            website: provisioned,
             templateKey,
           }))
         )

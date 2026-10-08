@@ -1,9 +1,10 @@
-import Link from 'next/link';
-
-import { useTranslations } from 'next-intl';
-
 import { Button } from '@components/ui/button';
 import { Eye, Pencil, Settings } from '@components/ui/icons';
+
+import { Link } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { modeChanged } from '../../state/builder-actions';
 import {

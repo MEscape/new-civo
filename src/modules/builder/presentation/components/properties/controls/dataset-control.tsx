@@ -1,5 +1,3 @@
-import { useTranslations } from 'next-intl';
-
 import {
   Select,
   SelectContent,
@@ -7,6 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@components/ui/select';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { useBuilderSession } from '../../builder-session-context';
 

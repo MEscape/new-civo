@@ -85,12 +85,17 @@ function hasSameStructure(
  * order) must be identical, and in restricted modes only the props the
  * catalog lists (plus the visibility toggle) may differ.
  */
-export function checkEditScope(
-    previous: PageConfig,
-    next: PageConfig,
-    mode: EditorMode,
-    catalog: ComponentCatalog
-): AppResult<void, ForbiddenAppError> {
+export function checkEditScope({
+    previous,
+    next,
+    mode,
+    catalog,
+}: {
+    readonly previous: PageConfig;
+    readonly next: PageConfig;
+    readonly mode: EditorMode;
+    readonly catalog: ComponentCatalog;
+}): AppResult<void, ForbiddenAppError> {
     const before = flattenNodes(previous.children);
     const after = flattenNodes(next.children);
 

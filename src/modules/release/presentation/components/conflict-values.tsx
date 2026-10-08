@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { stringifyJson, truncate } from '@lib/utils';
 import type { JsonValue } from '@lib/utils';

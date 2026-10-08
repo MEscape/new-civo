@@ -2,9 +2,10 @@
 
 import { useRef } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { useBeforeUnloadGuard } from '@hooks/use-before-unload-guard';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { cn } from '@lib/utils';
 
@@ -27,7 +28,7 @@ import { ComponentPalette } from './palette/component-palette';
 import { PropertiesPanel } from './properties/properties-panel';
 import { BuilderToolbar } from './toolbar/builder-toolbar';
 
-import type { EditorLinks } from '../editor-links';
+import type { EditorLinks } from '../navigation/editor-links';
 import type { ThemeStyle } from './canvas/canvas-theme-scope';
 
 export interface BuilderShellProps {

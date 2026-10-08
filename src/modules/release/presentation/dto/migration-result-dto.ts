@@ -15,6 +15,13 @@ export interface PageOutcomeDto {
   readonly outcome: PageOutcome;
 }
 
+export function toPageOutcomeDto(view: {
+  readonly path: string;
+  readonly outcome: PageOutcome;
+}): PageOutcomeDto {
+  return { path: view.path, outcome: view.outcome };
+}
+
 /**
  * Result returned after attempting to apply a migration.
  *
@@ -42,10 +49,7 @@ export function toApplyMigrationResultDto(
     migrationId: view.migrationId,
     websiteId: view.websiteId,
     status: view.status,
-    pages: view.pages.map(({ path, outcome }) => ({
-      path,
-      outcome,
-    })),
+    pages: view.pages.map(toPageOutcomeDto),
     updatedNodeCount: view.updatedNodeCount,
     skippedNodeCount: view.skippedNodeCount,
   };

@@ -20,7 +20,7 @@ export async function Hero({ props }: HeroComponentProps) {
   return (
     <Section className="relative overflow-hidden">
       {imageUrl !== null && (
-        // eslint-disable-next-line @next/next/no-img-element
+        // eslint-disable-next-line @next/next/no-img-element -- the URL comes from municipal content on any host; next/image would need each host allow-listed
         <img
           src={imageUrl}
           alt=""

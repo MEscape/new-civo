@@ -37,6 +37,8 @@ export interface AuthorizedReleaseWebsite {
  * Releases belong to a website and carry no tenant of their own, so
  * reaching a release only through an authorized website is what isolates
  * tenants here.
+ *
+ * @tenant-scope delegated The website module loads by the actor's tenant and checks the stored website's scope itself.
  */
 export function loadAuthorizedReleaseWebsite(
   deps: ReleaseDependencies,

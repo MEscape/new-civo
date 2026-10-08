@@ -22,7 +22,8 @@ export { toPageSummaryDto } from './presentation/dto/page-dto';
 export { BuilderSessionProvider } from './presentation/components/builder-session-provider';
 export { BuilderShell } from './presentation/components/builder-shell';
 export { toEditorSessionDto } from './presentation/dto/editor-session-dto';
-export { collectDatasetTypes } from './presentation/dataset-types';
+export { collectDatasetTypes } from './presentation/properties/dataset-types';
+export { toDatasetOptionsByType } from './presentation/dto/dataset-options-dto';
 export { builderRoutes } from './presentation/routes';
 
 export { HOME_PAGE_PATH } from './application/contracts/builder-constraints';
@@ -43,8 +44,9 @@ export type {
   SavePageConfigInput,
   SavedRevisionView,
 } from './application/contracts/page-views';
-export type { EditorLinks } from './presentation/editor-links';
+export type { EditorLinks } from './presentation/navigation/editor-links';
 export type {
   DatasetOptionDto,
-  DatasetOptionsByType,
+  DatasetOptionInput,
+  DatasetOptionsByKind,
 } from './presentation/dto/dataset-options-dto';

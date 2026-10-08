@@ -22,6 +22,19 @@ export default function Page() { return null; }`
       `export const metadata = { title: 'Websites', robots: { index: false, follow: false } };
 export default function Page() { return null; }`
     ),
+    // the other @lib/seo builders decide indexability too
+    valid(
+      'src/app/[locale]/(app)/websites/page.tsx',
+      `import { buildPrivateMetadata } from '@lib/seo';
+export async function generateMetadata() { return buildPrivateMetadata('Websites'); }
+export default function Page() { return null; }`
+    ),
+    valid(
+      'src/app/[locale]/(public)/s/[siteSlug]/page.tsx',
+      `import { buildContentMetadata } from '@lib/seo';
+export async function generateMetadata() { return buildContentMetadata({ pathname: '/s/x', title: 't', description: 'd', siteName: 's' }); }
+export default function Page() { return null; }`
+    ),
     // layouts and other files are not pages
     valid('src/app/[locale]/layout.tsx', 'export default function Layout({ children }) { return <div>{children}</div>; }'),
     valid('src/app/[locale]/shops/loading.tsx', 'export default function Loading() { return <p>…</p>; }'),

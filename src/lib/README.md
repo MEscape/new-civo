@@ -50,7 +50,6 @@ Typed application errors (Rule 5: Use strongly typed results and errors).
   - `ROOT_FIELD`: Key for validation errors that belong to no single field (`'_form'`).
   - `NestedKeyOf<ObjectType>`: Generates a union of all dotted paths for a nested object type.
   - `fieldPath<T>(...segments: T): JoinPath<T>`: Builds a strictly typed dotted field path (e.g., for `react-hook-form`).
-  - `failRoute(error: AppError, signInPath: string): never`: Translates domain errors into Next.js routing exceptions (`notFound`, `redirect`, or throw).
   - `escalate(error: AppError): never`: Logs and throws an unexpected or infrastructure error to the nearest `error.tsx` boundary.
 
 ### `@lib/fonts` (Typography)
@@ -121,6 +120,9 @@ Zero-dependency, pure utility functions organized by domain.
   - `Brand<T, B extends string>`
 - **CSS**:
   - `cn(...inputs: ClassValue[]): string` (Tailwind class merging)
+- **Color**:
+  - `parseHexColor(hex: string): RgbColor | null` (`#rrggbb` only)
+  - `toHexColor(color: RgbColor): string`
 - **Date**:
   - `formatDate(input: DateInput, locale: string, timeZone: string, options?: Intl.DateTimeFormatOptions): string`
   - `formatDateTime(input: DateInput, locale: string, timeZone: string): string`

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-import { useTranslations } from 'next-intl';
-
 import { COMPONENT_CATEGORIES } from '@modules/component-platform/client';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { cn } from '@lib/utils';
 

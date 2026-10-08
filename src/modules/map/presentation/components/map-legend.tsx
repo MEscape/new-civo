@@ -4,14 +4,14 @@ import { useTranslations } from '@i18n/client';
 
 import { cn } from '@lib/utils';
 
+
+import { useAttributeFormat } from '../hooks/use-attribute-format';
+import { useFieldLabel } from '../hooks/use-field-label';
 import {
   OTHER_COLOR_VAR,
   RANGE_GRADIENT,
   SERIES_COLOR_VARS,
 } from '../theme/map-palette';
-
-import { useAttributeFormat } from '../hooks/use-attribute-format';
-import { useFieldLabel } from '../hooks/use-field-label';
 
 import type {
   ColorEncoding,

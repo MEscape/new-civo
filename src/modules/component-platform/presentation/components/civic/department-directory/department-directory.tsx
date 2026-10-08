@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { Mail } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
@@ -69,9 +70,9 @@ export async function DepartmentDirectory({
                 <CardHeader>
                   <CardTitle>
                     {department.href !== undefined ? (
-                      <a href={department.href} className="hover:text-primary-copy">
+                      <ContentLink href={department.href} className="hover:text-primary-copy">
                         {department.name}
-                      </a>
+                      </ContentLink>
                     ) : (
                       department.name
                     )}
@@ -87,7 +88,7 @@ export async function DepartmentDirectory({
                       >
                         <span className="text-copy">{contact.name}</span>
                         {contact.email !== undefined && (
-                          <a
+                          <ContentLink
                             href={`mailto:${contact.email}`}
                             aria-label={t('departmentDirectory.writeTo', {
                               name: contact.name,
@@ -95,7 +96,7 @@ export async function DepartmentDirectory({
                             className="flex items-center gap-1.5 text-primary-copy hover:underline"
                           >
                             <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                          </a>
+                          </ContentLink>
                         )}
                       </li>
                     ))}

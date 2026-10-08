@@ -1,3 +1,5 @@
+import type { TenantId } from '@modules/auth';
+
 import { createPersistenceFailures, dateToInstant, db } from '@lib/db';
 import type {
   ConflictAppError,
@@ -24,6 +26,7 @@ import {
   RELEASE_SUMMARY_SELECT,
   toRelease,
   toReleaseSummary,
+  toStoredDependencies,
   toStoredSnapshot,
 } from './release-record-mapper';
 
@@ -140,24 +143,27 @@ export class PrismaReleaseRepository implements ReleaseRepository {
   }
 
   listPublishedDependencies(
-    tenantId: string,
+    tenantId: TenantId,
     limit: number
   ): AppResultAsync<readonly PublishedDependencies[], InfrastructureAppError> {
     return fromThrowableAsync(
       async () =>
         db.orm.public.Website.where({ tenantId })
+          // Filtered and bounded in the database: only live websites, at most `limit` of them.
+          .where((w) => w.publishedReleaseId.isNotNull())
           .select('id', 'publishedReleaseId')
           .include('publishedRelease', (r) => r.select('id', 'snapshot'))
           .orderBy([(w) => w.id.asc()])
+          .limit(limit)
           .all(),
       failures.infraOnly('listPublishedDependencies')
     ).map((websites) =>
-      websites.filter(w => w.publishedReleaseId !== null).slice(0, limit).flatMap((website) => {
+      websites.flatMap((website) => {
         const release = website.publishedRelease;
         if (release === null) {return [];}
-        const dependencies = (release.snapshot as any)?.dependencies;
-        if (!Array.isArray(dependencies)) {return [];}
-        
+        const dependencies = toStoredDependencies(release.snapshot);
+        if (dependencies === null) {return [];}
+
         return [
           {
             websiteId: toWebsiteId(website.id),
@@ -191,7 +197,7 @@ export class PrismaReleaseRepository implements ReleaseRepository {
             websiteId,
             releaseNumber: nextReleaseNumber(latest?.releaseNumber ?? null),
             status: RECORD_STATUS.published,
-            snapshot: stored as any,
+            snapshot: stored,
             snapshotHash,
             // Prisma 8 does not accept a `Date` for a `DateTime` column.
             publishedAt: dateToInstant(publishedAt),

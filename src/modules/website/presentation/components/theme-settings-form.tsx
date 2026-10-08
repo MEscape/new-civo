@@ -2,15 +2,17 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { SelectField } from '@components/shared/select-field';
 import { Button } from '@components/ui/button';
+
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 
@@ -41,6 +43,9 @@ export function ThemeSettingsForm({
   initialTheme,
 }: ThemeSettingsFormProps) {
   const t = useTranslations('website');
+  /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+  const errorText = (code: string | undefined) =>
+    code === undefined ? undefined : t(messageKeyForCode(code));
 
   const router = useRouter();
   const id = useId();
@@ -125,7 +130,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-heading-font`}
                 label={t('themeSettings.headingFont')}
-                errorMessage={errors.typography?.headingFont?.message ? t(messageKeyForCode(errors.typography.headingFont.message)) : undefined}
+                errorMessage={errorText(errors.typography?.headingFont?.message)}
                 {...form.register('typography.headingFont')}
               >
                 {THEME_FONT_FAMILIES.map((font) => (
@@ -137,7 +142,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-body-font`}
                 label={t('themeSettings.bodyFont')}
-                errorMessage={errors.typography?.bodyFont?.message ? t(messageKeyForCode(errors.typography.bodyFont.message)) : undefined}
+                errorMessage={errorText(errors.typography?.bodyFont?.message)}
                 {...form.register('typography.bodyFont')}
               >
                 {BODY_FONT_FAMILIES.map((font) => (
@@ -157,7 +162,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-radius`}
                 label={t('themeSettings.radiusLabel')}
-                errorMessage={errors.radius?.message ? t(messageKeyForCode(errors.radius.message)) : undefined}
+                errorMessage={errorText(errors.radius?.message)}
                 {...form.register('radius')}
               >
                 {THEME_RADII.map((radius) => (
@@ -169,7 +174,7 @@ export function ThemeSettingsForm({
               <SelectField
                 id={`${id}-spacing`}
                 label={t('themeSettings.spacingLabel')}
-                errorMessage={errors.spacingScale?.message ? t(messageKeyForCode(errors.spacingScale.message)) : undefined}
+                errorMessage={errorText(errors.spacingScale?.message)}
                 {...form.register('spacingScale')}
               >
                 {THEME_SPACING_SCALES.map((scale) => (

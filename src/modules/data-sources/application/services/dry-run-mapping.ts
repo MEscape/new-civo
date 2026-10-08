@@ -1,16 +1,16 @@
 import { err } from '@lib/result';
 import type { AppResult, AppResultAsync } from '@lib/result';
 
-import { toSampleRecords } from '../domain/discovery/discovery';
-import { noSampleRecords } from '../domain/errors/data-source-errors';
-import { applyMapping } from '../domain/mapping/apply-mapping';
+import { toSampleRecords } from '../../domain/discovery/discovery';
+import { noSampleRecords } from '../../domain/errors/data-source-errors';
+import { applyMapping } from '../../domain/mapping/apply-mapping';
 
-import type { DatasetMapping } from '../domain/mapping/dataset-mapping';
-import type { DataSource } from '../domain/models/data-source';
+import type { DatasetMapping } from '../../domain/mapping/dataset-mapping';
+import type { DataSource } from '../../domain/models/data-source';
 import type {
     ConnectorError,
     DataSourceConnector,
-} from '../domain/ports/data-source-connector.port';
+} from '../../domain/ports/data-source-connector.port';
 
 export type DryRunError = ConnectorError;
 

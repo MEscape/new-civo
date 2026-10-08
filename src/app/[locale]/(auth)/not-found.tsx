@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 
-import { useTranslations } from 'next-intl';
-
 import { NotFoundPanel } from '@components/shared/not-found-panel';
+
+import { useTranslations } from '@i18n/client';
+
 
 /*
  * A 404 is never indexed. Its metadata is static on purpose: a not-found page

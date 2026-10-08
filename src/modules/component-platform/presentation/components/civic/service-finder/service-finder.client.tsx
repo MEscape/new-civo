@@ -3,7 +3,9 @@
 import { useState } from 'react';
 
 import { Badge } from '@components/ui/badge';
+import { Button } from '@components/ui/button';
 import { Card, CardContent } from '@components/ui/card';
+import { ContentLink } from '@components/ui/content-link';
 import { DynamicIcon } from '@components/ui/dynamic-icon';
 import { Search } from '@components/ui/icons';
 import { Input } from '@components/ui/input';
@@ -63,18 +65,16 @@ interface CategoryChipProps {
 
 function CategoryChip({ label, active, onSelect }: CategoryChipProps) {
   return (
-    <button
+    <Button
       type="button"
+      size="sm"
+      variant={active ? 'default' : 'ghost'}
       onClick={onSelect}
       aria-pressed={active}
-      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-        active
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-surface text-copy-muted hover:text-copy'
-      }`}
+      className="rounded-full"
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
@@ -147,7 +147,7 @@ export function ServiceFinderClient({
         <ul className="flex flex-col divide-y divide-border">
           {filtered.map((service) => (
             <li key={service.id}>
-              <a
+              <ContentLink
                 href={service.href}
                 className="group flex items-start gap-4 py-4 hover:bg-surface"
               >
@@ -177,7 +177,7 @@ export function ServiceFinderClient({
                     )}
                   </div>
                 </CardContent>
-              </a>
+              </ContentLink>
             </li>
           ))}
         </ul>

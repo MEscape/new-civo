@@ -2,11 +2,12 @@
 
 import { useTransition } from 'react';
 
-import { useRouter } from 'next/navigation';
-
-import { useTranslations } from 'next-intl';
-
 import { Button } from '@components/ui/button';
+
+import { useRouter } from '@i18n';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { signOutAction } from '../actions/sign-out-action';
 import { authRoutes } from '../routes';

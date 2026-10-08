@@ -2,16 +2,18 @@
 
 import { useId, useState, useTransition } from "react";
 
-import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
 import { FieldMessage } from "@components/shared/field-message";
 import { SelectField } from "@components/shared/select-field";
 import { TextField } from "@components/shared/text-field";
 import { Button } from "@components/ui/button";
+
+import { useRouter } from "@i18n";
+
+import { useTranslations } from "@i18n/client";
 
 import { applyActionError } from "@lib/actions";
 
@@ -43,6 +45,9 @@ export function DatasetForm({
   onCancel,
 }: DatasetFormProps) {
   const t = useTranslations("dataSources");
+  /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+  const errorText = (code: string | undefined) =>
+    code === undefined ? undefined : t(messageKeyForCode(code), MESSAGE_PARAMS);
 
   const router = useRouter();
   const id = useId();
@@ -97,13 +102,13 @@ export function DatasetForm({
           id={nameId}
           label={t("datasetForm.name")}
           placeholder={t("datasetForm.namePlaceholder")}
-          error={errors.name?.message ? t(messageKeyForCode(errors.name.message), MESSAGE_PARAMS) : undefined}
+          error={errorText(errors.name?.message)}
           {...form.register("name")}
         />
         <SelectField
           id={`${id}-kind`}
           label={t("datasetForm.kind")}
-          errorMessage={errors.canonicalKind?.message ? t(messageKeyForCode(errors.canonicalKind.message), MESSAGE_PARAMS) : undefined}
+          errorMessage={errorText(errors.canonicalKind?.message)}
           {...form.register("canonicalKind")}
         >
           {CANONICAL_KINDS.map((type) => (

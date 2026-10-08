@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
 import { Container, Grid, Section } from '@components/layout/layout-primitives';
+import type { GridColumns } from '@components/layout/layout-primitives';
 import { Card, CardContent } from '@components/ui/card';
 import { Skeleton } from '@components/ui/skeleton';
 
 import { useTranslations } from '@i18n/client';
 
-import type { GridColumns } from './grid-columns';
 
 const MAX_PLACEHOLDERS = 8;
 const PLACEHOLDER_KEYS = Array.from(

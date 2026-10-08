@@ -1,9 +1,10 @@
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
 
 import { Label } from '@components/ui/input';
 import { Switch } from '@components/ui/switch';
+
+import { useTranslations } from '@i18n/client';
 
 import { useBuilderDispatch } from '../../state/builder-hooks';
 import { setNodeVisibility } from '../../state/props-thunks';

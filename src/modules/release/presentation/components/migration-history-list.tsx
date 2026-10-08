@@ -1,11 +1,12 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 
-import { useAppFormatters } from '@i18n/client';
 
 import { EmptyState } from '@components/layout/layout-primitives';
 import { Badge } from '@components/ui/badge';
+
+import { useTranslations , useAppFormatters } from '@i18n/client';
+
 
 import { MIGRATION_STATUS_MESSAGE_KEYS } from '../messages/message-keys';
 

@@ -15,7 +15,7 @@ import { I18N_CONFIG } from '@i18n/config';
 const ROOT = process.cwd();
 const [REFERENCE_LOCALE, ...OTHER_LOCALES] = I18N_CONFIG.locales;
 
-type Catalog = { readonly [key: string]: string | Catalog };
+interface Catalog { readonly [key: string]: string | Catalog }
 
 /** Every catalog by owner: the app shell, then one per module that owns texts. */
 function catalogPaths(): ReadonlyArray<{ readonly owner: string; readonly path: (locale: string) => string }> {
@@ -78,8 +78,8 @@ describe('translation catalogs', () => {
 
   for (const { owner, path } of catalogs) {
     for (const locale of OTHER_LOCALES) {
-      it(`${owner}: '${locale}' has exactly the keys of '${String(REFERENCE_LOCALE)}', with the same arguments`, () => {
-        const reference = load(path(String(REFERENCE_LOCALE)));
+      it(`${owner}: '${locale}' has exactly the keys of '${REFERENCE_LOCALE}', with the same arguments`, () => {
+        const reference = load(path(I18N_CONFIG.defaultLocale));
         const translated = load(path(locale));
 
         expect([...translated.keys()].filter((key) => !reference.has(key)), 'keys only in the translation').toEqual([]);

@@ -117,3 +117,5 @@ export {
 export { cn } from './cn';
 
 export { type Brand } from './brand';
+
+export { parseHexColor, toHexColor, type RgbColor } from './color';

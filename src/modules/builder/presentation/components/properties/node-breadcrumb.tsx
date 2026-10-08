@@ -1,6 +1,7 @@
-import { useTranslations } from 'next-intl';
-
 import { ChevronRight } from '@components/ui/icons';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { useComponentText } from '../../hooks/use-component-text';
 import { nodeSelected } from '../../state/builder-actions';

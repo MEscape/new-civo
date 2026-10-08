@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 
-import { getTranslations } from 'next-intl/server';
 
 import { builderQueries, CreatePageForm, PageList, toPageSummaryDto } from '@modules/builder';
 
 import { Container, PageHeading, Section } from '@components/layout/layout-primitives';
 import { I18nProvider } from '@components/providers/i18n-provider';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildPrivateMetadata } from '@lib/seo';
 
@@ -23,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function BuilderPagesPage({ params }: RouteProps) {
     const { websiteId } = await params;
     const t = await getTranslations('builder');
-    const pages = orFail(await builderQueries.listPages.execute({ websiteId }));
+    const pages = await orFail(builderQueries.listPages.execute({ websiteId }));
 
     return (
         <Container className="max-w-4xl">

@@ -1,9 +1,9 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { findNode } from '../../../application/contracts/editor-model';
+import { useComponentText } from '../../hooks/use-component-text';
 import { useBuilderSelector } from '../../state/builder-hooks';
 import { selectChildren } from '../../state/builder-selectors';
-import { useComponentText } from '../../hooks/use-component-text';
 
 import type { PageNodeId } from '../../../application/contracts/editor-model';
 import type { CanvasDnd } from '../../hooks/use-canvas-dnd';

@@ -274,8 +274,7 @@ export function createNodeFromBlueprint(
  */
 export function insertNode(
   nodes: readonly PageNode[],
-  newNode: PageNode,
-  placement: Placement,
+  { node: newNode, placement }: { readonly node: PageNode; readonly placement: Placement },
   policy: NestingPolicy
 ): AppResult<readonly PageNode[], NodeOperationError> {
   return resolveParent(nodes, placement.parentId).andThen(
@@ -314,7 +313,7 @@ export function insertNewComponent(input: {
   }
   return createNodeFromBlueprint(descriptor.blueprint, idSeed).andThen(
     (node): AppResult<InsertedComponent, NodeOperationError> =>
-      insertNode(nodes, node, placement, catalog).map((tree) => ({
+      insertNode(nodes, { node, placement }, catalog).map((tree) => ({
         tree,
         newNodeId: node.id,
       }))
@@ -362,8 +361,7 @@ export function updateNodeProps(
  */
 export function moveNode(
   nodes: readonly PageNode[],
-  nodeId: PageNodeId,
-  placement: Placement,
+  { nodeId, placement }: { readonly nodeId: PageNodeId; readonly placement: Placement },
   policy: NestingPolicy
 ): AppResult<readonly PageNode[], NodeOperationError> {
   return requireLocation(nodes, nodeId).andThen(

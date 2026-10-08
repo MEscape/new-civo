@@ -1,6 +1,7 @@
 import { cache } from 'react';
 
 import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { restoreStoredPageConfig } from '@modules/builder';
@@ -23,8 +24,8 @@ interface RouteProps {
  * and the page within one request.
  */
 const loadPublishedPage = cache(async (siteSlug: string, path: string) => {
-    const website = orFail(await websiteQueries.getPublicWebsiteBySlug.execute(siteSlug));
-    const snapshot = orFail(await releaseQueries.getPublishedSnapshot.execute(website.id));
+    const website = await orFail(websiteQueries.getPublicWebsiteBySlug.execute(siteSlug));
+    const snapshot = await orFail(releaseQueries.getPublishedSnapshot.execute(website.id));
 
     const page = snapshot.pages.find((candidate) => candidate.path === path);
     if (page === undefined) {
@@ -33,7 +34,7 @@ const loadPublishedPage = cache(async (siteSlug: string, path: string) => {
 
     // The builder is the only module that knows what a valid tree is. A snapshot it
     // cannot read is a fault of ours (corrupted storage), never of the visitor.
-    const config = orFail(restoreStoredPageConfig(page.config));
+    const config = await orFail(restoreStoredPageConfig(page.config));
 
     return { snapshot, page, config };
 });

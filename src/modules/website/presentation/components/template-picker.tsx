@@ -2,11 +2,12 @@
 
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
 import { useController } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { Card, CardContent } from '@components/ui/card';
+
+import { useTranslations } from '@i18n/client';
 
 import { TEMPLATE_KEYS } from '../../application/contracts/website-constraints';
 import { TEMPLATE_MESSAGE_KEYS, MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';

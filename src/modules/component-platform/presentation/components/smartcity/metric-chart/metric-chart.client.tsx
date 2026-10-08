@@ -12,11 +12,7 @@ import {
 
 import { useAppFormatters } from '@i18n/client';
 
-import {
-  AXIS_FONT_SIZE,
-  CHART_COLORS,
-  TOOLTIP_STYLE,
-} from '../support/chart-theme';
+import { AXIS_FONT_SIZE, BAR_RADIUS, CHART_COLORS, TOOLTIP_STYLE } from '../support/chart-theme';
 
 export interface MetricChartDatum {
   readonly label: string;
@@ -73,7 +69,7 @@ export function MetricChartClient({
           <Bar
             dataKey="value"
             fill={CHART_COLORS.primary}
-            radius={[4, 4, 0, 0]}
+            radius={BAR_RADIUS}
           />
         </BarChart>
       </ResponsiveContainer>

@@ -239,6 +239,7 @@ export function EmptyState({
  */
 export function SectionHeading({
   className,
+  children,
   ...props
 }: HTMLAttributes<HTMLHeadingElement>) {
   return (
@@ -248,7 +249,9 @@ export function SectionHeading({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </h2>
   );
 }
 

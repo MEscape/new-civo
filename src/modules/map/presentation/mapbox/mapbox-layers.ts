@@ -1,3 +1,5 @@
+import { parseHexColor } from '@lib/utils';
+
 import { PALETTE_SIZE } from '../../application/contracts/map-constraints';
 
 import type { LayerStyle, PointStyle } from '../../application/contracts/map-constraints';
@@ -95,51 +97,52 @@ function radiusExpression(style: LayerStyle): number | ExpressionSpecification {
   ];
 }
 
+/** The lightest feature still weighs this much, so a small value never vanishes from the heatmap. */
+const HEATMAP_MIN_WEIGHT = 0.2;
+const HEATMAP_LOW_DENSITY = 0.2;
+const HEATMAP_LOW_ALPHA = 0.6;
+const HEATMAP_MAX_OPACITY = 0.9;
+const CIRCLE_STROKE_WIDTH = 1.5;
+const MARKER_STROKE_WIDTH = 2;
+
 function heatmapWeight(style: LayerStyle): number | ExpressionSpecification {
   if (style.size.kind === 'fixed') {
     return 1;
   }
   const { field, min, max } = style.size;
-  return ['interpolate', ['linear'], numberOf(field, min), min, 0.2, max, 1];
+  return ['interpolate', ['linear'], numberOf(field, min), min, HEATMAP_MIN_WEIGHT, max, 1];
 }
-
-const HEX_RADIX = 16;
 
 /** The same colour with transparency, for the low end of a density ramp. Written as an expression, not a CSS string. */
 export function withAlpha(hex: string, alpha: number): string | ExpressionSpecification {
-  const match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
-  if (match === null) {
-    return hex;
-  }
-  const [red, green, blue] = [match[1], match[2], match[3]].map((channel) =>
-    parseInt(channel ?? '0', HEX_RADIX),
-  );
-  return ['rgba', red ?? 0, green ?? 0, blue ?? 0, alpha];
+  const color = parseHexColor(hex);
+  return color === null ? hex : ['rgba', color.red, color.green, color.blue, alpha];
 }
 
-interface SourceRef {
+/** One dataset's layers: their id prefix, their source, how they look and this map's resolved colours. */
+interface LayerInput {
+  readonly id: string;
   readonly source: string;
+  readonly style: LayerStyle;
+  readonly palette: ResolvedPalette;
 }
 
 function areaLayers(
-  id: string,
-  ref: SourceRef,
-  style: LayerStyle,
-  palette: ResolvedPalette,
+  { id, source, style, palette }: LayerInput,
 ): LayerSpecification[] {
   const color = colorExpression(style, palette);
   return [
     {
       id: `${id}-area`,
       type: 'fill',
-      source: ref.source,
+      source,
       filter: isGeometry(AREA_TYPES),
       paint: { 'fill-color': color, 'fill-opacity': AREA_OPACITY },
     },
     {
       id: `${id}-area-outline`,
       type: 'line',
-      source: ref.source,
+      source,
       filter: isGeometry(AREA_TYPES),
       paint: { 'line-color': color, 'line-width': 1.5, 'line-opacity': 0.9 },
     },
@@ -147,16 +150,13 @@ function areaLayers(
 }
 
 function lineLayers(
-  id: string,
-  ref: SourceRef,
-  style: LayerStyle,
-  palette: ResolvedPalette,
+  { id, source, style, palette }: LayerInput,
 ): LayerSpecification[] {
   return [
     {
       id: `${id}-line`,
       type: 'line',
-      source: ref.source,
+      source,
       filter: isGeometry(LINE_TYPES),
       layout: { 'line-cap': 'round', 'line-join': 'round' },
       paint: { 'line-color': colorExpression(style, palette), 'line-width': LINE_WIDTH },
@@ -165,43 +165,37 @@ function lineLayers(
 }
 
 function dotLayer(
-  id: string,
-  ref: SourceRef,
-  style: LayerStyle,
-  palette: ResolvedPalette,
+  { id, source, style, palette }: LayerInput,
   filter: ExpressionSpecification,
 ): LayerSpecification {
   const isCircles = style.pointStyle === 'circles';
   return {
     id,
     type: 'circle',
-    source: ref.source,
+    source,
     filter,
     paint: {
       'circle-color': colorExpression(style, palette),
       'circle-radius': radiusExpression(style),
       'circle-opacity': isCircles ? CIRCLE_OPACITY : 1,
       'circle-stroke-color': palette.outline,
-      'circle-stroke-width': isCircles ? 1.5 : 2,
+      'circle-stroke-width': isCircles ? CIRCLE_STROKE_WIDTH : MARKER_STROKE_WIDTH,
     },
   };
 }
 
 function pointLayers(
-  id: string,
-  ref: SourceRef,
-  style: LayerStyle,
-  palette: ResolvedPalette,
+  { id, source, style, palette }: LayerInput,
 ): LayerSpecification[] {
   const points = isGeometry(POINT_TYPES);
   const byStyle: Record<PointStyle, () => LayerSpecification[]> = {
-    markers: () => [dotLayer(`${id}-point`, ref, style, palette, points)],
-    circles: () => [dotLayer(`${id}-point`, ref, style, palette, points)],
+    markers: () => [dotLayer({ id: `${id}-point`, source, style, palette }, points)],
+    circles: () => [dotLayer({ id: `${id}-point`, source, style, palette }, points)],
     clusters: () => [
       {
         id: `${id}-cluster`,
         type: 'circle',
-        source: ref.source,
+        source,
         filter: ['has', 'point_count'],
         paint: {
           'circle-color': palette.series[0] ?? palette.other,
@@ -221,7 +215,7 @@ function pointLayers(
       {
         id: `${id}-cluster-count`,
         type: 'symbol',
-        source: ref.source,
+        source,
         filter: ['has', 'point_count'],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
@@ -231,13 +225,13 @@ function pointLayers(
         },
         paint: { 'text-color': palette.onCluster },
       },
-      dotLayer(`${id}-point`, ref, style, palette, ['all', points, ['!', ['has', 'point_count']]]),
+      dotLayer({ id: `${id}-point`, source, style, palette }, ['all', points, ['!', ['has', 'point_count']]]),
     ],
     heatmap: () => [
       {
         id: `${id}-heat`,
         type: 'heatmap',
-        source: ref.source,
+        source,
         filter: points,
         paint: {
           'heatmap-weight': heatmapWeight(style),
@@ -256,8 +250,8 @@ function pointLayers(
             ['heatmap-density'],
             0,
             TRANSPARENT,
-            0.2,
-            withAlpha(palette.rangeLow, 0.6),
+            HEATMAP_LOW_DENSITY,
+            withAlpha(palette.rangeLow, HEATMAP_LOW_ALPHA),
             1,
             palette.rangeHigh,
           ],
@@ -266,7 +260,7 @@ function pointLayers(
             ['linear'],
             ['zoom'],
             HEATMAP_FADE.from,
-            0.9,
+            HEATMAP_MAX_OPACITY,
             HEATMAP_FADE.to,
             0,
           ],
@@ -274,7 +268,7 @@ function pointLayers(
       },
       // Dense areas become unreadable blobs when zoomed in; individual locations take over there.
       {
-        ...dotLayer(`${id}-point`, ref, style, palette, points),
+        ...dotLayer({ id: `${id}-point`, source, style, palette }, points),
         minzoom: HEATMAP_FADE.from,
       } as LayerSpecification,
     ],
@@ -293,30 +287,28 @@ export interface LayerGroups {
 }
 
 function highlightLayers(
-  id: string,
-  ref: SourceRef,
-  palette: ResolvedPalette,
+  { id, source, palette }: LayerInput,
 ): LayerSpecification[] {
   const none: ExpressionSpecification = ['==', ['get', KEY_PROPERTY], ''];
   return [
     {
       id: `${id}-hl-area`,
       type: 'line',
-      source: ref.source,
+      source,
       filter: ['all', isGeometry(AREA_TYPES), none],
       paint: { 'line-color': palette.highlight, 'line-width': 4 },
     },
     {
       id: `${id}-hl-line`,
       type: 'line',
-      source: ref.source,
+      source,
       filter: ['all', isGeometry(LINE_TYPES), none],
       paint: { 'line-color': palette.highlight, 'line-width': LINE_WIDTH * 2, 'line-opacity': 0.6 },
     },
     {
       id: `${id}-hl-point`,
       type: 'circle',
-      source: ref.source,
+      source,
       filter: ['all', isGeometry(POINT_TYPES), none],
       paint: {
         'circle-color': TRANSPARENT,
@@ -340,17 +332,22 @@ export function highlightFilters(
 }
 
 /** The Mapbox layers one `LayerStyle` needs. The only place style decisions become Mapbox syntax. */
-export function buildLayerGroups(
-  layerId: string,
-  sourceId: string,
-  style: LayerStyle,
-  palette: ResolvedPalette,
-): LayerGroups {
-  const ref: SourceRef = { source: sourceId };
-  const areas = areaLayers(layerId, ref, style, palette);
-  const lines = lineLayers(layerId, ref, style, palette);
-  const points = pointLayers(layerId, ref, style, palette);
-  const highlights = highlightLayers(layerId, ref, palette);
+export function buildLayerGroups({
+  layerId,
+  sourceId,
+  style,
+  palette,
+}: {
+  readonly layerId: string;
+  readonly sourceId: string;
+  readonly style: LayerStyle;
+  readonly palette: ResolvedPalette;
+}): LayerGroups {
+  const input: LayerInput = { id: layerId, source: sourceId, style, palette };
+  const areas = areaLayers(input);
+  const lines = lineLayers(input);
+  const points = pointLayers(input);
+  const highlights = highlightLayers(input);
 
   return {
     areas,

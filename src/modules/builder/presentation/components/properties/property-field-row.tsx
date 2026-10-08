@@ -4,8 +4,8 @@ import { Label } from '@components/ui/input';
 
 import type { JsonValue } from '@lib/utils';
 
-import { propsEditFinished } from '../../state/builder-actions';
 import { useComponentText } from '../../hooks/use-component-text';
+import { propsEditFinished } from '../../state/builder-actions';
 import { useBuilderDispatch } from '../../state/builder-hooks';
 import { editNodeProps } from '../../state/props-thunks';
 

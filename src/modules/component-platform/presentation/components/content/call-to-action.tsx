@@ -1,5 +1,6 @@
 import { Container, Section } from '@components/layout/layout-primitives';
 import { buttonVariants } from '@components/ui/button';
+import { ContentLink } from '@components/ui/content-link';
 
 import { getTranslations } from '@i18n/server';
 
@@ -33,12 +34,12 @@ export async function CallToAction({ props }: CallToActionComponentProps) {
                 <p className="mt-2 max-w-lg text-primary-foreground/80">{body}</p>
               )}
             </div>
-            <a
+            <ContentLink
               href={href}
               className={cn(buttonVariants({ variant: 'accent', size: 'lg' }), 'shrink-0')}
             >
               {buttonLabel}
-            </a>
+            </ContentLink>
           </div>
         </div>
       </Container>

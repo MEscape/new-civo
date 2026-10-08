@@ -3,13 +3,14 @@
 import { useId, useState, useTransition } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { TextField } from '@components/shared/text-field';
 import { Button } from '@components/ui/button';
 import { Card } from '@components/ui/card';
+
+import { useTranslations } from '@i18n/client';
 
 import { applyActionError } from '@lib/actions';
 
@@ -31,6 +32,9 @@ const LINK_LIFETIME_MINUTES = AUTH_LINK_LIFETIME_SECONDS / SECONDS_PER_MINUTE;
 
 export function SignUpForm() {
     const t = useTranslations('auth');
+    /** A field's error code as text in this module's language; `undefined` while the field is valid. */
+    const errorText = (code: string | undefined) =>
+      code === undefined ? undefined : t(messageKeyForCode(code), MESSAGE_PARAMS);
 
     const id = useId();
     const [isPending, startTransition] = useTransition();
@@ -77,7 +81,7 @@ export function SignUpForm() {
                 id={`${id}-name`}
                 label={t('signUp.name')}
                 autoComplete="name"
-                error={errors.name?.message ? t(messageKeyForCode(errors.name.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.name?.message)}
                 {...form.register('name')}
             />
             <TextField
@@ -86,7 +90,7 @@ export function SignUpForm() {
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                error={errors.email?.message ? t(messageKeyForCode(errors.email.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.email?.message)}
                 {...form.register('email')}
             />
             <TextField
@@ -95,7 +99,7 @@ export function SignUpForm() {
                 hint={t('signUp.passwordHint', MESSAGE_PARAMS)}
                 type="password"
                 autoComplete="new-password"
-                error={errors.password?.message ? t(messageKeyForCode(errors.password.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.password?.message)}
                 {...form.register('password')}
             />
             <TextField
@@ -103,7 +107,7 @@ export function SignUpForm() {
                 label={t('signUp.confirmPassword')}
                 type="password"
                 autoComplete="new-password"
-                error={errors.confirmPassword?.message ? t(messageKeyForCode(errors.confirmPassword.message), MESSAGE_PARAMS) : undefined}
+                error={errorText(errors.confirmPassword?.message)}
                 {...form.register('confirmPassword')}
             />
 

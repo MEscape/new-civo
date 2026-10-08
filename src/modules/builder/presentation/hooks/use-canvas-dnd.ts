@@ -4,7 +4,6 @@ import type { RefObject } from 'react';
 import { hasCapability } from '../../application/contracts/editor-model';
 import { useBuilderSession } from '../components/builder-session-context';
 import { createCanvasDragController } from '../dnd/canvas-drag-controller';
-import { useComponentText } from './use-component-text';
 import {
   useBuilderDispatch,
   useBuilderSelector,
@@ -12,6 +11,8 @@ import {
 } from '../state/builder-hooks';
 import { selectMode } from '../state/builder-selectors';
 import { applyDrop } from '../state/editing-thunks';
+
+import { useComponentText } from './use-component-text';
 
 import type { PageNodeId } from '../../application/contracts/editor-model';
 import type { DragState, KeyEventLike } from '../dnd/canvas-drag-controller';

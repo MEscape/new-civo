@@ -22,6 +22,7 @@ export const FRAMEWORK_FILES = [
   'src/app/**/layout.tsx',
   'src/app/**/loading.tsx',
   'src/app/**/error.tsx',
+  'src/app/global-error.tsx',
   'src/app/**/not-found.tsx',
   'src/app/**/route.ts',
   'src/app/**/proxy.ts',

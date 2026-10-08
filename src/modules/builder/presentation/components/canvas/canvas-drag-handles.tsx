@@ -1,6 +1,7 @@
-import { useTranslations } from 'next-intl';
-
 import { GripVertical } from '@components/ui/icons';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { flattenNodes } from '../../../application/contracts/editor-model';
 import { useComponentText } from '../../hooks/use-component-text';

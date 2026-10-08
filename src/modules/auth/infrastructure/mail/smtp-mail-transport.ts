@@ -61,14 +61,15 @@ export class SmtpMailTransport implements MailTransport {
      */
     send(mail: OutboundMail): AppResultAsync<void, InfrastructureAppError> {
         return fromThrowableAsync(
-            async () =>
-                this.transporter.sendMail({
+            async () => {
+                await this.transporter.sendMail({
                     from: this.from,
                     to: mail.to,
                     subject: mail.subject,
                     text: mail.text,
                     html: mail.html,
-                }),
+                });
+            },
             mailDeliveryFailed
         ).andThen(() => okAsync(undefined));
     }

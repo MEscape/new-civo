@@ -8,7 +8,6 @@ import { Input, Label } from '@components/ui/input';
 import { useTranslations } from '@i18n/client';
 
 import { countActiveFilters } from '../../application/contracts/map-constraints';
-
 import { useAttributeFormat } from '../hooks/use-attribute-format';
 import { useFieldLabel } from '../hooks/use-field-label';
 

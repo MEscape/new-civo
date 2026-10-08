@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 import { useCanvasRender } from '../../hooks/use-canvas-render';
 import { useBuilderSelector } from '../../state/builder-hooks';

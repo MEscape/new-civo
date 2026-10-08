@@ -1,20 +1,23 @@
+import { z } from 'zod';
+
 import { instantToDate } from '@lib/db';
 import type { InstantRecord } from '@lib/db';
 import type { UnexpectedAppError } from '@lib/errors';
 import { err, ok } from '@lib/result';
 import type { AppResult } from '@lib/result';
-import { literalGuard } from '@lib/utils';
+import { isJsonRecord, literalGuard } from '@lib/utils';
+import type { JsonValue } from '@lib/utils';
 
 import { releaseSnapshotCorrupted } from '../../domain/errors/release-errors';
 import { toReleaseId, toWebsiteId } from '../../domain/models/ids';
+import { RELEASE_SNAPSHOT_SCHEMA_VERSION } from '../../domain/models/release-snapshot';
 
-import type { StoredReleaseSnapshot } from '../../application/contracts/stored-snapshot';
 import type {
   Release,
   ReleaseStatus,
   ReleaseSummary,
 } from '../../domain/models/release';
-import type { ReleaseSnapshot } from '../../domain/models/release-snapshot';
+import type { ReleaseComponentDependency, ReleaseSnapshot } from '../../domain/models/release-snapshot';
 
 
 /**
@@ -33,6 +36,50 @@ export interface ReleaseSummaryRecord {
 
 export interface ReleaseRecord extends ReleaseSummaryRecord {
   readonly snapshot: unknown;
+}
+
+const pageConfigSchema = z.custom<Readonly<Record<string, JsonValue>>>((value) => isJsonRecord(value));
+
+const dependencySchema = z.object({
+  type: z.string(),
+  version: z.number().int(),
+  contracts: z.array(z.object({ contract: z.string(), minVersion: z.number().int() })),
+});
+
+/**
+ * The flat shape written to the snapshot JSON column. Stored JSON is
+ * external data to this build (an older or damaged row), so it is parsed,
+ * never cast, before any of it reaches the domain.
+ */
+const storedReleaseSnapshotSchema = z.object({
+  schemaVersion: z.literal(RELEASE_SNAPSHOT_SCHEMA_VERSION),
+  website: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    description: z.string().nullable(),
+  }),
+  theme: z.object({
+    primaryColor: z.string(),
+    secondaryColor: z.string(),
+    accentColor: z.string(),
+    headingFont: z.string(),
+    bodyFont: z.string(),
+    radius: z.string(),
+    spacingScale: z.string(),
+  }),
+  pages: z.array(z.object({ path: z.string(), title: z.string(), config: pageConfigSchema })),
+  dependencies: z.array(dependencySchema),
+});
+
+export type StoredReleaseSnapshot = z.infer<typeof storedReleaseSnapshotSchema>;
+
+/** Only the dependency records of a stored snapshot; a snapshot without valid ones has none worth reporting. */
+const storedDependenciesSchema = z.object({ dependencies: z.array(dependencySchema) });
+
+export function toStoredDependencies(snapshot: unknown): readonly ReleaseComponentDependency[] | null {
+  const parsed = storedDependenciesSchema.safeParse(snapshot);
+  return parsed.success ? parsed.data.dependencies : null;
 }
 
 /** Select only what the use cases need (persistence.md): history never loads snapshots. */
@@ -88,7 +135,7 @@ export function toReleaseSummary(record: ReleaseSummaryRecord): ReleaseSummary {
 
 function toSnapshot(stored: StoredReleaseSnapshot): ReleaseSnapshot {
   return {
-    schemaVersion: 1,
+    schemaVersion: stored.schemaVersion,
     website: {
       id: toWebsiteId(stored.website.id),
       name: stored.website.name,
@@ -145,10 +192,8 @@ export function toStoredSnapshot(
 export function toRelease(
   record: ReleaseRecord
 ): AppResult<Release, UnexpectedAppError> {
-  try {
-    const data = record.snapshot as StoredReleaseSnapshot;
-    return ok({ ...toReleaseSummary(record), snapshot: toSnapshot(data) });
-  } catch (error) {
-    return err(releaseSnapshotCorrupted(error));
-  }
+  const parsed = storedReleaseSnapshotSchema.safeParse(record.snapshot);
+  return parsed.success
+    ? ok({ ...toReleaseSummary(record), snapshot: toSnapshot(parsed.data) })
+    : err(releaseSnapshotCorrupted(parsed.error));
 }

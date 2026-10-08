@@ -1,8 +1,9 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
 import { Badge } from '@components/ui/badge';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { STATUS_MESSAGE_KEYS } from '../messages/message-keys';
 

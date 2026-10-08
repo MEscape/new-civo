@@ -63,12 +63,12 @@
       "targetField": "Zielfeld",
       "targetFieldFor": "Zielfeld für {field}",
       "unassigned": "Nicht zugeordnet",
-      "alreadyAssigned": "(bereits zugeordnet)",
       "preview": "Vorschau",
       "save": "Mapping speichern",
       "saving": "Speichert…",
       "saved": "Mapping gespeichert.",
-      "previewTitle": "Vorschau des zugeordneten Datensatzes"
+      "previewTitle": "Vorschau des zugeordneten Datensatzes",
+      "targetOption": "{label}{required, select, yes { *} other {}}{taken, select, yes { (bereits zugeordnet)} other {}}"
     },
     "kinds": {
       "REST": "REST / JSON",

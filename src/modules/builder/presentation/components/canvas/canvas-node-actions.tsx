@@ -1,6 +1,7 @@
-import { useTranslations } from 'next-intl';
-
 import { ChevronDown, ChevronUp, Copy, Trash2 } from '@components/ui/icons';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { useBuilderDispatch } from '../../state/builder-hooks';
 import {

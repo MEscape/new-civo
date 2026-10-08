@@ -2,22 +2,23 @@
 
 import { useId, useState, useTransition } from 'react';
 
-import { useTranslations } from 'next-intl';
 
 import { FieldMessage } from '@components/shared/field-message';
 import { Button } from '@components/ui/button';
 import { Spinner } from '@components/ui/icons';
 
+import { useTranslations } from '@i18n/client';
+
 import { applyMigrationAction } from '../actions/apply-migration-action';
 import { messageKeyForError } from '../messages/message-keys';
-
-import { NodeMigrationItem } from './node-migration-item';
-import { PagePathLabel } from './page-path-label';
 import {
   countUnresolvedNodes,
   hasInvalidChoice,
   toResolutionsInput,
 } from '../resolutions/resolution-choices';
+
+import { NodeMigrationItem } from './node-migration-item';
+import { PagePathLabel } from './page-path-label';
 
 import type { MigrationPlanDto } from '../dto/migration-plan-dto';
 import type { ApplyMigrationResultDto } from '../dto/migration-result-dto';

@@ -212,7 +212,7 @@ export const prop = {
     max: number,
     meta?: PropMeta & { readonly multiline?: ReadonlyArray<keyof S & string> }
   ): PropField<ReadonlyArray<Infer<S>>> {
-    const multiline: ReadonlyArray<string> = meta?.multiline ?? [];
+    const multiline: readonly string[] = meta?.multiline ?? [];
     return propField({
       control: 'items',
       schema: list(object(shape), max),

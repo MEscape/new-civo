@@ -2,9 +2,10 @@ import { useRef } from 'react';
 
 import { createPortal } from 'react-dom';
 
-import { useTranslations } from 'next-intl';
-
 import { useScaledHeight } from '@hooks/use-scaled-height';
+
+import { useTranslations } from '@i18n/client';
+
 
 import { useComponentPreview } from '../../hooks/use-component-preview';
 import { useComponentText } from '../../hooks/use-component-text';

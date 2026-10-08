@@ -2,12 +2,13 @@
 
 import { useId, useState, useTransition } from "react";
 
-import { useRouter } from "next/navigation";
-
-import { useTranslations } from "next-intl";
-
 import { FieldMessage } from "@components/shared/field-message";
 import { Button } from "@components/ui/button";
+
+import { useRouter } from "@i18n";
+
+import { useTranslations } from "@i18n/client";
+
 
 import type { SerializedActionError } from "@lib/result";
 import { omit } from "@lib/utils";

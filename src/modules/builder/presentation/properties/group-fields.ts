@@ -1,5 +1,4 @@
 import { PROP_GROUPS } from '@modules/component-platform/client';
-
 import type { PropGroup } from '@modules/component-platform/client';
 
 import type { PropFieldDescriptor } from '../../application/contracts/builder-constraints';

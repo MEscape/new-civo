@@ -14,14 +14,13 @@ import { trimToNull } from '@lib/utils';
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
 
-import type { WASTE_TYPES } from '../../../../application/contracts/component-platform-constraints';
-import type {
+import type { WASTE_TYPES ,
   ComponentProps,
   RenderContext,
 } from '../../../../application/contracts/component-platform-constraints';
 import type { LoadContent } from '../../page-renderer/load-content';
 
-type WasteType = (typeof WASTE_TYPES)[number];
+type WasteKind = (typeof WASTE_TYPES)[number];
 
 const BADGE_VARIANTS = {
   restmuell: 'muted',
@@ -29,7 +28,7 @@ const BADGE_VARIANTS = {
   papier: 'muted',
   gelberSack: 'warning',
   sperrmuell: 'warning',
-} as const satisfies Record<WasteType, 'default' | 'muted' | 'warning'>;
+} as const satisfies Record<WasteKind, 'default' | 'muted' | 'warning'>;
 
 const DATE_FORMAT = {
   weekday: 'short',

@@ -1,16 +1,16 @@
 import type { AppResultAsync } from '@lib/result';
 
 import { createDatasetMapping } from '../../domain/mapping/dataset-mapping';
-import { dryRunMapping } from '../dry-run-mapping';
 import { loadAuthorizedDataset } from '../load-authorized-dataset';
+import { dryRunMapping } from '../services/dry-run-mapping';
 
 import type {
     MappingPreviewView,
     PreviewDatasetMappingInput,
 } from '../contracts/data-source-views';
 import type { ConnectedDataSourceDependencies } from '../data-source-dependencies';
-import type { DryRunError } from '../dry-run-mapping';
 import type { LoadDatasetError } from '../load-authorized-dataset';
+import type { DryRunError } from '../services/dry-run-mapping';
 
 /** Applies a candidate mapping to one live record without saving it. */
 export class PreviewDatasetMapping {

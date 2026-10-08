@@ -28,7 +28,11 @@ export interface SavedRevisionDto {
 
 export function toPageSummaryDto(view: PageSummaryView): PageSummaryDto {
   return {
-    ...view,
+    id: view.id,
+    websiteId: view.websiteId,
+    path: view.path,
+    title: view.title,
+    version: view.version,
     createdAt: view.createdAt.toISOString(),
     updatedAt: view.updatedAt.toISOString(),
   };

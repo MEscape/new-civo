@@ -63,12 +63,12 @@
       "targetField": "Target field",
       "targetFieldFor": "Target field for {field}",
       "unassigned": "Not assigned",
-      "alreadyAssigned": "(already assigned)",
       "preview": "Preview",
       "save": "Save mapping",
       "saving": "Saving…",
       "saved": "Mapping saved.",
-      "previewTitle": "Preview of the mapped record"
+      "previewTitle": "Preview of the mapped record",
+      "targetOption": "{label}{required, select, yes { *} other {}}{taken, select, yes { (already assigned)} other {}}"
     },
     "kinds": {
       "REST": "REST / JSON",

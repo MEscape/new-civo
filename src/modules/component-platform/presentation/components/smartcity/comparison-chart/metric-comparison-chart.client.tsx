@@ -11,12 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import {
-  AXIS_FONT_SIZE,
-  CHART_COLORS,
-  CHART_SERIES_COLORS,
-  TOOLTIP_STYLE,
-} from '../support/chart-theme';
+import { AXIS_FONT_SIZE, BAR_RADIUS, CHART_COLORS, CHART_SERIES_COLORS, TOOLTIP_STYLE } from '../support/chart-theme';
 
 export interface ComparisonDatum {
   readonly label: string;
@@ -61,13 +56,13 @@ export function MetricComparisonChartClient({ data, labels }: MetricComparisonCh
             dataKey="value"
             name={labels.actual}
             fill={CHART_SERIES_COLORS[0]}
-            radius={[4, 4, 0, 0]}
+            radius={BAR_RADIUS}
           />
           <Bar
             dataKey="target"
             name={labels.target}
             fill={CHART_SERIES_COLORS[1]}
-            radius={[4, 4, 0, 0]}
+            radius={BAR_RADIUS}
           />
         </BarChart>
       </ResponsiveContainer>

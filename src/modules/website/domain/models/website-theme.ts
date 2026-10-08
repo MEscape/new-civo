@@ -103,12 +103,17 @@ export const isBodyFontFamily = literalGuard(BODY_FONT_FAMILIES);
 export const isThemeRadius = literalGuard(THEME_RADII);
 export const isThemeSpacingScale = literalGuard(THEME_SPACING_SCALES);
 
+/** Where a rejected value is reported. */
+interface Rejection {
+  readonly path: string;
+  readonly code: string;
+  readonly bag: FieldErrorBag;
+}
+
 function narrow<T extends string>(
   value: string,
   guard: (candidate: string) => candidate is T,
-  path: string,
-  code: string,
-  bag: FieldErrorBag
+  { path, code, bag }: Rejection
 ): T | null {
   if (guard(value)) {return value;}
   bag.add(path, code);
@@ -137,34 +142,26 @@ export function createWebsiteTheme(
   const primary = checkColor(input.colors.primary, fieldPath('colors', 'primary'), bag);
   const secondary = checkColor(input.colors.secondary, fieldPath('colors', 'secondary'), bag);
   const accent = checkColor(input.colors.accent, fieldPath('colors', 'accent'), bag);
-  const headingFont = narrow(
-    input.typography.headingFont,
-    isThemeFontFamily,
-    fieldPath('typography', 'headingFont'),
-    CODES.fontUnsupported,
-    bag
-  );
-  const bodyFont = narrow(
-    input.typography.bodyFont,
-    isBodyFontFamily,
-    fieldPath('typography', 'bodyFont'),
-    CODES.fontUnsupported,
-    bag
-  );
-  const radius = narrow(
-    input.radius,
-    isThemeRadius,
-    'radius',
-    CODES.radiusUnsupported,
-    bag
-  );
-  const spacingScale = narrow(
-    input.spacingScale,
-    isThemeSpacingScale,
-    'spacingScale',
-    CODES.spacingUnsupported,
-    bag
-  );
+  const headingFont = narrow(input.typography.headingFont, isThemeFontFamily, {
+    path: fieldPath('typography', 'headingFont'),
+    code: CODES.fontUnsupported,
+    bag,
+  });
+  const bodyFont = narrow(input.typography.bodyFont, isBodyFontFamily, {
+    path: fieldPath('typography', 'bodyFont'),
+    code: CODES.fontUnsupported,
+    bag,
+  });
+  const radius = narrow(input.radius, isThemeRadius, {
+    path: 'radius',
+    code: CODES.radiusUnsupported,
+    bag,
+  });
+  const spacingScale = narrow(input.spacingScale, isThemeSpacingScale, {
+    path: 'spacingScale',
+    code: CODES.spacingUnsupported,
+    bag,
+  });
 
   if (
     bag.hasErrors ||
@@ -208,29 +205,18 @@ export function restoreWebsiteTheme(
   stored: StoredWebsiteTheme | null | undefined
 ): WebsiteTheme {
   const fallback = DEFAULT_WEBSITE_THEME;
+  const { colors = {}, typography = {}, radius, spacingScale } = stored ?? {};
   return {
     colors: {
-      primary: colorOr(stored?.colors?.primary, fallback.colors.primary),
-      secondary: colorOr(stored?.colors?.secondary, fallback.colors.secondary),
-      accent: colorOr(stored?.colors?.accent, fallback.colors.accent),
+      primary: colorOr(colors.primary, fallback.colors.primary),
+      secondary: colorOr(colors.secondary, fallback.colors.secondary),
+      accent: colorOr(colors.accent, fallback.colors.accent),
     },
     typography: {
-      headingFont: valueOr(
-        stored?.typography?.headingFont,
-        isThemeFontFamily,
-        fallback.typography.headingFont
-      ),
-      bodyFont: valueOr(
-        stored?.typography?.bodyFont,
-        isBodyFontFamily,
-        fallback.typography.bodyFont
-      ),
+      headingFont: valueOr(typography.headingFont, isThemeFontFamily, fallback.typography.headingFont),
+      bodyFont: valueOr(typography.bodyFont, isBodyFontFamily, fallback.typography.bodyFont),
     },
-    radius: valueOr(stored?.radius, isThemeRadius, fallback.radius),
-    spacingScale: valueOr(
-      stored?.spacingScale,
-      isThemeSpacingScale,
-      fallback.spacingScale
-    ),
+    radius: valueOr(radius, isThemeRadius, fallback.radius),
+    spacingScale: valueOr(spacingScale, isThemeSpacingScale, fallback.spacingScale),
   };
 }

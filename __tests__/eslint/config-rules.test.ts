@@ -113,6 +113,34 @@ describe('configuration hygiene and layer-specific syntax', () => {
   });
 });
 
+describe('translation and formatting rules', () => {
+  it('rejects literal text in JSX but allows translated text and language-neutral symbols', async () => {
+    const out = await lintFiles({
+      [COMPONENT]: `import { useTranslations } from '@i18n/client';
+export const A = () => <p>Hello</p>;
+export const B = () => { const t = useTranslations('shop'); return <p>{t('title')}…</p>; };
+`,
+    });
+    expect(out[COMPONENT]!.filter((m) => m.startsWith('[react/jsx-no-literals]'))).toHaveLength(1);
+  });
+
+  it('rejects locale formatting outside the request-bound formatters', async () => {
+    const out = await lintFiles({
+      [COMPONENT]: "import { formatDate } from '@lib/utils';\nexport const f = (d: Date) => formatDate(d, 'en', 'UTC');\n",
+      'src/app/[locale]/page.tsx': "import { formatNumber } from '@lib/utils/number';\nexport const f = (n: number) => formatNumber(n, 'en');\n",
+    });
+    expect(out[COMPONENT]!.join('\n')).toMatch(/Format through getAppFormatters/);
+    expect(out['src/app/[locale]/page.tsx']!.join('\n')).toMatch(/Format through getAppFormatters/);
+  });
+
+  it('keeps the error message, stack and cause out of error boundaries', async () => {
+    const out = await lintFiles({
+      'src/app/[locale]/error.tsx': "'use client';\nexport default function E({ error }: { error: Error }) { return <p>{error.message}</p>; }\n",
+    });
+    expect(out['src/app/[locale]/error.tsx']!.join('\n')).toMatch(/never render the error message/);
+  });
+});
+
 describe('React, accessibility and Next.js rules', () => {
   it('rejects raw primitives where an approved component exists', async () => {
     const out = await lintFiles({ [COMPONENT]: "export const A = () => (<div><button type=\"button\">x</button><select /><a href=\"/x\">y</a></div>);\n" });
@@ -135,7 +163,7 @@ describe('React, accessibility and Next.js rules', () => {
   });
 
   it('lets the primitives themselves use raw elements', async () => {
-    const out = await lintFiles({ 'src/components/ui/button.tsx': "export const B = () => <button type=\"button\">x</button>;\n" });
+    const out = await lintFiles({ 'src/components/ui/button.tsx': "export const B = ({ label }: { label: string }) => <button type=\"button\">{label}</button>;\n" });
     expect(out['src/components/ui/button.tsx']).toEqual([]);
   });
 

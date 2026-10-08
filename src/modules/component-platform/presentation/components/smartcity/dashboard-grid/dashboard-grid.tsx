@@ -3,6 +3,7 @@ import { Card, CardContent } from '@components/ui/card';
 
 import { getTranslations } from '@i18n/server';
 
+import type { Result } from '@lib/result';
 import { trimToNull } from '@lib/utils';
 
 import {
@@ -31,28 +32,23 @@ export interface DashboardGridComponentProps {
   readonly loadContent: LoadContent;
 }
 
+type Series = NonNullable<ReturnType<typeof pickSeries>>;
+type Distribution = NonNullable<ReturnType<typeof pickDistribution>>;
+
 /**
- * KPI tiles, a trend chart and a distribution in one section. The tiles read
- * metrics, the trend measurements over time and the distribution its parts:
- * three shapes, three datasets. The trend and the distribution are optional
- * and are only loaded when the editor chose a dataset for them; with nothing
- * chosen at all, the editor canvas shows all three as labelled samples.
+ * The three datasets of a dashboard. The trend and the distribution are
+ * optional and only loaded when the editor chose a dataset for them; with
+ * nothing chosen at all, the editor canvas shows all three as samples.
  */
-export async function DashboardGrid({ props, context, loadContent }: DashboardGridComponentProps) {
+function loadDashboard({ props, context, loadContent }: DashboardGridComponentProps) {
   const isNothingBound = trimToNull(props.datasetId) === null;
   const wantsTrend = isNothingBound || trimToNull(props.trendDatasetId) !== null;
   const wantsDistribution = isNothingBound || trimToNull(props.breakdownDatasetId) !== null;
   const base = { mode: context.mode, websiteId: context.websiteId };
   const category = categoryFilter(props.category);
 
-  const [t, metrics, observations, parts] = await Promise.all([
-    getTranslations('componentPlatform'),
-    loadContent({
-      ...base,
-      kind: 'SmartCityMetric',
-      datasetId: props.datasetId,
-      category,
-    }),
+  return Promise.all([
+    loadContent({ ...base, kind: 'SmartCityMetric', datasetId: props.datasetId, category }),
     wantsTrend
       ? loadContent({
           ...base,
@@ -71,7 +67,59 @@ export async function DashboardGrid({ props, context, loadContent }: DashboardGr
         })
       : null,
   ]);
-  const heading = trimToNull(props.heading) ?? t('dashboardGrid.defaultHeading');
+}
+
+/** An optional panel's content, or `null` when it was not requested or failed to load. */
+function valueOrNull<T, E>(result: Result<T, E> | null): T | null {
+  return result?.isOk() ? result.value : null;
+}
+
+interface DashboardChartsProps {
+  readonly series: Series | null;
+  readonly distribution: Distribution | null;
+}
+
+async function DashboardCharts({ series, distribution }: DashboardChartsProps) {
+  if (series === null && distribution === null) {
+    return null;
+  }
+  const t = await getTranslations('componentPlatform');
+
+  return (
+    <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {series !== null && (
+        <Card>
+          <CardContent className="pt-5">
+            <p className="mb-3 text-sm font-medium text-copy">
+              {t('dashboardGrid.trendTitle', { label: series.name })}
+            </p>
+            <MetricTrendChartClient data={series.points} unit={series.unit} />
+          </CardContent>
+        </Card>
+      )}
+      {distribution !== null && (
+        <Card>
+          <CardContent className="pt-5">
+            <p className="mb-3 text-sm font-medium text-copy">
+              {distribution.group === undefined
+                ? t('dashboardGrid.distributionFallbackTitle')
+                : t('dashboardGrid.distributionTitle', { label: distribution.group })}
+            </p>
+            <MetricDonutChartClient data={distribution.parts} />
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+/** KPI tiles, a trend chart and a distribution in one section: three shapes, three datasets. */
+export async function DashboardGrid(input: DashboardGridComponentProps) {
+  const [t, [metrics, observations, parts]] = await Promise.all([
+    getTranslations('componentPlatform'),
+    loadDashboard(input),
+  ]);
+  const heading = trimToNull(input.props.heading) ?? t('dashboardGrid.defaultHeading');
 
   if (metrics.isErr()) {
     return <ContentState kind="error" heading={heading} />;
@@ -82,13 +130,11 @@ export async function DashboardGrid({ props, context, loadContent }: DashboardGr
   }
 
   // A failing optional panel is left out rather than taking the whole dashboard down.
-  const series = observations?.isOk() ? pickSeries(observations.value.items, null) : null;
-  const distribution = parts?.isOk() ? pickDistribution(parts.value.items, null) : null;
-  const sample: ContentOrigin | undefined = [
-    origin,
-    observations?.isOk() ? observations.value.origin : undefined,
-    parts?.isOk() ? parts.value.origin : undefined,
-  ].find((entry) => entry?.kind === 'sample');
+  const trend = valueOrNull(observations);
+  const breakdown = valueOrNull(parts);
+  const sample: ContentOrigin | undefined = [origin, trend?.origin, breakdown?.origin].find(
+    (entry) => entry?.kind === 'sample'
+  );
 
   return (
     <Section className="relative">
@@ -104,34 +150,10 @@ export async function DashboardGrid({ props, context, loadContent }: DashboardGr
           ))}
         </Grid>
 
-        {(series !== null || distribution !== null) && (
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-            {series !== null && (
-              <Card>
-                <CardContent className="pt-5">
-                  <p className="mb-3 text-sm font-medium text-copy">
-                    {t('dashboardGrid.trendTitle', { label: series.name })}
-                  </p>
-                  <MetricTrendChartClient data={series.points} unit={series.unit} />
-                </CardContent>
-              </Card>
-            )}
-            {distribution !== null && (
-              <Card>
-                <CardContent className="pt-5">
-                  <p className="mb-3 text-sm font-medium text-copy">
-                    {distribution.group === undefined
-                      ? t('dashboardGrid.distributionFallbackTitle')
-                      : t('dashboardGrid.distributionTitle', {
-                          label: distribution.group,
-                        })}
-                  </p>
-                  <MetricDonutChartClient data={distribution.parts} />
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
+        <DashboardCharts
+          series={trend === null ? null : pickSeries(trend.items, null)}
+          distribution={breakdown === null ? null : pickDistribution(breakdown.items, null)}
+        />
       </Container>
     </Section>
   );

@@ -19,7 +19,12 @@ export function toReleaseSummaryDto(
   view: ReleaseSummaryView
 ): ReleaseSummaryDto {
   return {
-    ...view,
+    id: view.id,
+    websiteId: view.websiteId,
+    releaseNumber: view.releaseNumber,
+    status: view.status,
+    isActive: view.isActive,
+    canRollback: view.canRollback,
     publishedAt: view.publishedAt?.toISOString() ?? null,
     createdAt: view.createdAt.toISOString(),
   };

@@ -2,13 +2,15 @@
 
 import { useState, useTransition } from "react";
 
-import { useRouter } from "next/navigation";
 
-import { useTranslations } from "next-intl";
 
+import { EmptyState } from "@components/layout/layout-primitives";
 import { FieldMessage } from "@components/shared/field-message";
 import { Button } from "@components/ui/button";
-import { EmptyState } from "@components/layout/layout-primitives";
+
+import { useRouter } from "@i18n";
+
+import { useTranslations } from "@i18n/client";
 
 import { deleteDatasetAction } from "../actions/delete-dataset-action";
 import {

@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 
-import { getTranslations } from 'next-intl/server';
 
 import { MigrationPanel, releaseQueries } from '@modules/release';
 import { toMigrationHistoryDto } from '@modules/release/client';
 
-import { I18nProvider } from '@components/providers/i18n-provider';
 import { Container, PageHeading, Section } from '@components/layout/layout-primitives';
+import { I18nProvider } from '@components/providers/i18n-provider';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildPrivateMetadata } from '@lib/seo';
 
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MigrationsPage({ params }: RouteProps) {
     const { websiteId } = await params;
     const t = await getTranslations('release');
-    const migrations = orFail(await releaseQueries.listMigrations.execute(websiteId));
+    const migrations = await orFail(releaseQueries.listMigrations.execute(websiteId));
 
     return (
         <Container className="max-w-4xl">

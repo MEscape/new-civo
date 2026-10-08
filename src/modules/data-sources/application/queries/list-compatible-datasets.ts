@@ -65,12 +65,12 @@ export class ListCompatibleDatasets {
                     .asyncAndThen(({ id, kinds }) =>
                         kinds.length === 0
                             ? okAsync([])
-                            : datasets.listCompatible(
-                            id,
-                            actor.tenantId,
-                            kinds,
-                            MAX_COMPATIBLE_DATASETS
-                        )
+                            : datasets.listCompatible({
+                                  websiteId: id,
+                                  tenantId: actor.tenantId,
+                                  canonicalKinds: kinds,
+                                  limit: MAX_COMPATIBLE_DATASETS,
+                              })
                     )
             )
             .map((found) => found.map(toDatasetView));

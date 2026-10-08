@@ -2,18 +2,19 @@ import { cache } from 'react';
 
 import type { Metadata } from 'next';
 
-import { getTranslations } from 'next-intl/server';
 
 import { builderRoutes } from '@modules/builder/client';
 import { ReleaseHistoryPanel, releaseQueries } from '@modules/release';
 import { releaseRoutes, toReleaseHistoryDto } from '@modules/release/client';
 import { websiteQueries, websiteRoutes } from '@modules/website';
 
-import { I18nProvider } from '@components/providers/i18n-provider';
 import { Container, Grid, PageHeading, Section } from '@components/layout/layout-primitives';
+import { I18nProvider } from '@components/providers/i18n-provider';
 import { Card, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
 
 import { Link } from '@i18n';
+
+import { getTranslations } from '@i18n/server';
 
 import { buildPrivateMetadata } from '@lib/seo';
 
@@ -28,7 +29,7 @@ const loadWebsite = cache((websiteId: string) => websiteQueries.getWebsiteById.e
 
 export async function generateMetadata({ params }: RouteProps): Promise<Metadata> {
     const { websiteId } = await params;
-    const website = orFail(await loadWebsite(websiteId));
+    const website = await orFail(loadWebsite(websiteId));
     return buildPrivateMetadata(website.name);
 }
 
@@ -36,9 +37,9 @@ export default async function WebsitePage({ params }: RouteProps) {
     const { websiteId } = await params;
     const t = await getTranslations('website');
     const [website, history] = await Promise.all([
-        loadWebsite(websiteId),
-        releaseQueries.listReleases.execute(websiteId),
-    ]).then(([site, releases]) => [orFail(site), orFail(releases)] as const);
+        orFail(loadWebsite(websiteId)),
+        orFail(releaseQueries.listReleases.execute(websiteId)),
+    ]);
 
     const links = [
         { key: 'builder', href: builderRoutes.pages(website.id) },

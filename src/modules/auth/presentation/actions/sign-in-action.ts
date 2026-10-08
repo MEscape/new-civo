@@ -6,7 +6,7 @@ import { toActionResult } from '@lib/result';
 import type { ActionResult } from '@lib/result';
 
 import { getAuthCommands } from '../../composition';
-import { resolveReturnPath } from '../return-path';
+import { resolveReturnPath } from '../navigation/return-path';
 import { ROOT_LAYOUT_PATH } from '../routes';
 import { parseAuthInput } from '../schemas/parse-auth-input';
 import { signInActionSchema } from '../schemas/sign-in-schema';

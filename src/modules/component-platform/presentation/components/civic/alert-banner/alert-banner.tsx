@@ -1,4 +1,5 @@
 import { Container } from '@components/layout/layout-primitives';
+import { ContentLink } from '@components/ui/content-link';
 import { AlertOctagon, AlertTriangle, Info } from '@components/ui/icons';
 
 import { getTranslations } from '@i18n/server';
@@ -92,9 +93,9 @@ export async function AlertBanner({
               <div>
                 <p className="font-medium">
                   {alert.href !== undefined ? (
-                    <a href={alert.href} className="hover:underline">
+                    <ContentLink href={alert.href} className="hover:underline">
                       {alert.title}
-                    </a>
+                    </ContentLink>
                   ) : (
                     alert.title
                   )}

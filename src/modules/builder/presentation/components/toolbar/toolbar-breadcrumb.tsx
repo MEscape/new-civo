@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import { Link } from '@i18n';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations } from '@i18n/client';
 
 export interface ToolbarBreadcrumbProps {
   readonly websiteName: string;

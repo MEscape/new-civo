@@ -37,3 +37,8 @@ export const TOOLTIP_STYLE = {
 } as const;
 
 export const AXIS_FONT_SIZE = 12;
+
+const BAR_CORNER_RADIUS = 4;
+
+/** Rounded top corners and square bottom corners: bars grow from the axis. */
+export const BAR_RADIUS: [number, number, number, number] = [BAR_CORNER_RADIUS, BAR_CORNER_RADIUS, 0, 0];

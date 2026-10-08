@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 
-import { useTranslations } from "next-intl";
-
 import { Button } from "@components/ui/button";
+
+import { useTranslations } from "@i18n/client";
+
 
 import { CANONICAL_KIND_MESSAGE_KEYS } from "../messages/message-keys";
 

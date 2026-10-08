@@ -18,7 +18,7 @@ import {
 import { countPageNodes } from '../../domain/tree/tree-operations';
 import { loadAuthorizedPage } from '../load-authorized-page';
 import { toSavedRevisionView } from '../page-view-mappers';
-import { resolveEditorMode } from '../resolve-editor-mode';
+import { resolveEditorMode } from '../services/resolve-editor-mode';
 
 import type { EditorMode } from '../../domain/models/editor-capabilities';
 import type { Page } from '../../domain/models/page';
@@ -107,7 +107,12 @@ export class SavePageConfig {
     config: PageConfig,
     { page, actor, mode }: SaveContext
   ): AppResult<PageConfig, ForbiddenAppError> {
-    return checkEditScope(page.config, config, mode, this.deps.components)
+    return checkEditScope({
+      previous: page.config,
+      next: config,
+      mode,
+      catalog: this.deps.components,
+    })
       .map(() => config)
       .mapErr((error) => {
         this.deps.audit.record({

@@ -1,10 +1,11 @@
 import { useId } from 'react';
 
-import { useTranslations } from 'next-intl';
 
 import { Button } from '@components/ui/button';
 import { Close } from '@components/ui/icons';
 import { Input, Label, Textarea } from '@components/ui/input';
+
+import { useTranslations } from '@i18n/client';
 
 import { isJsonRecord } from '@lib/utils';
 import type { JsonValue } from '@lib/utils';
