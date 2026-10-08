@@ -565,7 +565,8 @@
       "time": "{time}"
     },
     "states": {
-      "empty": "There is nothing to show here yet."
+      "empty": "There is nothing to show here yet.",
+      "loading": "Loading content…"
     },
     "render": {
       "sectionUnavailable": "This section is temporarily unavailable.",

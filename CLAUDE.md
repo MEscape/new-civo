@@ -2,8 +2,8 @@
 
 Read and follow these project instructions before making changes:
 
-1. [`rules/README.md`](./rules/README.md) — organized rule hierarchy and ownership.
-2. [`conventions/README.md`](./conventions/README.md) — task-specific procedures.
+1. [`docs/rules/README.md`](./docs/rules/README.md) — organized rule hierarchy and ownership.
+2. [`docs/conventions/README.md`](./docs/conventions/README.md) — task-specific procedures.
 3. [`src/lib/README.md`](./src/lib/README.md) — index of core shared infrastructure and utilities (always check before writing a utility).
 
 Rules define what is allowed. Conventions define how recurring tasks are performed.

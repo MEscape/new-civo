@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@components/ui/card";
+import { EmptyState } from "@components/layout/layout-primitives";
 
 import { ConfiguredSourceCard } from "./configured-source-card";
 import { DataSourceForm } from "./data-source-form";
@@ -60,9 +61,7 @@ export function DataSourcesPanel({
       ))}
 
       {sources.length === 0 && !isCreating && (
-        <div className="rounded-lg border border-dashed p-8 text-center text-sm text-copy-muted">
-          {t("panel.empty")}
-        </div>
+        <EmptyState variant="outlined" className="py-8" title={t("panel.empty")} />
       )}
     </div>
   );

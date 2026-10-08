@@ -24,7 +24,8 @@ export function MigrationHistoryList({ history }: MigrationHistoryListProps) {
     return (
       <EmptyState
         title={t('migration.history.empty')}
-        className="rounded-token border border-dashed border-border py-10"
+        variant="outlined"
+        className="py-10"
       />
     );
   }

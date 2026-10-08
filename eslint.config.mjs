@@ -15,7 +15,8 @@
  *
  * Order matters: later blocks win per rule key, Prettier is next to last
  * (it disables conflicting stylistic rules) and `curly` is re-enabled after it.
- * Layer/module rules are NOT listed per module: see docs/architecture/eslint-architecture.md.
+ * Layer/module rules are NOT listed per module: eslint/architecture-policy/policy.mjs is the one policy, read by
+ * both the `architecture/*` rules and the architecture tests (docs/rules/boundaries.md describes it).
  */
 import { defineConfig } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';

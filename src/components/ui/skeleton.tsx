@@ -7,13 +7,15 @@ import { cn } from "@lib/utils";
  *
  * Rule §19: never use raw gray values for skeletons — they must track the
  * current theme's canvas color.
+ *
+ * A block is decorative and hidden from assistive technology: the region it
+ * stands in for marks itself `aria-busy` and announces loading once.
  */
 function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
     return (
         <div
             className={cn("animate-pulse rounded-token bg-canvas", className)}
-            aria-busy="true"
-            aria-live="polite"
+            aria-hidden="true"
             {...props}
         />
     );

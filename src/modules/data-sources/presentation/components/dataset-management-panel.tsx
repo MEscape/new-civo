@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 
 import { FieldMessage } from "@components/shared/field-message";
 import { Button } from "@components/ui/button";
+import { EmptyState } from "@components/layout/layout-primitives";
 
 import { deleteDatasetAction } from "../actions/delete-dataset-action";
 import {
@@ -82,9 +83,7 @@ export function DatasetManagementPanel({
       />
 
       {datasets.length === 0 && !isCreating ? (
-        <div className="rounded-token border border-dashed border-border p-4 text-center text-sm text-copy-muted">
-          {t("datasets.empty")}
-        </div>
+        <EmptyState variant="outlined" className="py-4" title={t("datasets.empty")} />
       ) : (
         <ul className="space-y-4">
           {datasets.map((dataset) => (

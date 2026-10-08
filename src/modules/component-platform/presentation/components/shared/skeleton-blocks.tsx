@@ -4,6 +4,8 @@ import { Container, Grid, Section } from '@components/layout/layout-primitives';
 import { Card, CardContent } from '@components/ui/card';
 import { Skeleton } from '@components/ui/skeleton';
 
+import { useTranslations } from '@i18n/client';
+
 import type { GridColumns } from './grid-columns';
 
 const MAX_PLACEHOLDERS = 8;
@@ -23,6 +25,16 @@ export interface SectionSkeletonProps {
   readonly withHeading?: boolean;
 }
 
+/** Says once, politely, what a busy region is waiting for; the blocks themselves are hidden. */
+export function LoadingAnnouncement() {
+  const t = useTranslations('componentPlatform');
+  return (
+    <p role="status" className="sr-only">
+      {t('states.loading')}
+    </p>
+  );
+}
+
 /** Section chrome (heading bar + container) shared by every skeleton. */
 export function SectionSkeleton({
   children,
@@ -32,6 +44,7 @@ export function SectionSkeleton({
 }: SectionSkeletonProps) {
   return (
     <Section tone={tone} aria-busy="true">
+      <LoadingAnnouncement />
       <Container className={containerClassName}>
         {withHeading && <Skeleton className="mb-6 h-7 w-56" />}
         {children}

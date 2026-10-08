@@ -63,7 +63,8 @@ export function ReleaseHistoryPanel({
       <EmptyState
         title={t('history.empty')}
         icon={<AlertTriangle className="size-8" aria-hidden="true" />}
-        className="rounded-token border border-dashed border-border py-12"
+        variant="outlined"
+        className="py-12"
       />
     );
   }

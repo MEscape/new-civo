@@ -184,14 +184,21 @@ export function Divider({
   return <hr className={cn('border-t border-border', className)} {...props} />;
 }
 
+const EMPTY_STATE_VARIANTS = {
+  plain: '',
+  /** Inside a panel or list: a dashed outline marks where content will appear. */
+  outlined: 'rounded-token border border-dashed border-border',
+} as const;
+
 /**
  * Empty-state placeholder. Centered, muted, with optional icon slot.
  */
 interface EmptyStateProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
-  description?: string;
+  description?: string | undefined;
   action?: React.ReactNode;
   icon?: React.ReactNode;
+  variant?: keyof typeof EMPTY_STATE_VARIANTS;
 }
 
 export function EmptyState({
@@ -199,6 +206,7 @@ export function EmptyState({
   description,
   action,
   icon,
+  variant = 'plain',
   className,
   ...props
 }: EmptyStateProps) {
@@ -206,6 +214,7 @@ export function EmptyState({
     <div
       className={cn(
         'flex flex-col items-center justify-center gap-4 py-16 text-center',
+        EMPTY_STATE_VARIANTS[variant],
         className
       )}
       {...props}

@@ -1,11 +1,11 @@
 # Adding an Environment Variable
 
-Owning rules: [`configuration.md`](../../rules/configuration.md), [`security.md`](../../rules/security.md), [`validation.md`](../../rules/validation.md), [`naming.md`](../../rules/naming.md).
+Owning rules: [`configuration.md`](../rules/configuration.md), [`security.md`](../rules/security.md), [`validation.md`](../rules/validation.md), [`naming.md`](../rules/naming.md).
 
 ## Checklist
 
 1. Decide server-only or public. Secrets are always server-only. Use `NEXT_PUBLIC_*` only for values that are safe to ship to the browser.
-2. Name it in `UPPER_SNAKE_CASE`. See [`naming.md`](../../rules/naming.md).
+2. Name it in `UPPER_SNAKE_CASE`. See [`naming.md`](../rules/naming.md).
 3. Add it to the Zod schema of the typed configuration module, with the right type and a default only when a default is safe.
 4. Read it only through the typed configuration module. Never use `process.env` elsewhere.
 5. Add it to `.env.example` with a placeholder value and a one-line description. Never commit a real value.

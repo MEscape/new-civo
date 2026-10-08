@@ -1,35 +1,25 @@
 # Global Components (`@components`)
 
-This directory contains the global React components for the application, organized by their role and scope.
+Shared UI used by more than one module or by framework entry points. Nothing here imports a business module; see [`docs/rules/shared.md`](../../docs/rules/shared.md).
 
-## Available Modules
+## `@components/ui` (Design-system primitives)
 
-### `@components/ui` (UI Library)
+Built on **shadcn/ui** and **Radix UI**, adapted to the design tokens in `src/app/globals.css`. Add a primitive with the shadcn CLI (`npx shadcn add …`) when a module needs it, and remove it when its last consumer goes.
 
-Our core UI components are built using **shadcn/ui** and **Radix UI** primitives. They have been extensively customized and adjusted to perfectly integrate with our specific design token system, ensuring visual consistency across the application.
+- **Primitives:** Accordion, Alert, Badge (`default`, `secondary`, `outline`, `muted`, status variants), Button (`default`, `secondary`, `accent`, `outline`, `ghost`, `destructive`, `link`; use `buttonVariants` to style a link as a button), Card, Input / Textarea / Label, Select, Skeleton (decorative: the busy region announces loading), Switch, Table, Tabs.
+- **Icons:** `icons.tsx` holds the custom SVG icons on one shared 24×24 stroke canvas; `dynamic-icon.tsx` renders an icon named by content data, falling back to a known icon.
 
-Instead of relying on external icon libraries, we use our own custom SVG icons defined locally in `icons.tsx`.
+## `@components/layout` (Layout primitives)
 
-- **Available Primitives:** Accordion, Alert, Avatar, Badge, Button, Card, Dialog, Dropdown Menu, Icons, Input, Select, Separator, Sheet, Skeleton, Switch, Table, Tabs, Toolbar Link, and Tooltip.
-- _Note:_ Always prefer using these existing components over creating custom ones for fundamental UI elements.
+`layout-primitives.tsx`: `PageShell`, `AppHeader`, `AppBody`, `Container`, `Section` (`tone`: `default` | `muted`), `SidebarLayout`, `PageHeading` (the page's single `h1`), `SectionHeading` (`h2`), `Divider`, `EmptyState` (`variant`: `plain` | `outlined`), `Grid` (container-query columns).
 
-### `@components/shared` (Shared Components)
+## `@components/shared` (Composites)
 
-Composite or application-specific components that reuse `@components/ui` primitives for recurring patterns (like forms).
+- `text-field.tsx`, `select-field.tsx`, `field-message.tsx`: labelled form fields with hints and errors wired to `aria-describedby`.
+- `not-found-panel.tsx`: the body of every `not-found.tsx`.
+- `route-error-panel.tsx`: the body of every `error.tsx`; it never shows the raw error message.
 
-- `text-field.tsx`: Reusable text input field wrapper.
-- `select-field.tsx`: Reusable select dropdown field wrapper.
-- `field-message.tsx`: Form field validation message wrapper.
+## `@components/providers`
 
-### `@components/layout` (Layout Primitives)
-
-Components responsible for structural layout constraints and shells.
-
-- `layout-primitives.tsx`: Contains core layout wrappers and containers used to structure pages and sections.
-
-### `@components/providers` (Context Providers)
-
-Global React Context providers that wrap the application or specific trees to supply state and configuration.
-
-- `i18n-provider.tsx`: Server-side i18n initialization.
-- `i18n-client-provider.tsx`: Client-side i18n context provider.
+- `i18n-provider.tsx`: Server Component that hands a subtree only the message namespaces it declares (always including the app shell's `app`).
+- `i18n-client-provider.tsx`: the client side of it.

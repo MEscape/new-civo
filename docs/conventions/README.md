@@ -1,6 +1,6 @@
 # Conventions
 
-Step-by-step procedures for recurring tasks. Rules in [`rules/`](../../rules/README.md) say what is allowed; conventions say how to do the task.
+Step-by-step procedures for recurring tasks. Rules in [`rules/`](../rules/README.md) say what is allowed; conventions say how to do the task.
 
 Conventions link to rules and never restate them. If a convention and a rule disagree, the rule wins and the convention must be fixed.
 
