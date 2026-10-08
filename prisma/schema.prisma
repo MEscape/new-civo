@@ -1,0 +1,178 @@
+// use prisma-8
+
+enum PageConfigStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ReleaseStatus {
+  DRAFT
+  PUBLISHED
+  FAILED
+  ROLLED_BACK
+}
+
+enum MigrationStatus {
+  PROPOSED
+  APPLIED
+}
+
+enum DataSourceKind {
+  MOCK
+  REST
+}
+
+enum DataSourceStatus {
+  UNKNOWN
+  OK
+  ERROR
+}
+
+enum DatasetStatus {
+  UNKNOWN
+  OK
+  ERROR
+}
+
+model Website {
+  id          String   @id @default(uuid())
+  tenantId    String
+  name        String
+  slug        String   @unique
+  description String?
+  templateKey String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  publishedReleaseId String? @unique
+
+  pages       Page[]
+  theme       WebsiteTheme?
+  releases    WebsiteRelease[]
+  migrations  WebsiteMigration[]
+  dataSources DataSource[]
+  publishedRelease WebsiteRelease? @relation("PublishedRelease", fields: [publishedReleaseId], references: [id], onDelete: Restrict)
+
+  @@unique([id, tenantId])
+}
+
+model Page {
+  id        String   @id @default(uuid())
+  tenantId  String
+  websiteId String
+  website   Website  @relation(fields: [websiteId, tenantId], references: [id, tenantId], onDelete: Cascade)
+  path      String
+  title     String
+
+  version   Int      @default(1)
+  configs   PageConfig[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([websiteId, path])
+}
+
+model PageConfig {
+  id        String           @id @default(uuid())
+  pageId    String
+  content   Json
+  status    PageConfigStatus @default(DRAFT)
+  version   Int              @default(1)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
+
+  page      Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, version])
+}
+
+model WebsiteTheme {
+  id             String  @id @default(uuid())
+  websiteId      String  @unique
+  primaryColor   String  @default("#1F3A34")
+  secondaryColor String  @default("#7A8B85")
+  accentColor    String  @default("#C9782F")
+  headingFont    String  @default("Source Serif 4")
+  bodyFont       String  @default("Inter")
+  radius         String  @default("md")
+  spacingScale   String  @default("comfortable")
+
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+}
+
+model WebsiteRelease {
+  id            String   @id @default(uuid())
+  websiteId     String
+  releaseNumber Int
+  status        ReleaseStatus @default(DRAFT)
+  snapshot      Json
+  snapshotHash  String
+  publishedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  website       Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  activeWebsites Website[] @relation("PublishedRelease")
+  migrations    WebsiteMigration[]
+
+  @@unique([websiteId, releaseNumber])
+}
+
+model WebsiteMigration {
+  id              String          @id @default(uuid())
+  websiteId       String
+  sourceReleaseId String
+  status          MigrationStatus @default(PROPOSED)
+  plan            Json
+  resolutions     Json?
+  proposedBy      String
+  appliedBy       String?
+  createdAt       DateTime        @default(now())
+  appliedAt       DateTime?
+
+  website       Website        @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  sourceRelease WebsiteRelease @relation(fields: [sourceReleaseId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, createdAt])
+}
+
+model DataSource {
+  id            String    @id @default(uuid())
+  websiteId     String
+  name          String
+  kind          DataSourceKind
+  config        Json
+  status        DataSourceStatus @default(UNKNOWN)
+  lastCheckedAt DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
+
+  website       Website   @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  datasets      Dataset[]
+}
+
+model Dataset {
+  id            String    @id @default(uuid())
+  dataSourceId  String
+  name          String
+  slug          String
+  canonicalKind String
+  mapping       Json?
+  status        DatasetStatus @default(UNKNOWN)
+  lastFetchedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
+
+  dataSource    DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+
+  @@unique([dataSourceId, slug])
+}
+
+model Membership {
+  id        String   @id @default(uuid())
+  actorId   String
+  tenantId  String
+  role      String
+  createdAt DateTime @default(now())
+
+  @@unique([actorId, tenantId, role])
+}

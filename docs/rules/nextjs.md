@@ -1,0 +1,28 @@
+# Next.js Rules
+
+- Use the App Router exclusively.
+- Use Server Components by default. See [`react.md`](react.md).
+- Add `use client` only when client-side capabilities are required.
+- Keep Client Component boundaries as small and deep as practical.
+- Pages and layouts compose application capabilities; they contain no business logic.
+- Server Components call application queries directly.
+- Do not create internal API endpoints for Server Component data fetching.
+- Server Actions are framework adapters for mutations.
+- Server Actions must call application use cases.
+- Server Actions must enforce authentication and authorization independently. See [`security.md`](security.md).
+- Validate Server Action input before calling the use case. See [`validation.md`](validation.md).
+- Server Actions return a typed result: success data, or field-level errors plus an optional form-level error code, never localized messages. See [`i18n.md`](i18n.md).
+- Forms submit through Server Actions unless a real HTTP consumer requires a Route Handler.
+- Show pending state during submission, prevent double submission, and preserve user input when validation fails.
+- Route Handlers exist only for actual HTTP consumers; see [`api.md`](api.md) for what they may do once created.
+- Use `proxy.ts` only for request-level concerns.
+- Do not put business authorization rules in `proxy.ts`. See [`security.md`](security.md).
+- Use `loading.tsx` for meaningful route loading states.
+- Use `error.tsx` for unexpected route-level failures.
+- Use `not-found.tsx` or `notFound()` for missing resources.
+- Use Suspense boundaries for independently streamable UI. See [`performance.md`](performance.md).
+- Use async request APIs such as `params`, `searchParams`, `cookies`, and `headers`.
+- Use Next.js navigation primitives instead of raw equivalents where applicable.
+- Use route metadata APIs for page metadata.
+- Keep Node-only dependencies out of Edge-compatible code.
+- Declare runtime requirements explicitly when they matter, except where the framework forbids it: with `cacheComponents` the `runtime` segment option is rejected and every route runs on Node.js.

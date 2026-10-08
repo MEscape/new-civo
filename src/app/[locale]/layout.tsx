@@ -1,0 +1,53 @@
+import React from "react";
+
+import type { Metadata } from "next";
+
+import { publicEnv } from '@lib/config';
+import { fontVariables } from "@lib/fonts";
+
+import { setRequestLocale } from 'next-intl/server';
+
+import { I18nProvider } from "@components/providers/i18n-provider";
+
+import { I18N_CONFIG, requireLocale } from "@i18n";
+
+import "../globals.css";
+
+
+/*
+ * Static on purpose. A translated, per-request `generateMetadata` here would
+ * read route params for EVERY route below, including the catch-all whose
+ * fallback shell cannot resolve them. Pages own their title and description
+ * through `lib/seo`; this only sets what is the same everywhere.
+ */
+export const metadata: Metadata = {
+    metadataBase: new URL(publicEnv.NEXT_PUBLIC_APP_URL),
+    title: { template: '%s | Civo', default: 'Civo' },
+};
+
+export function generateStaticParams() {
+    return I18N_CONFIG.locales.map((locale) => ({ locale }));
+}
+
+export default async function RootLayout({
+    children,
+    params,
+}: {
+    children: React.ReactNode;
+    /** The raw URL segment: only `requireLocale` turns it into a `Locale` (or a 404). */
+    params: Promise<{ locale: string }>;
+}) {
+    const locale = requireLocale((await params).locale);
+    // Tells next-intl the locale without reading request headers, which would make the whole tree dynamic.
+    setRequestLocale(locale);
+
+    return (
+        <html lang={locale} className={`${fontVariables} h-full antialiased`}>
+            <body className="min-h-full flex flex-col">
+                <I18nProvider locale={locale}>
+                    {children}
+                </I18nProvider>
+            </body>
+        </html>
+    );
+}

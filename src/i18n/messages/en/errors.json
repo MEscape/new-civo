@@ -1,0 +1,17 @@
+{
+  "generic": "Something went wrong. Please try again.",
+  "unauthorized": "Unauthorized access.",
+  "forbidden": "You do not have permission to perform this action.",
+  "not_found": "The requested resource was not found.",
+  "validation": "Please check your input.",
+  "conflict": "There was a conflict with your request.",
+  "infrastructure": "A service error occurred. Please try again later.",
+  "unexpected": "An unexpected error occurred.",
+  "page": {
+    "title": "Something went wrong!",
+    "retry": "Try again",
+    "returnHome": "Return Home",
+    "notFoundTitle": "404 - Not Found",
+    "notFoundDescription": "Could not find requested resource"
+  }
+}
