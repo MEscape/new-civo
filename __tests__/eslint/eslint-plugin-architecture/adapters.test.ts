@@ -50,20 +50,10 @@ ruleTester.run('architecture/persistence-failures', rules['persistence-failures'
 });
 
 const GOOD_AUDIT = `
-import { logger } from '@lib/logger';
+import { createAuditLog } from '@lib/logger';
 import type { ShopAuditLog, ShopEvent } from '../../domain/ports/shop-audit-log.port';
-const auditLogger = logger.withContext({ module: 'shop.audit' });
 const LEVEL_BY_EVENT = { 'shop.created': 'info', 'shop.failed': 'warn' } as const satisfies Record<ShopEvent['type'], 'info' | 'warn'>;
-export class LoggerShopAuditLog implements ShopAuditLog {
-  record(event: ShopEvent): void {
-    const { type, ...details } = event;
-    try {
-      auditLogger[LEVEL_BY_EVENT[type]](type, details);
-    } catch {
-      // never fail the request
-    }
-  }
-}`;
+export const loggerShopAuditLog: ShopAuditLog = createAuditLog('shop.audit', LEVEL_BY_EVENT);`;
 
 ruleTester.run('architecture/audit-adapter', rules['audit-adapter']!, {
   valid: [
@@ -72,17 +62,11 @@ ruleTester.run('architecture/audit-adapter', rules['audit-adapter']!, {
     valid('src/modules/shop/infrastructure/prisma/prisma-shop.repository.ts', 'export class NotAnAdapter {}'),
   ],
   invalid: [
-    invalid(AUDIT, GOOD_AUDIT.replace("logger.withContext({ module: 'shop.audit' })", 'logger'), /Create a module-scoped logger/),
     invalid(AUDIT, GOOD_AUDIT.replace(" as const satisfies Record<ShopEvent['type'], 'info' | 'warn'>", ' as const'), /exhaustive|event→level map/i),
     invalid(AUDIT, GOOD_AUDIT.replace("satisfies Record<ShopEvent['type'], 'info' | 'warn'>", "satisfies Record<ShopEvent['type'], string>"), /event→level map/),
-    invalid(AUDIT, `${GOOD_AUDIT}\nexport class Other {}`, /exactly one class \(found 2\)/),
-    invalid(AUDIT, GOOD_AUDIT.replace(' implements ShopAuditLog', ''), /must `implements <Module>AuditLog`/),
-    invalid(
-      AUDIT,
-      GOOD_AUDIT.replace(/ {4}try \{[\s\S]*?\n {4}\}\n {2}\}/, '    auditLogger[LEVEL_BY_EVENT[type]](type, details);\n  }'),
-      /Wrap the logging call in try\/catch/
-    ),
-    invalid(AUDIT, GOOD_AUDIT.replace('// never fail the request', 'throw new Error("x");'), /must swallow the logging failure/),
-    invalid(AUDIT, GOOD_AUDIT.replace('auditLogger[LEVEL_BY_EVENT[type]](type, details);', 'auditLogger.info(type, details);'), /Select the log level through `LEVEL_BY_EVENT\[event\.type\]`/),
+    invalid(AUDIT, GOOD_AUDIT.replace("createAuditLog('shop.audit', LEVEL_BY_EVENT)", '{ record() {} }'), /exactly one `createAuditLog/),
+    invalid(AUDIT, GOOD_AUDIT.replace("'shop.audit'", "'shop'"), /module-scoped logger name/),
+    invalid(AUDIT, GOOD_AUDIT.replace("createAuditLog('shop.audit', LEVEL_BY_EVENT)", "createAuditLog('shop.audit', { 'shop.created': 'info' })"), /Pass `LEVEL_BY_EVENT` as the levels/),
+    invalid(AUDIT, `${GOOD_AUDIT}\nexport class LoggerShopAuditLog { record() {} }`, /Do not hand-write the audit mechanism/),
   ],
 });

@@ -21,7 +21,7 @@ import { createComponentCatalog } from './domain/models/component-catalog';
 import { restorePageConfig } from './domain/models/page-config';
 import { ComponentPlatformDescriptorProvider } from './infrastructure/component-platform/component-platform-descriptor-provider';
 import { ComponentPlatformDraftRenderer } from './infrastructure/component-platform/component-platform-draft-renderer';
-import { LoggerBuilderAuditLog } from './infrastructure/logging/logger-builder-audit-log';
+import { loggerBuilderAuditLog } from './infrastructure/logging/logger-builder-audit-log';
 import { PrismaPageRepository } from './infrastructure/prisma/prisma-page.repository';
 
 import type { CreateSystemPageError } from './application/commands/create-system-page';
@@ -50,7 +50,6 @@ import type { ListPagesForReleaseError } from './application/queries/list-pages-
  */
 const authorization = getAccessControl();
 const pages = new PrismaPageRepository(systemClock);
-const audit = new LoggerBuilderAuditLog();
 /*
  * Both platform queries are infallible (`AppResult<_, never>`), so the error
  * branch has type `never` and needs no handling.
@@ -78,7 +77,7 @@ const dependencies: PageDependencies = {
   authorization,
   pages,
   components,
-  audit,
+  audit: loggerBuilderAuditLog,
 };
 
 export const builderCommands = {
@@ -99,7 +98,7 @@ export const builderQueries = {
 const createSystemPageCommand = new CreateSystemPage({
   pages,
   components,
-  audit,
+  audit: loggerBuilderAuditLog,
 });
 const listPagesForReleaseQuery = new ListPagesForRelease({ pages });
 

@@ -43,7 +43,7 @@ function renderContent({ node, context, services }: PageNodeRendererProps): Reac
     rawProps: node.props,
     context,
     children: renderChildNodes(node.children ?? [], context, services),
-    loadContent: services.loadContent,
+    ...services,
   });
   const streams = context.mode === 'published' && implementation.skeleton !== null;
   return streams ? <Suspense fallback={implementation.skeleton}>{content}</Suspense> : content;

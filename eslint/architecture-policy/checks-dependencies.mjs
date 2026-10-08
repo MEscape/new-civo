@@ -232,6 +232,26 @@ export function checkCompositionWiring(project) {
         for (const n of instantiatedClasses(f))
           everywhere.add(`${f.path}::${n}`);
     for (const impl of portImplementations(project, name)) {
+      if (impl.kind === 'value') {
+        // A ready-made adapter value is wired by importing it into composition.ts.
+        const wired =
+          composition !== undefined &&
+          composition.imports.some(
+            (i) =>
+              i.names?.includes(impl.name) &&
+              project.resolveFile(composition.path, i.specifier)?.path === impl.file.path
+          );
+        if (!wired) {
+          out.push(
+            violation(
+              'composition-wiring',
+              impl.file.path,
+              `\`${impl.name}\` is typed as ${impl.implemented.join(', ')} but composition.ts never imports it. An adapter that is not wired makes the port unusable (e.g. audit events silently dropped).`
+            )
+          );
+        }
+        continue;
+      }
       const others = files.filter((f) => f.path !== impl.file.path);
       const inComposition =
         composition !== undefined &&

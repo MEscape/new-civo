@@ -20,6 +20,9 @@ ruleTester.run('architecture/layer-imports', rules['layer-imports']!, {
     // infrastructure: domain, application, own infra, logger/db/config; cross-module adapter outside prisma/
     valid(INFRA_REPO, "import { db, createPersistenceFailures } from '@lib/db';\nimport type { TenantId } from '@modules/auth';"),
     valid(INFRA_REPO, "import { toTenantId } from '@modules/auth';"),
+    // presentation: another module's browser-safe API, or its types
+    valid(COMPONENT, "import { builderRoutes } from '@modules/builder/client';"),
+    valid(COMPONENT, "import type { MapSectionProps } from '@modules/map';"),
     // the shared Clock port, as a type
     valid(APP, "import type { Clock } from '@lib/clock';"),
     valid(INFRA_REPO, "import type { Clock } from '@lib/clock';"),
@@ -43,6 +46,8 @@ ruleTester.run('architecture/layer-imports', rules['layer-imports']!, {
   ],
   invalid: [
     invalid(DOMAIN, "import { db } from '@lib/db';", /Domain must not import '@lib\/db'/),
+    // a module's server-side parts reach another module's presentation only through composition.ts
+    invalid(COMPONENT, "import { MapSection } from '@modules/map';", /Presentation may use another module only through its browser-safe API/),
     // @lib/clock defines the shared Clock port: the type is everyone's, the system clock is composition's.
     invalid(APP, "import { systemClock } from '@lib/clock';", /may only `import type` from '@lib\/clock'/),
     invalid(DOMAIN, "import { logger } from '@lib/logger';", /must not import '@lib\/logger'/),

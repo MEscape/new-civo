@@ -93,6 +93,9 @@ function checkCrossModule({ file, layer, label, target, isTypeOnly, names }) {
     }
     return null;
   }
+  if (layer === 'presentation' && !isTypeOnly && target.file !== 'client') {
+    return `Presentation may use another module only through its browser-safe API ('@modules/${target.module}/client': routes, vocabulary, actions) or \`import type\`. Server-side parts of '${target.module}' are wired in ${file.module}'s composition.ts and handed in.`;
+  }
   if (layer === 'infrastructure' && file.dir === 'prisma' && !isTypeOnly) {
     const onlyBrandConstructors = names !== null && names.length > 0 && names.every((name) => TRUSTED_BRAND_CONSTRUCTOR.test(name));
     if (!onlyBrandConstructors) {

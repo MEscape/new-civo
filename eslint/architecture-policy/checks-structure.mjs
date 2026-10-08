@@ -251,12 +251,35 @@ export function checkModuleStructure(project) {
   return out;
 }
 
-/** Class declared in `file` that implements an interface whose name is exported by a domain port. */
+/** Exported `const x: Port = …` values: an adapter built by a factory (e.g. `createAuditLog`) instead of a class. */
+function portTypedConstants(file) {
+  const constants = [];
+  for (const statement of file.ast.body) {
+    if (statement.type !== 'ExportNamedDeclaration' || statement.declaration?.type !== 'VariableDeclaration') continue;
+    for (const declarator of statement.declaration.declarations) {
+      const annotation = declarator.id.typeAnnotation?.typeAnnotation;
+      if (declarator.id.type === 'Identifier' && annotation?.type === 'TSTypeReference' && annotation.typeName.type === 'Identifier') {
+        constants.push({ name: declarator.id.name, type: annotation.typeName.name });
+      }
+    }
+  }
+  return constants;
+}
+
+/**
+ * Adapters of a module: a class declared in infrastructure that implements an interface exported by a domain port,
+ * or an exported constant typed as one (`kind: 'value'`).
+ */
 export function portImplementations(project, name) {
   const found = [];
   for (const f of project
     .moduleFiles(name)
     .filter((x) => x.local.startsWith('infrastructure/'))) {
+    const isPortName = (n) =>
+      f.imports.some((imp) => imp.names?.includes(n) && /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/')));
+    for (const constant of portTypedConstants(f)) {
+      if (isPortName(constant.type)) found.push({ file: f, name: constant.name, implemented: [constant.type], kind: 'value' });
+    }
     for (const cls of topLevelClasses(f)) {
       const implemented = (cls.node.implements ?? [])
         .filter((i) => i.expression.type === 'Identifier')
@@ -267,7 +290,7 @@ export function portImplementations(project, name) {
           imp.names?.some((n) => implemented.includes(n)) &&
           /domain\/ports\//.test(imp.specifier.replace(/\\/g, '/'))
       );
-      if (fromPorts) found.push({ file: f, name: cls.name, implemented });
+      if (fromPorts) found.push({ file: f, name: cls.name, implemented, kind: 'class' });
     }
   }
   return found;

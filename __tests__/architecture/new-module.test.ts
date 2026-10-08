@@ -69,9 +69,10 @@ const mutations: Mutation[] = [
   {
     name: 'an audit adapter that is never wired in composition',
     mutate: (f) => {
-      replaceIn(f, `${M}/composition.ts`, 'const audit = new LoggerInventoryAuditLog();', 'const audit = { record: () => undefined };');
+      replaceIn(f, `${M}/composition.ts`, "import { loggerInventoryAuditLog } from './infrastructure/audit/logger-inventory-audit-log';\n", '');
+      replaceIn(f, `${M}/composition.ts`, 'audit: loggerInventoryAuditLog', 'audit: { record: () => undefined }');
     },
-    tree: /\[composition wiring\].*`LoggerInventoryAuditLog` implements InventoryAuditLog but is never constructed in composition\.ts/,
+    tree: /\[composition wiring\].*`loggerInventoryAuditLog` is typed as InventoryAuditLog but composition\.ts never imports it/,
   },
   {
     name: 'a command that imports an infrastructure class',

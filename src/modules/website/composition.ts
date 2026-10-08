@@ -9,7 +9,7 @@ import { GetPublicWebsiteBySlug } from './application/queries/get-public-website
 import { GetWebsiteById } from './application/queries/get-website-by-id';
 import { ListWebsites } from './application/queries/list-websites';
 import { restoreWebsiteTheme } from './domain/models/website-theme';
-import { LoggerWebsiteAuditLog } from './infrastructure/logging/logger-website-audit-log';
+import { loggerWebsiteAuditLog } from './infrastructure/logging/logger-website-audit-log';
 import { PrismaWebsiteRepository } from './infrastructure/prisma/prisma-website.repository';
 import { BuilderHomePageProvisioner } from './infrastructure/provisioner/builder-home-page-provisioner';
 
@@ -25,9 +25,8 @@ import type { StoredWebsiteTheme } from './domain/models/website-theme';
  */
 const websites = new PrismaWebsiteRepository();
 const homePages = new BuilderHomePageProvisioner(createSystemPage, HOME_PAGE_PATH);
-const audit = new LoggerWebsiteAuditLog();
 const authorization = getAccessControl();
-const dependencies = { authorization, websites, audit };
+const dependencies = { authorization, websites, audit: loggerWebsiteAuditLog };
 
 export const websiteCommands = {
   createWebsite: new CreateWebsite({ ...dependencies, homePages }),

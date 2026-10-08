@@ -24,7 +24,7 @@ import { sessionSourceFrom } from './infrastructure/better-auth/better-auth-sess
 import { createAuth } from './infrastructure/better-auth/create-auth';
 import { createAuthRouteHandlers } from './infrastructure/better-auth/create-auth-route-handlers';
 import { DevCurrentActorProvider } from './infrastructure/dev/dev-current-actor-provider';
-import { LoggerSecurityAuditLog } from './infrastructure/logging/logger-security-audit-log';
+import { loggerSecurityAuditLog } from './infrastructure/logging/logger-security-audit-log';
 import { ResendMailTransport } from './infrastructure/mail/resend-mail-transport';
 import { SmtpMailTransport } from './infrastructure/mail/smtp-mail-transport';
 import { TransactionalAuthMailer } from './infrastructure/mail/transactional-auth-mailer';
@@ -40,7 +40,6 @@ import type { Role } from './domain/models/role';
 import type { AuthMailer } from './domain/ports/auth-mailer.port';
 import type { CurrentActorProvider } from './domain/ports/current-actor-provider.port';
 import type { MembershipRepository } from './domain/ports/membership.repository';
-import type { SecurityAuditLog } from './domain/ports/security-audit-log.port';
 import type {
   AuthSettings,
   BetterAuthInstance,
@@ -171,8 +170,6 @@ function buildMailer(env: ServerEnv): AuthMailer {
   });
 }
 
-const getAudit = once<SecurityAuditLog>(() => new LoggerSecurityAuditLog());
-
 const getMailer = once<AuthMailer>(() => buildMailer(serverEnv));
 
 const getMemberships = once<MembershipRepository>(
@@ -201,7 +198,7 @@ const getAuth = once<BetterAuthInstance>(() => {
   return createAuth(toAuthSettings(serverEnv), {
     pool: getPool(),
     mailer: getMailer(),
-    audit: getAudit(),
+    audit: loggerSecurityAuditLog,
   });
 });
 
@@ -248,7 +245,7 @@ const getCurrentActorProvider = once(() =>
 export const getAccessControl = once<AuthorizationService>(() =>
   createAuthorizationService({
     currentActor: getCurrentActorProvider(),
-    audit: getAudit(),
+    audit: loggerSecurityAuditLog,
   })
 );
 
@@ -280,7 +277,7 @@ export const getAuthCommands = once(() => {
       getPool(),
       requireAuthCredentials(serverEnv).secret
     ),
-    audit: getAudit(),
+    audit: loggerSecurityAuditLog,
   };
 
   return {

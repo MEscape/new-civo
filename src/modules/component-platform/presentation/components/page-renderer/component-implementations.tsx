@@ -194,8 +194,13 @@ export const COMPONENT_IMPLEMENTATIONS = {
     skeleton: <KpiGridSkeleton />,
   }),
   map: implementComponent('map', {
-    render: ({ props, context, loadContent }) => (
-      <MapBlock props={props} context={context} loadContent={loadContent} />
+    render: ({ props, context, loadContent, mapSection }) => (
+      <MapBlock
+        props={props}
+        context={context}
+        loadContent={loadContent}
+        mapSection={mapSection}
+      />
     ),
     skeleton: <MapBlockSkeleton />,
   }),

@@ -20,7 +20,7 @@ import { CachedDataSourceConnector } from "./infrastructure/cache/cached-data-so
 import { KindRoutingConnector } from "./infrastructure/connector/kind-routing-connector";
 import { restJsonConnector } from "./infrastructure/connector/rest-json-connector";
 import { Sha256ContentHasher } from "./infrastructure/hashing/sha256-content-hasher";
-import { LoggerDataSourceAuditLog } from "./infrastructure/logging/logger-data-source-audit-log";
+import { loggerDataSourceAuditLog } from "./infrastructure/logging/logger-data-source-audit-log";
 import { PrismaDataSourceRepository } from "./infrastructure/prisma/prisma-data-source.repository";
 import { PrismaDatasetRepository } from "./infrastructure/prisma/prisma-dataset.repository";
 
@@ -44,7 +44,7 @@ const authorizationService = getAccessControl();
 
 const dependencies: DataSourceDependencies = {
   authorization: authorizationService,
-  audit: new LoggerDataSourceAuditLog(),
+  audit: loggerDataSourceAuditLog,
   clock: systemClock,
   dataSources,
   datasets,

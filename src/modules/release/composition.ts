@@ -20,7 +20,7 @@ import { GetPublishedSnapshot } from './application/queries/get-published-snapsh
 import { ListMigrations } from './application/queries/list-migrations';
 import { ListReleases } from './application/queries/list-releases';
 import { ComponentPlatformCatalog } from './infrastructure/component-platform/component-platform-catalog';
-import { LoggerReleaseAuditLog } from './infrastructure/logging/logger-release-audit-log';
+import { loggerReleaseAuditLog } from './infrastructure/logging/logger-release-audit-log';
 import { PrismaMigrationRepository } from './infrastructure/prisma/prisma-migration.repository';
 import { PrismaReleaseRepository } from './infrastructure/prisma/prisma-release.repository';
 import { BuilderPageSource } from './infrastructure/source/builder-page-source';
@@ -46,7 +46,7 @@ const dependencies = {
     websiteQueries.getWebsiteById.execute(id)
   ),
   releases,
-  audit: new LoggerReleaseAuditLog(),
+  audit: loggerReleaseAuditLog,
 };
 
 const migrationDependencies = {
