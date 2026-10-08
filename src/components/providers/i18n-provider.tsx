@@ -10,10 +10,8 @@ import { pick, unique } from '@lib/utils';
 
 import { I18nClientProvider } from './i18n-client-provider';
 
-const CLIENT_SHELL_NAMESPACES = [
-  'errors',
-  'controls',
-] as const satisfies readonly Namespace[];
+/** The app shell's own texts: `error.tsx` boundaries are Client Components and need them everywhere. */
+const CLIENT_SHELL_NAMESPACES = ['app'] as const satisfies readonly Namespace[];
 
 interface I18nProviderProps {
   /**

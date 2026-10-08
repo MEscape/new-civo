@@ -5,7 +5,8 @@
  * code through `composition.ts` and must never end up in a client bundle.
  */
 
-export * from './domain/models/ids';
+export { toTenantId } from './domain/models/ids';
+export type { ActorId, TenantId } from './domain/models/ids';
 export type { Permission } from './domain/models/permission';
 export type { ResourceScope } from './domain/models/authorize';
 export type { Actor } from './domain/models/actor';

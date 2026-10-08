@@ -20,6 +20,9 @@ ruleTester.run('architecture/layer-imports', rules['layer-imports']!, {
     // infrastructure: domain, application, own infra, logger/db/config; cross-module adapter outside prisma/
     valid(INFRA_REPO, "import { db, createPersistenceFailures } from '@lib/db';\nimport type { TenantId } from '@modules/auth';"),
     valid(INFRA_REPO, "import { toTenantId } from '@modules/auth';"),
+    // the shared Clock port, as a type
+    valid(APP, "import type { Clock } from '@lib/clock';"),
+    valid(INFRA_REPO, "import type { Clock } from '@lib/clock';"),
     valid(INFRA_ADAPTER, "import { createSystemPage } from '@modules/builder';"),
     // presentation: contracts, composition from actions, shared UI, wrappers
     valid(ACTION, "import { shopCommands } from '../../composition';\nimport type { OrderView } from '../../application/contracts/order-views';"),
@@ -40,6 +43,8 @@ ruleTester.run('architecture/layer-imports', rules['layer-imports']!, {
   ],
   invalid: [
     invalid(DOMAIN, "import { db } from '@lib/db';", /Domain must not import '@lib\/db'/),
+    // @lib/clock defines the shared Clock port: the type is everyone's, the system clock is composition's.
+    invalid(APP, "import { systemClock } from '@lib/clock';", /may only `import type` from '@lib\/clock'/),
     invalid(DOMAIN, "import { logger } from '@lib/logger';", /must not import '@lib\/logger'/),
     invalid(DOMAIN, "import { useState } from 'react';", /Domain must not depend on 'react'/),
     invalid(DOMAIN, "import Link from 'next/link';", /Domain must not depend on 'next\/link'/),

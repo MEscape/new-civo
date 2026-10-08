@@ -45,8 +45,10 @@ function withCause(thrown: unknown): readonly unknown[] {
  *   documents as the way to classify one without knowing any
  *   target-specific error shape.
  * - ORM errors are structured envelopes carrying a dotted `NAMESPACE.CODE`
- *   on `error.code`, recognized by `isStructuredError`
- *   (https://www.prisma.io/docs/orm/v8/reference/error-reference).
+ *   (https://www.prisma.io/docs/orm/v8/reference/error-reference). None of
+ *   them is an expected outcome: a single-row write that matches nothing
+ *   resolves to `null` and is handled by `requireRow` in
+ *   `persistence-failures.ts`, so every ORM error is an infrastructure failure.
  *
  * Only unique violations become `conflictError`. Foreign-key, not-null
  * and check violations are deliberately not mapped to a conflict: they

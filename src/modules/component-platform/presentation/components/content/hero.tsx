@@ -29,7 +29,7 @@ export async function Hero({ props }: HeroComponentProps) {
         />
       )}
       <Container className="relative">
-        <h1 className="max-w-3xl font-heading text-4xl leading-tight text-primary sm:text-5xl">
+        <h1 className="max-w-3xl font-heading text-4xl leading-tight text-primary-copy sm:text-5xl">
           {title}
         </h1>
         {subtitle !== null && (

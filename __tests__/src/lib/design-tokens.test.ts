@@ -26,6 +26,12 @@ const ALLOWED_PATHS: ReadonlyArray<{ match: (path: string) => boolean; why: stri
     { match: (p) => p === "app/globals.css", why: "defines the tokens" },
     { match: (p) => p.startsWith("data/"), why: "seed content" },
     { match: (p) => /\.test\.(ts|tsx)$/.test(p), why: "tests describe violations on purpose" },
+    { match: (p) => p.startsWith("lib/db/contract."), why: "generated from prisma/schema.prisma, which stores theme defaults" },
+    { match: (p) => p.startsWith("modules/auth/infrastructure/mail/"), why: "mail clients do not resolve CSS custom properties" },
+    { match: (p) => p === "modules/website/domain/models/website-theme.ts", why: "a website theme IS colour data; its default is a value, not styling" },
+    { match: (p) => p === "modules/website/presentation/theme/readable-foreground.ts", why: "computes the foreground token values for a theme colour" },
+    { match: (p) => p === "modules/website/presentation/components/color-field.tsx", why: "a native colour input only accepts a #rrggbb value" },
+    { match: (p) => p === "modules/map/presentation/theme/map-palette.ts", why: "resolves tokens to #rrggbb for Mapbox, which cannot read CSS variables" },
 ];
 
 interface Rule { name: string; pattern: RegExp; fix: string }

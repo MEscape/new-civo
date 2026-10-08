@@ -32,7 +32,7 @@ export async function QuickLinks({ props }: QuickLinksComponentProps) {
             <li key={`${String(index)}-${link.href}`}>
               <a
                 href={link.href}
-                className="flex items-center justify-between py-3 text-sm font-medium text-copy hover:text-primary"
+                className="flex items-center justify-between py-3 text-sm font-medium text-copy hover:text-primary-copy"
               >
                 {link.label}
                 <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />

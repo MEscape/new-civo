@@ -20,7 +20,7 @@ import type {
 } from '../../../../application/contracts/component-platform-constraints';
 import type { LoadContent } from '../../page-renderer/load-content';
 
-const FALLBACK_ICON = 'arrow-right' as const;
+const FALLBACK_ICON = 'arrowRight' as const;
 
 export interface ServiceGridComponentProps {
   readonly props: ComponentProps<'serviceGrid'>;
@@ -67,7 +67,7 @@ export async function ServiceGrid({
                     <DynamicIcon
                       name={service.icon}
                       fallback={FALLBACK_ICON}
-                      className="h-5 w-5 shrink-0 text-primary"
+                      className="h-5 w-5 shrink-0 text-primary-copy"
                       aria-hidden="true"
                     />
                     <span className="text-sm font-medium text-copy">

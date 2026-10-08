@@ -11,6 +11,7 @@ import { cn } from "@lib/utils";
  * token triplet (solid / subtle / border) defined in globals.css.
  * `default` uses the primary brand color.
  * `outline` uses only the border token with no fill.
+ * `muted` is a neutral label (a party, a department) that carries no status.
  */
 const badgeVariants = cva(
     "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors",
@@ -20,6 +21,7 @@ const badgeVariants = cva(
                 default: "border-transparent bg-primary text-primary-foreground",
                 secondary: "border-transparent bg-secondary text-secondary-foreground",
                 outline: "border-border text-copy",
+                muted: "border-border bg-canvas text-copy-muted",
                 success: "border-success-border bg-success-subtle text-success",
                 warning: "border-warning-border bg-warning-subtle text-warning",
                 danger: "border-danger-border bg-danger-subtle text-danger",

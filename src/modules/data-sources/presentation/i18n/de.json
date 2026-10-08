@@ -199,7 +199,10 @@
       "noSampleRecords": "Ungültige Antwort: Die Datenquelle hat keine Beispieldatensätze zurückgegeben.",
       "credentialsMissing": "Ungültige Konfiguration: Die Zugangsdaten sind auf dem Server nicht hinterlegt.",
       "connectorUnavailable": "Ungültige Konfiguration: Für diesen Datenquellentyp ist noch kein Connector verfügbar.",
-      "addressNotAllowed": "Ungültige Konfiguration: Diese Adresse ist nicht erlaubt."
+      "addressNotAllowed": "Ungültige Konfiguration: Diese Adresse ist nicht erlaubt.",
+      "validation": "Bitte überprüfen Sie Ihre Eingabe.",
+      "infrastructure": "Ein Servicefehler ist aufgetreten. Bitte versuchen Sie es später noch einmal.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
     },
     "validation": {
       "idInvalid": "Ungültige Kennung.",

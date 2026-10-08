@@ -28,6 +28,8 @@ export type ListPagesForReleaseError =
  * is reported per page (`config_invalid`) so one bad page cannot hide the
  * others; a website over the bound is refused rather than silently cut
  * short, because a release missing pages is worse than no release.
+ *
+ * @authorization system Called by the release module, which authorizes the release and passes a website id read from a stored record.
  */
 export class ListPagesForRelease {
   constructor(private readonly deps: PageReaderDependencies) {}

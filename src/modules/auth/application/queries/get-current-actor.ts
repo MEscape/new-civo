@@ -10,6 +10,8 @@ import type { ActorView } from '../contracts/auth-views';
  * Who is signed in, for server-side guards and rendering. Reading this is
  * not authorization: a page that shows or hides something on it must
  * still be backed by a use case that calls `AuthorizationService`.
+ *
+ * @authorization public Answers who the caller is; an anonymous caller learns only that it is anonymous.
  */
 export class GetCurrentActor {
     constructor(private readonly deps: CurrentActorDependencies) {}

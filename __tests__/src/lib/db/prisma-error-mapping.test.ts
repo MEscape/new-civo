@@ -80,19 +80,6 @@ describe('mapPrismaError', () => {
     });
   });
 
-  it('maps MUTATION_ROW_MISSING_CODE structured errors to a not_found error', () => {
-    const error = { code: 'ORM.MUTATION_ROW_MISSING' };
-    vi.mocked(isStructuredError).mockImplementation((e) => e === error);
-
-    const result = mapPrismaError(error, context);
-
-    expect(result).toEqual({
-      kind: 'not_found',
-      code: context.code,
-      message: context.message,
-    });
-  });
-
   it('maps unmapped structured errors to an infrastructure error', () => {
     const error = { code: 'ORM.SOME_OTHER_ERROR' };
     vi.mocked(isStructuredError).mockImplementation((e) => e === error);

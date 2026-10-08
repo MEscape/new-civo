@@ -37,7 +37,7 @@ export function CardGrid({ props }: CardGridComponentProps) {
                 <CardHeader>
                   <CardTitle>
                     {card.href !== undefined ? (
-                      <a href={card.href} className="hover:text-primary">
+                      <a href={card.href} className="hover:text-primary-copy">
                         {card.title}
                       </a>
                     ) : (

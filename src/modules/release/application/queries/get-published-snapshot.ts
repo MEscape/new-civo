@@ -20,6 +20,8 @@ import type { PublicReleaseDependencies } from '../release-dependencies';
  * live release pointer, never through draft pages, and fails closed for a
  * website that was never published. A malformed id is just "not
  * published": the public surface does not explain its own id format.
+ *
+ * @authorization public Serves the published site, which anyone may read; it resolves only the live release.
  */
 export class GetPublishedSnapshot {
   constructor(private readonly deps: PublicReleaseDependencies) {}

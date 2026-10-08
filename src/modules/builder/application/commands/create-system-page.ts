@@ -34,6 +34,8 @@ export type CreateSystemPageError =
  * and `tenantId` MUST come from a stored record, never a request. The
  * content gets the same checks as a user save, minus the edit scope: the
  * system may build any structure.
+ *
+ * @authorization system Called by the website module right after it created and authorized the website; never reachable from a request.
  */
 export class CreateSystemPage {
   constructor(private readonly deps: SystemPageDependencies) {}

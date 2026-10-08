@@ -62,6 +62,8 @@ function toFieldDefinition(
     options: field.options,
     bounds: field.bounds,
     hasPlaceholder: field.hasPlaceholder,
+    itemFields: field.itemFields,
+    datasetKind: field.datasetKind,
   };
 }
 

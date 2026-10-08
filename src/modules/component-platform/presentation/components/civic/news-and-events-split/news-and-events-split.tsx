@@ -10,9 +10,9 @@ import {
   CardTitle,
 } from '@components/ui/card';
 
-import { getLocale, getTimeZone, getTranslations } from '@i18n/server';
+import { getAppFormatters, getTranslations } from '@i18n/server';
 
-import { formatDate, trimToNull } from '@lib/utils';
+import { trimToNull } from '@lib/utils';
 
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
@@ -41,10 +41,9 @@ export async function NewsAndEventsSplit({
   context,
   loadContent,
 }: NewsAndEventsSplitComponentProps) {
-  const [t, locale, timeZone, newsResult, eventsResult] = await Promise.all([
+  const [t, format, newsResult, eventsResult] = await Promise.all([
     getTranslations('componentPlatform'),
-    getLocale(),
-    getTimeZone(),
+    getAppFormatters(),
     loadContent({
       kind: 'NewsItem',
       mode: context.mode,
@@ -94,7 +93,7 @@ export async function NewsAndEventsSplit({
                       <Card>
                         <CardHeader>
                           {item.category !== undefined && (
-                            <p className="text-xs font-medium text-accent">
+                            <p className="text-xs font-medium text-accent-copy">
                               {item.category}
                             </p>
                           )}
@@ -132,12 +131,7 @@ export async function NewsAndEventsSplit({
                               dateTime={event.startDate}
                               className="flex shrink-0 flex-col items-center rounded-token-sm border border-border px-3 py-1.5 text-center text-xs uppercase text-copy-muted"
                             >
-                              {formatDate(
-                                event.startDate,
-                                locale,
-                                timeZone,
-                                DAY_FORMAT
-                              )}
+                              {format.date(event.startDate, DAY_FORMAT)}
                             </time>
                             <div>
                               <CardTitle>{event.title}</CardTitle>

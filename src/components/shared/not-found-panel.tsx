@@ -3,8 +3,11 @@ import {
   PageHeading,
   Section,
 } from '@components/layout/layout-primitives';
+import { buttonVariants } from '@components/ui/button';
 
 import { Link } from '@i18n';
+
+import { cn } from '@lib/utils';
 
 export interface NotFoundPanelProps {
   readonly title: string;
@@ -28,7 +31,7 @@ export function NotFoundPanel({
         <PageHeading title={title} description={description} />
         <Link
           href="/"
-          className="flex w-full justify-center rounded-md bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/90"
+          className={cn(buttonVariants(), 'w-full')}
         >
           {returnLabel}
         </Link>

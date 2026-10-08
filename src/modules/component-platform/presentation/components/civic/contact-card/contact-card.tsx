@@ -77,7 +77,7 @@ export async function ContactCard({
                     {contact.email !== undefined && (
                       <a
                         href={`mailto:${contact.email}`}
-                        className="flex items-center gap-2 text-primary hover:underline"
+                        className="flex items-center gap-2 text-primary-copy hover:underline"
                       >
                         <Mail className="h-4 w-4" aria-hidden="true" />
                         {contact.email}

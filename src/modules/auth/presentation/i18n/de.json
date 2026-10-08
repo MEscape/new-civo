@@ -102,7 +102,10 @@
       "invalidToken": "Dieser Link ist ungültig oder abgelaufen. Fordern Sie einen neuen an.",
       "emailNotVerified": "Ihre E-Mail-Adresse ist noch nicht bestätigt. Wir haben Ihnen einen neuen Link gesendet.",
       "permissionDenied": "Sie haben keine Berechtigung für diese Aktion.",
-      "rateLimited": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut."
+      "rateLimited": "Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+      "validation": "Bitte überprüfen Sie Ihre Eingabe.",
+      "infrastructure": "Ein Servicefehler ist aufgetreten. Bitte versuchen Sie es später noch einmal.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
     },
     "validation": {
       "emailRequired": "Bitte geben Sie Ihre E-Mail-Adresse ein.",

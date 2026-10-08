@@ -11,6 +11,16 @@ import { describeViolations } from './fixture-tree';
 
 import type { Violation } from './fixture-tree';
 
+/** The policy shapes this test reads; the policy is untyped ESM (see eslint/shims.d.ts). */
+interface ModuleOverride {
+  readonly reason: string;
+  readonly extraRootFiles?: Readonly<Record<string, readonly string[]>>;
+}
+interface LegacyModule {
+  readonly reason: string;
+  readonly relax?: readonly string[];
+}
+
 const ROOT = process.cwd();
 const project = loadProject(ROOT);
 
@@ -40,12 +50,18 @@ describe('architecture of this repository', () => {
       'action:signInAction=public',
       'action:signOutAction=public',
       'action:signUpAction=public',
+      'route-handler:GET src/app/api/health/route.ts=none',
+      'use-case:BuildMapModel=public',
+      'use-case:CanNestComponent=public',
       'use-case:CreateSystemPage=system',
+      'use-case:GetComponentDefaultProps=public',
+      'use-case:GetComponentReleaseInfo=public',
       'use-case:GetCurrentActor=public',
       'use-case:GetMappedDatasetRecords=public',
-      'use-case:GetPublicPage=public',
       'use-case:GetPublicWebsiteBySlug=public',
       'use-case:GetPublishedSnapshot=public',
+      'use-case:ListComponentCatalog=public',
+      'use-case:ListContent=public',
       'use-case:ListPagesForRelease=system',
       'use-case:RequestPasswordReset=public',
       'use-case:ResetPassword=public',
@@ -57,12 +73,12 @@ describe('architecture of this repository', () => {
 
   it('keeps the policy exceptions small, explicit and justified', () => {
     // the one exception to the module layout: auth's single authorization service file in application/
-    const extraRootFiles = Object.entries(MODULE_OVERRIDES).flatMap(([module, override]) =>
+    const extraRootFiles = Object.entries<ModuleOverride>(MODULE_OVERRIDES).flatMap(([module, override]) =>
       Object.entries(override.extraRootFiles ?? {}).map(([layer, files]) => `${module}/${layer}/${files.join(',')}`)
     );
     expect(extraRootFiles).toEqual(['auth/application/authorization-service.ts']);
     expect(Object.keys(MODULE_OVERRIDES)).toEqual(['auth']);
-    for (const [name, override] of Object.entries(MODULE_OVERRIDES)) {
+    for (const [name, override] of Object.entries<ModuleOverride>(MODULE_OVERRIDES)) {
       expect(override.reason.length, `${name} needs a reason`).toBeGreaterThan(40);
     }
     const authFiles = project.moduleFiles('auth').filter((f: { local: string }) => f.local === 'application/authorization-service.ts');
@@ -70,8 +86,8 @@ describe('architecture of this repository', () => {
   });
 
   it('lists a legacy module only while it still needs the exemption (the list can only shrink)', () => {
-    expect(Object.keys(LEGACY_MODULES).sort()).toEqual(['component-platform', 'integrations']);
-    for (const [name, legacy] of Object.entries(LEGACY_MODULES)) {
+    expect(Object.keys(LEGACY_MODULES).sort()).toEqual([]);
+    for (const [name, legacy] of Object.entries<LegacyModule>(LEGACY_MODULES)) {
       expect(legacy.reason.length, `${name} needs a reason`).toBeGreaterThan(40);
       expect(project.modules, `${name} no longer exists: remove it from LEGACY_MODULES`).toContain(name);
       for (const rule of legacy.relax ?? []) {
@@ -83,7 +99,7 @@ describe('architecture of this repository', () => {
       const saved = LEGACY_MODULES[name];
       delete (LEGACY_MODULES as Record<string, unknown>)[name];
       try {
-        const own = [...checkModuleStructure(project), ...checkPublicApi(project)].filter((v: Violation) => v.file.startsWith(`src/modules/${name}/`));
+        const own = [...checkModuleStructure(project), ...checkPublicApi(project)].filter((v: Violation) => v.file?.startsWith(`src/modules/${name}/`) === true);
         expect(own.length, `${name} follows the module layout now: remove it from LEGACY_MODULES`).toBeGreaterThan(0);
       } finally {
         (LEGACY_MODULES as Record<string, unknown>)[name] = saved;

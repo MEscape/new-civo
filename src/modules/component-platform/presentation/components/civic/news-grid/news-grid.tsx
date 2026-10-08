@@ -76,7 +76,7 @@ export async function NewsGrid({
                 )}
                 <CardHeader>
                   {item.category !== undefined && (
-                    <p className="text-xs font-medium text-accent">
+                    <p className="text-xs font-medium text-accent-copy">
                       {item.category}
                     </p>
                   )}

@@ -15,6 +15,9 @@ export type SignUpError = AuthenticatorError | RateLimitError;
  * address is already registered (the real owner is told by email instead),
  * so the caller can only say "check your inbox". The new account has no
  * membership, and therefore no permissions, until one is granted.
+ *
+ * @authorization public Registration precedes any actor; the rate limiter gates it.
+ * @audit-exempt Outcomes are audited by the identity provider hooks (create-security-audit-options) where sessions and accounts change; this command audits only its rate-limit refusal, through enforceRateLimit.
  */
 export class SignUp {
     constructor(private readonly deps: AuthenticationDependencies) {}

@@ -10,6 +10,7 @@ import { cn } from "@lib/utils";
  * Variant map:
  *   default     → primary brand fill
  *   secondary   → secondary brand fill
+ *   accent      → accent brand fill, for a call to action on a primary-filled surface
  *   outline     → transparent with border, fills on hover
  *   ghost       → no border or fill, canvas on hover
  *   destructive → danger semantic tokens (soft, not alarming by default)
@@ -38,6 +39,8 @@ const buttonVariants = cva(
                 default: "bg-primary text-primary-foreground hover:bg-primary/80",
                 /** Secondary brand fill. */
                 secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                /** Accent brand fill — a call to action placed on a primary-filled surface. */
+                accent: "bg-accent text-accent-foreground hover:bg-accent/80",
                 /** Transparent with border; fills to canvas on hover. */
                 outline: [
                     "border-border bg-surface",

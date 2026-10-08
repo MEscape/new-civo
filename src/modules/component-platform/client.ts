@@ -13,6 +13,7 @@ export type {
   CatalogBoundsView,
   CatalogContractView,
   CatalogFieldView,
+  CatalogItemFieldView,
   CatalogOptionView,
   ComponentCatalogEntry,
 } from './application/contracts/catalog-views';

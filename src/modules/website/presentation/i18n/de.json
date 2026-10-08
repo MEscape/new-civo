@@ -60,7 +60,10 @@
     },
     "errors": {
       "notFound": "Die Website wurde nicht gefunden.",
-      "slugTaken": "Dieser Slug ist bereits vergeben."
+      "slugTaken": "Dieser Slug ist bereits vergeben.",
+      "validation": "Bitte überprüfen Sie Ihre Eingabe.",
+      "infrastructure": "Ein Servicefehler ist aufgetreten. Bitte versuchen Sie es später noch einmal.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
     },
     "validation": {
       "idInvalid": "Ungültige Kennung.",
@@ -82,8 +85,7 @@
         "description": "Erstellen und verwalten Sie die Websites Ihrer Kommune.",
         "empty": "Noch keine Websites",
         "emptyDescription": "Erstellen Sie Ihre erste Website, um loszulegen.",
-        "createTitle": "Website erstellen",
-        "open": "Öffnen"
+        "createTitle": "Website erstellen"
       },
       "detail": {
         "releasesTitle": "Veröffentlichungen",

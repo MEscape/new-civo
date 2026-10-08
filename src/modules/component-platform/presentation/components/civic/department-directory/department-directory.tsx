@@ -69,7 +69,7 @@ export async function DepartmentDirectory({
                 <CardHeader>
                   <CardTitle>
                     {department.href !== undefined ? (
-                      <a href={department.href} className="hover:text-primary">
+                      <a href={department.href} className="hover:text-primary-copy">
                         {department.name}
                       </a>
                     ) : (
@@ -92,7 +92,7 @@ export async function DepartmentDirectory({
                             aria-label={t('departmentDirectory.writeTo', {
                               name: contact.name,
                             })}
-                            className="flex items-center gap-1.5 text-primary hover:underline"
+                            className="flex items-center gap-1.5 text-primary-copy hover:underline"
                           >
                             <Mail className="h-3.5 w-3.5" aria-hidden="true" />
                           </a>

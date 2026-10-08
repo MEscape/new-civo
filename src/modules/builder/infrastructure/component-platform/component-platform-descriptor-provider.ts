@@ -33,6 +33,11 @@ function toFieldDescriptor(field: CatalogFieldView): PropFieldDescriptor {
     })),
     bounds: field.bounds,
     canonicalKind: field.canonicalKind,
+    itemFields: field.itemFields.map((itemField) => ({
+      key: itemField.key,
+      labelKey: itemField.labelKey,
+      multiline: itemField.multiline,
+    })),
   };
 }
 

@@ -12,13 +12,13 @@ import { NotFoundPanel } from '@components/shared/not-found-panel';
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default function NotFound() {
-    const t = useTranslations('errors');
+    const t = useTranslations('app');
 
     return (
         <NotFoundPanel
-            title={t('page.notFoundTitle')}
-            description={t('page.notFoundDescription')}
-            returnLabel={t('page.returnHome')}
+            title={t('notFound.title')}
+            description={t('notFound.description')}
+            returnLabel={t('notFound.returnHome')}
         />
     );
 }

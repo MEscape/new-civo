@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from 'react';
 
-import { cn } from 'cn';
+import { cn } from '@lib/utils';
 
 /**
  * Full-viewport page shell. Composes the app header + scrollable body.
@@ -77,12 +77,34 @@ export function Container({
   );
 }
 
+const SECTION_TONE_CLASSES = {
+  default: '',
+  muted: 'bg-surface',
+} as const;
+
+/** Background of a page section: the canvas, or the raised surface that sets a section apart from its neighbours. */
+export type SectionTone = keyof typeof SECTION_TONE_CLASSES;
+
+/** The background class of a section tone, for wrappers that group sections without being one. */
+export function sectionToneClass(tone: SectionTone): string {
+  return SECTION_TONE_CLASSES[tone];
+}
+
+interface SectionProps extends HTMLAttributes<HTMLElement> {
+  tone?: SectionTone;
+}
+
 /**
  * Vertical section block with the standard section spacing token.
  * Use for major content sections on marketing/content pages.
  */
-export function Section({ className, ...props }: HTMLAttributes<HTMLElement>) {
-  return <section className={cn('py-section', className)} {...props} />;
+export function Section({ tone = 'default', className, ...props }: SectionProps) {
+  return (
+    <section
+      className={cn('py-section', sectionToneClass(tone), className)}
+      {...props}
+    />
+  );
 }
 
 /**

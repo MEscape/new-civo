@@ -16,6 +16,7 @@ export type {
   ComponentDescriptor,
   NodeBlueprint,
   PropFieldDescriptor,
+  PropItemFieldDescriptor,
   PropOptionDescriptor,
 } from '../../domain/models/component-descriptor';
 export {

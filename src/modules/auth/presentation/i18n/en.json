@@ -102,7 +102,10 @@
       "invalidToken": "This link is invalid or has expired. Request a new one.",
       "emailNotVerified": "Your email address is not verified yet. We have sent you a new link.",
       "permissionDenied": "You do not have permission to do this.",
-      "rateLimited": "Too many attempts. Please wait a while and try again."
+      "rateLimited": "Too many attempts. Please wait a while and try again.",
+      "validation": "Please check your input.",
+      "infrastructure": "A service error occurred. Please try again later.",
+      "unexpected": "An unexpected error occurred."
     },
     "validation": {
       "emailRequired": "Please enter your email address.",

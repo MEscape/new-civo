@@ -18,6 +18,7 @@ export type {
   CatalogBoundsView,
   CatalogContractView,
   CatalogFieldView,
+  CatalogItemFieldView,
   CatalogOptionView,
   ComponentCatalogEntry,
   ComponentCatalogView,

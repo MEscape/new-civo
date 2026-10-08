@@ -8,9 +8,13 @@ import { UpdateWebsiteTheme } from './application/commands/update-website-theme'
 import { GetPublicWebsiteBySlug } from './application/queries/get-public-website-by-slug';
 import { GetWebsiteById } from './application/queries/get-website-by-id';
 import { ListWebsites } from './application/queries/list-websites';
+import { restoreWebsiteTheme } from './domain/models/website-theme';
 import { LoggerWebsiteAuditLog } from './infrastructure/logging/logger-website-audit-log';
 import { PrismaWebsiteRepository } from './infrastructure/prisma/prisma-website.repository';
 import { BuilderHomePageProvisioner } from './infrastructure/provisioner/builder-home-page-provisioner';
+
+import type { WebsiteThemeView } from './application/contracts/website-views';
+import type { StoredWebsiteTheme } from './domain/models/website-theme';
 
 /**
  * The module's composition root: the one file that knows both the
@@ -36,3 +40,15 @@ export const websiteQueries = {
   listWebsites: new ListWebsites(dependencies),
   getPublicWebsiteBySlug: new GetPublicWebsiteBySlug({ websites }),
 } as const;
+
+/**
+ * Reads a theme that the website module once validated and someone else
+ * stored (a release snapshot) back into a valid theme, with the website's
+ * own per-field fallbacks. The one place another module or a page learns
+ * what a valid theme is, so nobody keeps a second theme reader.
+ */
+export function restoreStoredWebsiteTheme(
+  stored: StoredWebsiteTheme | null | undefined
+): WebsiteThemeView {
+  return restoreWebsiteTheme(stored);
+}

@@ -15,6 +15,8 @@ import type { PublicWebsiteDependencies } from '../website-dependencies';
  * website is public by slug, as before. That is also why it returns the
  * narrow `PublicWebsiteView` and never the owner's view. If drafts or
  * unpublished sites are introduced, the visibility check belongs here.
+ *
+ * @authorization public Serves the public site; every website is public by its slug.
  */
 export class GetPublicWebsiteBySlug {
   constructor(private readonly deps: PublicWebsiteDependencies) {}

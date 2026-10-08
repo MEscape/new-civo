@@ -14,7 +14,7 @@ export async function generateMetadata({
     params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
     const locale = requireLocale((await params).locale);
-    const t = await getTranslations({ locale, namespace: 'controls.metadata' });
+    const t = await getTranslations({ locale, namespace: 'app.metadata' });
 
     return buildLocalizedMetadata({
         locale,
@@ -24,15 +24,19 @@ export async function generateMetadata({
     });
 }
 
-export default function LocaleRootPage() {
+export default async function LocaleRootPage({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}) {
+    const locale = requireLocale((await params).locale);
+    const t = await getTranslations({ locale, namespace: 'app.home' });
+
     return (
         <Container className="max-w-4xl">
-            <Section className="space-y-8 mt-12 text-center">
-                <PageHeading 
-                    title="Civo" 
-                    description="Municipal & Smart City Website Builder"
-                />
-                <p className="text-muted-foreground">Public landing page coming soon.</p>
+            <Section className="mt-12 space-y-8 text-center">
+                <PageHeading title={t('title')} description={t('description')} />
+                <p className="text-copy-muted">{t('comingSoon')}</p>
             </Section>
         </Container>
     );

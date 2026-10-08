@@ -7,25 +7,21 @@ import { Badge } from '@components/ui/badge';
 import { Card, CardContent } from '@components/ui/card';
 import { Trash2 } from '@components/ui/icons';
 
-import { getLocale, getTimeZone, getTranslations } from '@i18n/server';
+import { getAppFormatters, getTranslations } from '@i18n/server';
 
-import { formatDate, trimToNull } from '@lib/utils';
+import { trimToNull } from '@lib/utils';
 
 import { ContentOriginBadge } from '../../shared/content-origin-badge';
 import { ContentState } from '../../shared/content-state';
 
+import type { WASTE_TYPES } from '../../../../application/contracts/component-platform-constraints';
 import type {
   ComponentProps,
   RenderContext,
 } from '../../../../application/contracts/component-platform-constraints';
 import type { LoadContent } from '../../page-renderer/load-content';
 
-type WasteType =
-  | 'restmuell'
-  | 'biomuell'
-  | 'papier'
-  | 'gelberSack'
-  | 'sperrmuell';
+type WasteType = (typeof WASTE_TYPES)[number];
 
 const BADGE_VARIANTS = {
   restmuell: 'muted',
@@ -53,10 +49,9 @@ export async function WasteCalendar({
   context,
   loadContent,
 }: WasteCalendarComponentProps) {
-  const [t, locale, timeZone, result] = await Promise.all([
+  const [t, format, result] = await Promise.all([
     getTranslations('componentPlatform'),
-    getLocale(),
-    getTimeZone(),
+    getAppFormatters(),
     loadContent({
       kind: 'WasteCollectionEntry',
       mode: context.mode,
@@ -97,7 +92,7 @@ export async function WasteCalendar({
                     />
                     <div>
                       <time dateTime={entry.date} className="text-copy">
-                        {formatDate(entry.date, locale, timeZone, DATE_FORMAT)}
+                        {format.date(entry.date, DATE_FORMAT)}
                       </time>
                       {entry.district !== undefined && (
                         <p className="text-xs text-copy-muted">

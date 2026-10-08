@@ -23,7 +23,7 @@ export const cardGridDefinition = defineComponent({
         href: optional(url({ max: PROP_LIMITS.url, allowRelative: true })),
       },
       MAX_CARDS,
-      { group: 'content', municipal: true },
+      { group: 'content', municipal: true, multiline: ['description'] },
     ),
     columns: prop.columns(INITIAL_COLUMNS, { group: 'appearance' }),
   },

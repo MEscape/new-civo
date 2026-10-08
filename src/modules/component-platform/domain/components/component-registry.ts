@@ -39,7 +39,9 @@ export function createComponentRegistry(
     }
     for (const field of definition.fields) {
       invariant(
-        field.control !== 'dataset' || field.datasetKind !== null,
+        field.control !== 'dataset' ||
+          field.datasetKind !== null ||
+          definition.dataBinding !== null,
         `"${definition.type}" has the dataset prop "${field.key}" but declares no data binding for it.`
       );
     }

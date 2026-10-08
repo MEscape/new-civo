@@ -48,10 +48,6 @@ export class ListCompatibleDatasets {
     > {
         const { authorization, datasets } = this.deps;
         const { websiteId, canonicalKinds } = input;
-        
-        if (canonicalKinds.length === 0) {
-            return okAsync([]);
-        }
 
         return authorization
             .requireInTenant('dataset.read')
@@ -67,7 +63,9 @@ export class ListCompatibleDatasets {
                         return ok({ id, kinds: parsedKinds });
                     })
                     .asyncAndThen(({ id, kinds }) =>
-                        datasets.listCompatible(
+                        kinds.length === 0
+                            ? okAsync([])
+                            : datasets.listCompatible(
                             id,
                             actor.tenantId,
                             kinds,

@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import { restoreStoredPageConfig } from '@modules/builder';
 import { renderPageNodes } from '@modules/component-platform';
 import { releaseQueries } from '@modules/release';
-import { restoreWebsiteTheme, ThemeProvider, websiteQueries } from '@modules/website';
+import { restoreStoredWebsiteTheme, ThemeProvider, websiteQueries } from '@modules/website';
 
 import { buildContentMetadata } from '@lib/seo';
 
@@ -57,7 +57,7 @@ export default async function PublishedSitePage({ params }: RouteProps) {
     const { snapshot, config } = await loadPublishedPage(siteSlug, toPath(path));
 
     return (
-        <ThemeProvider theme={restoreWebsiteTheme(snapshot.theme)} className="min-h-dvh">
+        <ThemeProvider theme={restoreStoredWebsiteTheme(snapshot.theme)} className="min-h-dvh">
             {renderPageNodes(config.children, { mode: 'published', websiteId: snapshot.website.id })}
         </ThemeProvider>
     );

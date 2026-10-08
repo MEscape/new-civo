@@ -2,6 +2,7 @@ import { getPath } from '@lib/utils';
 
 import type {
   PropFieldDescriptor,
+  PropItemFieldDescriptor,
   PropOptionDescriptor,
 } from '../../application/contracts/builder-constraints';
 import type { ComponentCatalog } from '../../application/contracts/editor-model';
@@ -25,6 +26,7 @@ export interface ComponentText {
   fieldLabel(field: PropFieldDescriptor): string;
   fieldPlaceholder(field: PropFieldDescriptor): string | undefined;
   optionLabel(option: PropOptionDescriptor): string;
+  itemFieldLabel(itemField: PropItemFieldDescriptor): string;
 }
 
 function lookup(messages: unknown, key: string): string | undefined {
@@ -53,5 +55,7 @@ export function createComponentText(
     optionLabel: (option) =>
       (option.labelKey === null ? undefined : lookup(messages, option.labelKey)) ??
       String(option.value),
+    itemFieldLabel: (itemField) =>
+      lookup(messages, itemField.labelKey) ?? itemField.key,
   };
 }

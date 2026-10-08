@@ -55,9 +55,6 @@ ruleTester.run('architecture/module-structure', rules['module-structure']!, {
     ].map((p) => ok(`src/modules/shop/${p}`)),
     // documented exceptions live in eslint/architecture-policy/policy.mjs and are scoped to the module that earned them
     ok('src/modules/auth/application/authorization-service.ts'),
-    // modules listed in LEGACY_MODULES have the structure family suspended (and only that)
-    ok('src/modules/component-platform/domain/registry.ts'),
-    ok('src/modules/integrations/civic/infrastructure/mock-civic-provider.ts'),
     // not module code
     ok('src/lib/utils/x.ts'),
   ],

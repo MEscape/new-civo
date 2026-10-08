@@ -25,7 +25,6 @@ export type {
   MappedRecordsView,
 } from "./application/contracts/data-source-views";
 
-export * from "./domain/models/ids";
 export { DATA_SOURCE_ERROR_CODES } from "./domain/errors/data-source-errors";
 
 export { default as enDataSource } from "./presentation/i18n/en.json";

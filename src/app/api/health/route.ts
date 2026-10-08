@@ -2,6 +2,11 @@
 // cannot make the platform or Docker kill a healthy web process.
 export const dynamic = 'force-dynamic';
 
+/**
+ * Liveness probe for the platform and Docker.
+ *
+ * @authorization none Reports only that the process answers; it reads no data.
+ */
 export function GET() {
   return Response.json(
     { status: 'ok' },

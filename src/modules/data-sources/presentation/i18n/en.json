@@ -199,7 +199,10 @@
       "noSampleRecords": "Invalid response: the data source returned no sample records.",
       "credentialsMissing": "Invalid configuration: the credentials are not set up on the server.",
       "connectorUnavailable": "Invalid configuration: no connector is available for this data source type yet.",
-      "addressNotAllowed": "Invalid configuration: this address is not allowed."
+      "addressNotAllowed": "Invalid configuration: this address is not allowed.",
+      "validation": "Please check your input.",
+      "infrastructure": "A service error occurred. Please try again later.",
+      "unexpected": "An unexpected error occurred."
     },
     "validation": {
       "idInvalid": "Invalid identifier.",

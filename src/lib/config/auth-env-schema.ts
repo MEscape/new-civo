@@ -15,12 +15,15 @@ const DEFAULT_DEV_ACTOR_ROLE = 'viewer';
 
 const MIN_AUTH_SECRET_LENGTH = 32;
 
-const authEnabledSchema = z
-  .enum(['true', 'false'])
-  .optional()
-  .transform((value) =>
-    value === undefined ? DEFAULT_AUTH_ENABLED : value === 'true'
-  );
+/**
+ * An environment flag is the text `true` or `false`. `z.coerce.boolean()`
+ * is not used: it turns every non-empty string, including "false", into `true`.
+ */
+const booleanFlagSchema = (defaultValue: boolean) =>
+  z
+    .enum(['true', 'false'])
+    .optional()
+    .transform((value) => (value === undefined ? defaultValue : value === 'true'));
 
 const commaSeparatedListSchema = z
   .string()
@@ -37,7 +40,7 @@ const positiveIntegerSchema = (defaultValue: number) =>
 
 export const authEnvSchema = z
   .object({
-    AUTH_ENABLED: authEnabledSchema,
+    AUTH_ENABLED: booleanFlagSchema(DEFAULT_AUTH_ENABLED),
 
     AUTH_SECRET: z.string().optional(),
 
@@ -72,7 +75,7 @@ export const authEnvSchema = z
     AUTH_MAIL_API_URL: z.url().optional(),
     AUTH_MAIL_SMTP_HOST: z.string().min(1).optional(),
     AUTH_MAIL_SMTP_PORT: positiveIntegerSchema(1025).optional(),
-    AUTH_MAIL_SMTP_SECURE: z.coerce.boolean().default(false),
+    AUTH_MAIL_SMTP_SECURE: booleanFlagSchema(false),
     AUTH_MAIL_FROM: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {

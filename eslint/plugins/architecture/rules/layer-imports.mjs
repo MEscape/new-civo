@@ -6,6 +6,7 @@ import {
   I18N_VOCABULARY_ALLOW,
   SERVER_ONLY_SPECIFIERS,
   SHARED_LIB_ALLOW,
+  SHARED_PORT_LIBS,
   TRUSTED_BRAND_CONSTRUCTOR,
   policyFor,
 } from '../../../architecture-policy/policy.mjs';
@@ -57,6 +58,11 @@ function checkModuleFile({ file, target, isTypeOnly, names }) {
     const allow = SHARED_LIB_ALLOW[layer] ?? null;
     if (allow === null) return null;
     const lib = sharedLibName(target);
+    if (lib !== null && SHARED_PORT_LIBS.includes(lib)) {
+      return isTypeOnly
+        ? null
+        : `${label} may only \`import type\` from '@lib/${lib}': it defines a port. The implementation is wired by composition.ts and handed in.`;
+    }
     if (lib !== null && !allow.includes(lib)) {
       return `${label} must not import '@lib/${lib}'. Allowed shared libraries here: ${allow.map((n) => `@lib/${n}`).join(', ')}.`;
     }

@@ -15,7 +15,7 @@ import { Button } from '@components/ui/button';
 
 import { applyActionError } from '@lib/actions';
 
-import { BUILDER_ERROR_CODES } from '../../domain/errors/builder-errors';
+import { BUILDER_ERROR_CODES } from '../../application/contracts/builder-constraints';
 import { createPageAction } from '../actions/create-page-action';
 import { MESSAGE_PARAMS, messageKeyForCode } from '../messages/message-keys';
 import { normalizePagePath } from '../page-path';

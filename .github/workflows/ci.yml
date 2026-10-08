@@ -43,8 +43,8 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      # tsconfig.json includes scripts/ and prisma/, so one run covers them.
       - run: npm run typecheck
-      - run: npm run typecheck:scripts
 
   database:
     name: Contract & migrations

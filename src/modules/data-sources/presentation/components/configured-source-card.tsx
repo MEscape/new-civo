@@ -17,7 +17,7 @@ import {
   CardTitle,
 } from "@components/ui/card";
 
-import { useAppFormatters } from "@i18n";
+import { useAppFormatters } from "@i18n/client";
 
 import { deleteDataSourceAction } from "../actions/delete-data-source-action";
 import { testDataSourceConnectionAction } from "../actions/test-data-source-connection-action";

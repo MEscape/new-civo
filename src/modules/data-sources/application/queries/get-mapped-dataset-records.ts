@@ -41,6 +41,8 @@ export type GetMappedDatasetRecordsError =
  * Mapping is applied after the fetch and is never cached, so a mapping
  * change takes effect immediately. Caching of the raw response, if any,
  * belongs to the injected connector.
+ *
+ * @authorization public Feeds published pages, which anyone may read; the dataset is always resolved within the website that renders it.
  */
 export class GetMappedDatasetRecords {
     constructor(private readonly deps: PublicDatasetDependencies) { }

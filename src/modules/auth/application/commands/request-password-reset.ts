@@ -13,6 +13,9 @@ export type RequestPasswordResetError = AuthenticatorError | RateLimitError;
 /**
  * Sends a reset link if the address has an account. Succeeds either way, so
  * it cannot be used to find out which addresses are registered.
+ *
+ * @authorization public A forgotten password means there is no actor; the rate limiter gates it and the answer never reveals whether the address exists.
+ * @audit-exempt Outcomes are audited by the identity provider hooks (create-security-audit-options) where sessions and accounts change; this command audits only its rate-limit refusal, through enforceRateLimit.
  */
 export class RequestPasswordReset {
     constructor(private readonly deps: AuthenticationDependencies) {}

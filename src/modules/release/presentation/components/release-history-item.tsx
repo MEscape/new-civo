@@ -7,7 +7,7 @@ import { Badge } from '@components/ui/badge';
 import { Button } from '@components/ui/button';
 import { Check, Undo2, AlertTriangle } from '@components/ui/icons';
 
-import { useAppFormatters } from '@i18n';
+import { useAppFormatters } from '@i18n/client';
 
 import { cn } from '@lib/utils';
 

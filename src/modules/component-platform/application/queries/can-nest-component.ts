@@ -9,7 +9,11 @@ export interface CanNestComponentInput {
   readonly childType: string;
 }
 
-/** Whether `childType` may be placed under `parentType`. An unknown type simply cannot be nested. */
+/**
+ * Whether `childType` may be placed under `parentType`. An unknown type simply cannot be nested.
+ *
+ * @authorization public A rule of the component catalog, which is code and contains nothing per tenant.
+ */
 export class CanNestComponent {
   constructor(private readonly deps: PublicComponentPlatformDependencies) {}
 

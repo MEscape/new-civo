@@ -13,6 +13,8 @@ import type { ComponentReleaseInfo } from '../contracts/catalog-views';
  * version and, for every contract it relies on, the minimum it needs and the
  * version in force. A type that is not registered is an error the caller
  * decides how to treat.
+ *
+ * @authorization public Reads the component catalog, which is code and contains nothing per tenant.
  */
 export class GetComponentReleaseInfo {
   constructor(private readonly deps: PublicComponentPlatformDependencies) {}

@@ -30,17 +30,16 @@ export class FindWebsitesUsingComponent {
     input: FindWebsitesUsingComponentInput
   ): AppResultAsync<readonly ComponentUsageView[], FindUsagesError> {
     const componentType = trimToNull(input.componentType);
-    if (componentType === null) {
-      return okAsync<readonly ComponentUsageView[], FindUsagesError>([]);
-    }
 
     return this.deps.authorization
       .requireInTenant('release.read')
       .andThen((actor) =>
-        this.deps.releases.listPublishedDependencies(
-          actor.tenantId,
-          MAX_SCANNED_WEBSITES
-        )
+        componentType === null
+          ? okAsync([])
+          : this.deps.releases.listPublishedDependencies(
+              actor.tenantId,
+              MAX_SCANNED_WEBSITES
+            )
       )
       .map((published) =>
         published.flatMap((entry) => {

@@ -41,6 +41,8 @@ function resolveLimit(requested: number | undefined): number {
  *  - draft: both fall back to labelled sample data, so an editor can lay a
  *    page out before the municipality's API is mapped. The fallback names
  *    its cause instead of hiding it.
+ *
+ * @authorization public Renders content for pages anyone may read; datasets are read through data-sources within the rendering website.
  */
 export class ListContent {
   constructor(private readonly deps: PublicComponentPlatformDependencies) {}

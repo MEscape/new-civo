@@ -1,20 +1,18 @@
-import { cn, range } from '@lib/utils';
+import { cn } from '@lib/utils';
 
 import type { ControlProps } from './control-props';
 
-const MIN_COLUMNS = 1;
-const MAX_COLUMNS = 4;
-const COLUMN_COUNTS = range(MIN_COLUMNS, MAX_COLUMNS + 1);
-
+/** The column counts come from the platform's field options, so the panel never restates them. */
 export function ColumnsControl({
   labelId,
+  field,
   value,
   onChange,
   onCommit,
 }: ControlProps) {
   return (
     <div role="group" aria-labelledby={labelId} className="flex gap-1">
-      {COLUMN_COUNTS.map((count) => (
+      {field.options.map(({ value: count }) => (
         <button
           key={count}
           type="button"

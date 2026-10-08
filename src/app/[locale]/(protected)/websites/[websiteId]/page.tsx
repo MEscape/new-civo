@@ -73,7 +73,7 @@ export default async function WebsitePage({ params }: RouteProps) {
                     <I18nProvider namespaces={['release']}>
                         <ReleaseHistoryPanel
                             websiteId={website.id}
-                            history={toReleaseHistoryDto(history.releases)}
+                            history={toReleaseHistoryDto(history)}
                         />
                     </I18nProvider>
                 </div>

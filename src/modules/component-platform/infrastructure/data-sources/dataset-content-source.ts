@@ -1,4 +1,4 @@
-import type { MappedRecordsView } from '@modules/data-sources';
+import type { CanonicalKind, MappedRecordsView } from '@modules/data-sources';
 
 import type { AppError } from '@lib/errors';
 import { logger } from '@lib/logger';
@@ -55,6 +55,16 @@ function toSourceError(error: AppError): ContentSourceError {
       sourceLogger.error('Dataset source failed', error, { code: error.code });
       return contentSourceFailed(error);
   }
+}
+
+/**
+ * Compile-time proof that every kind this module renders exists in
+ * data-sources. One direction only: a kind data-sources adds needs nothing
+ * here until a component renders it, while a kind it removes or renames
+ * stops this file compiling, which is exactly when this adapter must change.
+ */
+function toCanonicalKind(kind: ContentKind): CanonicalKind {
+  return kind;
 }
 
 function mismatch(expected: ContentKind, view: MappedRecordsView): ContentSourceError {
@@ -114,7 +124,7 @@ export class DatasetContentSource implements ContentSource {
     return this.fetchRecords(request.datasetId, request.websiteId)
       .mapErr(toSourceError)
       .andThen((view): AppResultAsync<ContentBatch<K>, ContentSourceError> =>
-        view.canonicalKind === request.kind
+        view.canonicalKind === toCanonicalKind(request.kind)
           ? okAsync(validate(request.kind, view, request.datasetId))
           : errAsync(mismatch(request.kind, view)),
       );

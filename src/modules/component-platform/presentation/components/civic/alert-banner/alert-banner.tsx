@@ -22,12 +22,12 @@ const SEVERITY_ICONS = {
   urgent: AlertOctagon,
 } as const satisfies Record<AlertSeverity, typeof Info>;
 
-// Deliberately not theme tokens: severity is a fixed semantic signal that
+// Status tokens, not brand tokens: severity is a fixed semantic signal that
 // must stay legible whatever a municipality's brand palette is.
 const SEVERITY_CLASSES = {
-  info: 'border-blue-200 bg-blue-50 text-blue-900',
-  warning: 'border-amber-200 bg-amber-50 text-amber-900',
-  urgent: 'border-red-200 bg-red-50 text-red-900',
+  info: 'border-info-border bg-info-subtle text-info',
+  warning: 'border-warning-border bg-warning-subtle text-warning',
+  urgent: 'border-danger-border bg-danger-subtle text-danger',
 } as const satisfies Record<AlertSeverity, string>;
 
 export interface AlertBannerComponentProps {

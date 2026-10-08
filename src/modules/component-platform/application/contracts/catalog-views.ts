@@ -21,6 +21,13 @@ export interface CatalogBoundsView {
   readonly max: number;
 }
 
+/** One field of an `items` entry. */
+export interface CatalogItemFieldView {
+  readonly key: string;
+  readonly labelKey: string;
+  readonly multiline: boolean;
+}
+
 export interface CatalogFieldView {
   readonly key: string;
   readonly control: PropControl;
@@ -32,6 +39,8 @@ export interface CatalogFieldView {
   readonly bounds: CatalogBoundsView | null;
   /** Which canonical kind a `dataset` control must offer datasets of. */
   readonly canonicalKind: ContentKind | null;
+  /** The fields of one entry of an `items` control; empty for every other control. */
+  readonly itemFields: readonly CatalogItemFieldView[];
 }
 
 export interface CatalogContractView {

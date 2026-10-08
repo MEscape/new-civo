@@ -6,5 +6,5 @@ export {
   getTimeZone,
   getTranslations,
 } from 'next-intl/server';
-export { getAppFormatters } from './formatters';
+export { getAppFormatters } from './formatters.server';
 export { requireLocale } from './config';

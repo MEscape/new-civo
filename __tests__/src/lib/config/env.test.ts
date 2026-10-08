@@ -2,22 +2,48 @@ import { describe, expect, it } from 'vitest';
 
 import { publicEnvSchema, serverEnvSchema } from '@lib/config/env-schema';
 
+/** Authentication is on by default and then needs its own settings; these tests are about the rest. */
+const AUTH_DISABLED = { AUTH_ENABLED: 'false' } as const;
+
 describe('serverEnvSchema', () => {
   it('applies expected defaults when optional fields are omitted', () => {
     const result = serverEnvSchema.safeParse({
+      ...AUTH_DISABLED,
       DATABASE_URL: 'postgres://user:pass@localhost:5432/db',
     });
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data).toEqual({
+      expect(result.data).toMatchObject({
         DATABASE_URL: 'postgres://user:pass@localhost:5432/db',
         NODE_ENV: 'development',
         DATABASE_POOL_SIZE: 10,
         DATABASE_POOL_TIMEOUT_SECONDS: 10,
         LOG_LEVEL: 'info',
+        AUTH_ENABLED: false,
+        AUTH_MAIL_PROVIDER: 'none',
+        AUTH_MAIL_SMTP_SECURE: false,
       });
     }
+  });
+
+  it('requires the auth secret and database when auth is enabled (the default)', () => {
+    const result = serverEnvSchema.safeParse({
+      DATABASE_URL: 'postgres://localhost/db',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it.each([
+    ['true', true],
+    ['false', false],
+  ])('reads the flag AUTH_MAIL_SMTP_SECURE=%s as %s', (raw, expected) => {
+    const result = serverEnvSchema.safeParse({
+      ...AUTH_DISABLED,
+      DATABASE_URL: 'postgres://localhost/db',
+      AUTH_MAIL_SMTP_SECURE: raw,
+    });
+    expect(result.success && result.data.AUTH_MAIL_SMTP_SECURE).toBe(expected);
   });
 
   it('fails if the required DATABASE_URL is missing', () => {
@@ -34,6 +60,7 @@ describe('serverEnvSchema', () => {
 
   it('coerces string values to integers for pool configurations', () => {
     const result = serverEnvSchema.safeParse({
+      ...AUTH_DISABLED,
       DATABASE_URL: 'postgres://localhost/db',
       DATABASE_POOL_SIZE: '15',
       DATABASE_POOL_TIMEOUT_SECONDS: '5',

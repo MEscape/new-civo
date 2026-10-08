@@ -11,8 +11,7 @@ import {
   CardTitle,
 } from '@components/ui/card';
 
-import { getAppFormatters } from '@i18n/formatters.server';
-import { getTranslations } from '@i18n/server';
+import { getAppFormatters, getTranslations } from '@i18n/server';
 
 import { trimToNull } from '@lib/utils';
 

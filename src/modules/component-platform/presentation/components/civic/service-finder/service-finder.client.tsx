@@ -8,7 +8,7 @@ import { DynamicIcon } from '@components/ui/dynamic-icon';
 import { Search } from '@components/ui/icons';
 import { Input } from '@components/ui/input';
 
-const FALLBACK_ICON = 'arrow-right' as const;
+const FALLBACK_ICON = 'arrowRight' as const;
 
 export interface ServiceFinderItem {
   readonly id: string;
@@ -69,7 +69,7 @@ function CategoryChip({ label, active, onSelect }: CategoryChipProps) {
       aria-pressed={active}
       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
         active
-          ? 'bg-primary text-white'
+          ? 'bg-primary text-primary-foreground'
           : 'bg-surface text-copy-muted hover:text-copy'
       }`}
     >
@@ -155,12 +155,12 @@ export function ServiceFinderClient({
                   <DynamicIcon
                     name={service.icon}
                     fallback={FALLBACK_ICON}
-                    className="h-5 w-5 text-primary"
+                    className="h-5 w-5 text-primary-copy"
                     aria-hidden="true"
                   />
                 </Card>
                 <CardContent className="flex-1 p-0">
-                  <p className="text-sm font-medium text-copy group-hover:text-primary">
+                  <p className="text-sm font-medium text-copy group-hover:text-primary-copy">
                     {service.title}
                   </p>
                   {service.description !== undefined && (

@@ -30,6 +30,13 @@ export interface PropOptionDescriptor {
   readonly labelKey: string | null;
 }
 
+/** One field of an `items` entry, e.g. the question of an FAQ entry. */
+export interface PropItemFieldDescriptor {
+  readonly key: string;
+  readonly labelKey: string;
+  readonly multiline: boolean;
+}
+
 /**
  * One editable prop. Explicit `null`s instead of optional keys keep the
  * shape uniform and JSON-safe.
@@ -46,6 +53,8 @@ export interface PropFieldDescriptor {
   readonly bounds: CatalogBoundsView | null;
   /** The content kind a `dataset` control filters by. */
   readonly canonicalKind: ContentKind | null;
+  /** The fields of one entry of an `items` control; empty otherwise. */
+  readonly itemFields: readonly PropItemFieldDescriptor[];
 }
 
 /** A node without identity: ids are assigned when it is instantiated. */

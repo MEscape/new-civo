@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import { useAppFormatters } from '@i18n';
+import { useAppFormatters } from '@i18n/client';
 
 import { EmptyState } from '@components/layout/layout-primitives';
 import { Badge } from '@components/ui/badge';
